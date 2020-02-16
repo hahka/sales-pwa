@@ -1,45 +1,60 @@
 {
-  "extends": "tslint:recommended",
+  "extends": [
+      "tslint:recommended",
+      "tslint-config-prettier"
+  ],
+  "rulesDirectory": [
+    "codelyzer"
+  ],
   "rules": {
+    "no-construct": true,
+    "prefer-object-spread": true,
+    "prefer-readonly": true,
+    "prefer-template": true,
+    "no-duplicate-imports": true,
+    "no-invalid-template-strings": true,
+    "no-unnecessary-initializer": true,
+    "no-parameter-reassignment": true,
+    "unnecessary-constructor": true,
+    "unnecessary-else": true,
+    "newline-before-return": true,
+    "variable-name": {
+      "options": [
+        "ban-keywords",
+        "check-format",
+        "allow-leading-underscore"
+      ]
+    },
     "array-type": false,
-    "arrow-parens": false,
     "deprecation": {
       "severity": "warning"
     },
-    "component-class-suffix": true,
-    "contextual-lifecycle": true,
-    "directive-class-suffix": true,
-    "directive-selector": [
-      true,
-      "attribute",
-      "app",
-      "camelCase"
-    ],
-    "component-selector": [
-      true,
-      "element",
-      "app",
-      "kebab-case"
-    ],
     "import-blacklist": [
       true,
       "rxjs/Rx"
     ],
     "interface-name": false,
     "max-classes-per-file": false,
-    "max-line-length": [
-      true,
-      140
-    ],
     "member-access": false,
     "member-ordering": [
       true,
       {
         "order": [
-          "static-field",
-          "instance-field",
-          "static-method",
-          "instance-method"
+          "public-static-field",
+          "public-static-method",
+          "protected-static-field",
+          "protected-static-method",
+          "private-static-field",
+          "private-static-method",
+          "public-instance-field",
+          "protected-instance-field",
+          "private-instance-field",
+          "public-constructor",
+          "protected-constructor",
+          "private-constructor",
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
         ]
       }
     ],
@@ -65,13 +80,15 @@
       true,
       "as-needed"
     ],
-    "object-literal-sort-keys": false,
-    "ordered-imports": false,
-    "quotemark": [
+    "object-literal-sort-keys": [
       true,
-      "single"
+      "shorthand-first",
+      "match-declaration-order-only"
     ],
-    "trailing-comma": false,
+    "ordered-imports": true,
+    "component-class-suffix": true,
+    "contextual-lifecycle": true,
+    "directive-class-suffix": true,
     "no-conflicting-lifecycle": true,
     "no-host-metadata-property": true,
     "no-input-rename": true,
@@ -85,7 +102,7 @@
     "use-lifecycle-interface": true,
     "use-pipe-transform-interface": true
   },
-  "rulesDirectory": [
-    "codelyzer"
-  ]
+  "linterOptions": {
+    "exclude": ["tests/mocks/**/**"]
+  }
 }
