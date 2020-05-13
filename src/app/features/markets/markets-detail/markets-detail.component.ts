@@ -1,10 +1,12 @@
 import { Location } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketsService } from 'src/app/core/services/features/markets.service';
 import { DetailComponent } from 'src/app/shared/components/detail/detail.component';
 import { Market } from 'src/app/shared/models/market.model';
+import { POSTGRESQL_DUPLICATION_CODE } from 'src/app/utils/error_codes.util';
 
 @Component({
   selector: 'app-markets-detail',
@@ -35,5 +37,17 @@ export class MarketsDetailComponent extends DetailComponent<Market> {
 
   patchForm(market: Market): void {
     this.form.patchValue(market);
+  }
+
+  onHttpError(httpError: HttpErrorResponse): void {
+    if (
+      httpError.error &&
+      httpError.error.code &&
+      httpError.error.code === POSTGRESQL_DUPLICATION_CODE
+    ) {
+      if (this.form.controls.name) {
+        this.form.controls.name.setErrors({ duplicated: true });
+      }
+    }
   }
 }
