@@ -1,0 +1,29 @@
+:host {
+  background-color: inherit;
+}
+
+.pageHeaderContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: sticky;
+  top: 24px;
+  background: inherit;
+  z-index: 100;
+}
+
+.btn-back {
+  margin-right: 16px;
+}
+
+.page-header-title {
+  font-size: 24px;
+  vertical-align: middle;
+}
+
+.buttons-container {
+  & > button {
+    margin-left: 10px;
+  }
+}

@@ -9,20 +9,25 @@
     "test:cov": "ng test --code-coverage --source-map",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "ncu": "npx npm-check-updates -u && npm install"
+    "ncu": "npx npm-check-updates -u && npm install",
+    "http-serve": "npx http-server -p 8080 -c-1 dist/sales-pwa-app/"
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "~9.1.4",
+    "@angular/cdk": "^9.2.3",
     "@angular/common": "~9.1.4",
     "@angular/compiler": "~9.1.4",
     "@angular/core": "~9.1.4",
     "@angular/forms": "~9.1.4",
+    "@angular/material": "^9.2.3",
     "@angular/platform-browser": "~9.1.4",
     "@angular/platform-browser-dynamic": "~9.1.4",
     "@angular/pwa": "^0.901.4",
     "@angular/router": "~9.1.4",
     "@angular/service-worker": "~9.1.4",
+    "@ngx-translate/core": "^12.1.2",
+    "@ngx-translate/http-loader": "^4.0.0",
     "rxjs": "~6.5.5",
     "tslib": "^1.11.1",
     "zone.js": "~0.10.3"

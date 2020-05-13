@@ -1,0 +1,11 @@
+{
+    "common": {
+        "name": "Nom",
+        "search": "Rechercher"
+    },
+    "features": {
+        "markets": {
+            "title": "Marchés"
+        }
+    }
+}

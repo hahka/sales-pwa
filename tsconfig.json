@@ -23,14 +23,6 @@
       "es2018",
       "dom"
     ],
-    "paths": {
-      "beyond-defects-lib": [
-        "dist/beyond-defects-lib",
-      ],
-      "beyond-defects-lib/*": [
-        "dist/beyond-defects-lib/*",
-      ],
-    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
