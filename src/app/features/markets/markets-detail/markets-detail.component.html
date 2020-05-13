@@ -1,0 +1,24 @@
+<ng-container *ngIf="detailId$ | async as detailId">
+  <app-page-header
+    title="{{ 'features.markets.title' | translate }}"
+    [control]="form"
+    [isArchived]="isArchived"
+    (pageHeaderEvent)="onPageHeaderEvent($event)"
+  ></app-page-header>
+  <mat-card>
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="detail$ | async as detail">
+      <h3>{{ 'common.information' | translate }}</h3>
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>{{ 'common.name' | translate }}</mat-label>
+        <input matInput formControlName="name" required />
+        <mat-error *ngIf="form.controls.name?.errors?.duplicated"
+          >{{ 'features.markets.form.errors.name_duplicated' | translate }}
+        </mat-error>
+      </mat-form-field>
+    </form>
+  </mat-card>
+</ng-container>
+<app-api-obs-helper
+  (postedOrPatched)="onPostedOrPatched($event)"
+  (httpError)="onHttpError($event)"
+></app-api-obs-helper>

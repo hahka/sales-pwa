@@ -62,22 +62,22 @@ export abstract class ApiService<T> {
    * @param resource The resource to patch
    */
   public postOrPatch(resource: BaseModel): Observable<T> {
-    let apiCall$: Observable<Detail<T>>;
-    if (!resource._id) {
-      apiCall$ = this.httpClient.post<Detail<T>>(
+    let apiCall$: Observable<T>;
+    const resourceId = resource.id;
+    delete resource.id;
+    if (!resourceId) {
+      apiCall$ = this.httpClient.post<T>(
         `${this.environmentService.apiUrl}${this.resource}`,
         resource,
       );
     } else {
-      const resourceToPatch = { ...resource };
-      delete resourceToPatch._id;
-      apiCall$ = this.httpClient.patch<Detail<T>>(
-        `${this.environmentService.apiUrl}${this.resource}/${resource._id}`,
-        resourceToPatch,
+      apiCall$ = this.httpClient.patch<T>(
+        `${this.environmentService.apiUrl}${this.resource}/${resourceId}`,
+        resource,
       );
     }
 
-    return apiCall$.pipe(take(1), pluck('data'));
+    return apiCall$.pipe(take(1));
   }
 
   /** Fetches all resources from the API for the giver resource */

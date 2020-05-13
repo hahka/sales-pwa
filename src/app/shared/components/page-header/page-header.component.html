@@ -20,18 +20,18 @@
     <ng-content select="[buttons]"></ng-content>
     <div *ngIf="readonly">
       <button mat-stroked-button color="primary" (click)="onClick(PageHeaderAction.UPDATE)">
-        {{ 'common.action.update' }}
+        {{ 'common.action.update' | translate }}
       </button>
     </div>
     <div *ngIf="!readonly" class="buttons-container">
       <ng-container *ngIf="displayArchive">
         <button mat-stroked-button color="warn" (click)="onClick(PageHeaderAction.ARCHIVE)">
-          {{ isArchived ? 'common.action.unarchive' : 'common.action.archive' }}
+          {{ isArchived ? 'common.action.unarchive' : ('common.action.archive' | translate) }}
         </button>
       </ng-container>
 
       <button mat-stroked-button color="primary" (click)="onClick(PageHeaderAction.CANCEL)">
-        {{ 'common.action.cancel' }}
+        {{ 'common.action.cancel' | translate }}
       </button>
       <button
         mat-flat-button
@@ -40,7 +40,7 @@
         [disabled]="disableValidate || (control && !control.valid) || !!isArchived"
         (click)="onClick(PageHeaderAction.SAVE)"
       >
-        {{ 'common.action.save' }}
+        {{ 'common.action.save' | translate }}
       </button>
     </div>
   </div>

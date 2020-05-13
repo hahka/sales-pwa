@@ -76,7 +76,7 @@ export class DatatableComponent implements OnDestroy {
   /** Redirects to the detail page of clicked row */
   onRowClick(row: BaseModel): void {
     if (this.clickEvent === DatatableClickEvent.REDIRECT) {
-      this.router.navigate(['.', row._id], { relativeTo: this.activatedRoute });
+      this.router.navigate(['.', row.id], { relativeTo: this.activatedRoute });
     } else {
       this.rowClicked.emit(row);
     }

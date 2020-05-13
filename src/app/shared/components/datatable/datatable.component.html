@@ -1,8 +1,13 @@
-<app-page-header [title]="datatableTitle" [displayBack]="false" *ngIf="showPageHeader">
+<app-page-header
+  [title]="datatableTitle"
+  [displayBack]="false"
+  [forList]="true"
+  *ngIf="showPageHeader"
+>
   <div buttons>
     <button mat-flat-button color="primary" [routerLink]="'new'">
       <mat-icon matPrefix>add</mat-icon>
-      {{ 'common.action.add' }}
+      {{ 'common.action.add' | translate }}
     </button>
   </div>
 </app-page-header>
