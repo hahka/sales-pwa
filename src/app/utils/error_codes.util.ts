@@ -1,0 +1,1 @@
+export const POSTGRESQL_DUPLICATION_CODE = '23505';
