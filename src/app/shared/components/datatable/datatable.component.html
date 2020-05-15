@@ -64,7 +64,7 @@
     <mat-row
       *matRowDef="let row; columns: displayedColumns"
       (click)="onRowClick(row)"
-      [ngClass]="{ '--activated': activatedObject?._id === row._id }"
+      [ngClass]="{ '--activated': activatedObject?.id === row._id }"
     ></mat-row>
   </mat-table>
 
