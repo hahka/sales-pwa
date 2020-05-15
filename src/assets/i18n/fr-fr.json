@@ -1,0 +1,25 @@
+{
+    "common": {
+        "action": {
+            "add": "Ajouter",
+            "archive": "Archiver",
+            "cancel": "Annuler",
+            "unarchive": "Restaurer",
+            "update": "Mettre à jour",
+            "save": "Enregistrer"
+        },
+        "information": "Informations",
+        "name": "Nom",
+        "search": "Rechercher"
+    },
+    "features": {
+        "markets": {
+            "form": {
+                "errors": {
+                    "name_duplicated": "Un marché portant ce nom est déjà existant"
+                }
+            },
+            "title": "Marchés"
+        }
+    }
+}

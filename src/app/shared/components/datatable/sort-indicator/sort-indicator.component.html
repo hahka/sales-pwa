@@ -1,0 +1,9 @@
+<div
+  *ngIf="dataSource?.getSort() | async as sort; else noSort"
+  class="sort-by"
+  [ngClass]="{
+    asc: sort.field === field && sort.order === 1,
+    desc: sort.field === field && sort.order === -1
+  }"
+></div>
+<ng-template #noSort><div class="sort-by"></div></ng-template>
