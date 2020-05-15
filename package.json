@@ -1,16 +1,21 @@
 {
   "name": "sales-pwa-app",
   "version": "0.0.0",
+  "engines": {
+    "node": "10.19.0",
+    "npm": "6.13.4"
+  },
   "scripts": {
     "ng": "ng",
-    "start": "http-server -p 8080 -c-1 dist/sales-pwa-app/",
-    "build": "ng build",
+    "start": "node server.js",
+    "build": "ng build --prod",
     "test": "ng test",
     "test:cov": "ng test --code-coverage --source-map",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "ncu": "npx npm-check-updates -u && npm install",
-    "http-serve": "npx http-server -p 8080 -c-1 dist/sales-pwa-app/"
+    "http-serve": "npx http-server -p 8080 -c-1 dist/sales-pwa-app/",
+    "heroku-postbuild": "ng build --prod"
   },
   "private": true,
   "dependencies": {
@@ -28,8 +33,11 @@
     "@angular/service-worker": "~9.1.4",
     "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^4.0.0",
+    "express": "^4.17.1",
+    "path": "^0.12.7",
     "rxjs": "~6.5.5",
     "tslib": "^1.11.1",
+    "typescript": "~3.8.3",
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
@@ -52,7 +60,6 @@
     "protractor": "^6.0.0",
     "ts-node": "~8.9.1",
     "tslint": "~6.1.2",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "~3.8.3"
+    "tslint-config-prettier": "^1.18.0"
   }
 }
