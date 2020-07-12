@@ -6,6 +6,10 @@ const routes: Routes = [
     path: 'markets',
     loadChildren: () => import('./features/markets/markets.module').then((m) => m.MarketsModule),
   },
+  {
+    path: 'products',
+    loadChildren: () => import('./features/products/products.module').then((m) => m.ProductsModule),
+  },
 ];
 
 @NgModule({

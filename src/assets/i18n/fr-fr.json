@@ -20,6 +20,14 @@
                 }
             },
             "title": "Marchés"
+        },
+        "products": {
+            "form": {
+                "errors": {
+                    "name_duplicated": "Un produit portant ce nom est déjà existant"
+                }
+            },
+            "title": "Produits"
         }
     }
 }

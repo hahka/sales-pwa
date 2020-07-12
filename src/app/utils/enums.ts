@@ -1,0 +1,4 @@
+export enum PRODUCT_CATEGORIES {
+  FRESH = 'FRESH',
+  FROZEN = 'FROZEN',
+}
