@@ -41,7 +41,6 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
       price: [null, [Validators.required, Validators.min(0)]],
       category: ['', Validators.required],
       image: [null],
-      stockQuantity: [0, Validators.min(0)],
     });
   }
 

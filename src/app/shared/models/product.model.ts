@@ -5,5 +5,4 @@ export class Product {
   name: string;
   price: number;
   category: PRODUCT_CATEGORIES;
-  stockQuantity: number;
 }
