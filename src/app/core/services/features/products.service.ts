@@ -7,4 +7,10 @@ import { ApiService } from '../api/api.service';
 })
 export class ProductsService extends ApiService<Product> {
   resource = 'products';
+
+  getImage(id: string) {
+    return this.httpClient.get(`${this.environmentService.apiUrl}${this.resource}/${id}/image`, {
+      responseType: 'text',
+    });
+  }
 }

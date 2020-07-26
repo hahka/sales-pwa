@@ -1,0 +1,56 @@
+<ng-container *ngIf="detailId$ | async as detailId">
+  <app-page-header
+    title="{{ 'features.products.title' | translate }}"
+    [control]="form"
+    [isArchived]="isArchived"
+    (pageHeaderEvent)="onPageHeaderEvent($event)"
+  ></app-page-header>
+  <mat-card>
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="detail$ | async as detail">
+      <h3>{{ 'common.information' | translate }}</h3>
+      <div class="container">
+        <div class="form-group">
+          <input type="file" name="image" (change)="fileProgress($event)" accept=".jpg,.png" />
+        </div>
+        <div *ngIf="fileUploadProgress">Upload progress: {{ fileUploadProgress }}</div>
+        <div class="image-preview" *ngIf="previewUrl">
+          <img [src]="previewUrl" />
+        </div>
+
+        <div *ngIf="uploadedFilePath">
+          {{ uploadedFilePath }}
+        </div>
+      </div>
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>{{ 'common.name' | translate }}</mat-label>
+        <input matInput formControlName="name" required />
+        <mat-error *ngIf="form.controls.name?.errors?.duplicated"
+          >{{ 'features.products.form.errors.name_duplicated' | translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>{{ 'common.price' | translate }}</mat-label>
+        <input matInput formControlName="price" required type="number" />
+        <mat-error *ngIf="form.controls.price?.errors?.negative"
+          >{{ 'features.products.form.errors.price_negative' | translate }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'common.product_category' | translate }}</mat-label>
+        <mat-select formControlName="category" required>
+          <mat-option *ngFor="let option of productCategories" [value]="option">
+            {{ option | translate }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'common.stock_quantity' | translate }}</mat-label>
+        <input matInput formControlName="stockQuantity" type="number" />
+      </mat-form-field>
+    </form>
+  </mat-card>
+</ng-container>
+<app-api-obs-helper
+  (postedOrPatched)="onPostedOrPatched($event)"
+  (httpError)="onHttpError($event)"
+></app-api-obs-helper>

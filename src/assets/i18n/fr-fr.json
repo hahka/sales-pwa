@@ -10,7 +10,10 @@
         },
         "information": "Informations",
         "name": "Nom",
-        "search": "Rechercher"
+        "price": "Prix",
+        "product_category": "Catégorie de produit",
+        "search": "Rechercher",
+        "stock_quantity": "Quantité en stock"
     },
     "features": {
         "markets": {
