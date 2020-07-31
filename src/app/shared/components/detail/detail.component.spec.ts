@@ -60,7 +60,7 @@ describe('DetailComponent', () => {
     const disableSpy = spyOn(instance, 'disable').and.callFake(() => {});
     const submitSpy = spyOn(instance, 'submit').and.callFake(() => {});
     const nextSpy = spyOn(instance.refresh, 'next').and.callFake(() => {});
-    const location = TestBed.get(Location);
+    const location = TestBed.inject(Location);
 
     expect(location.back).toHaveBeenCalledTimes(0);
     instance.onPageHeaderEvent({ action: PageHeaderAction.BACK });
@@ -96,8 +96,8 @@ describe('DetailComponent', () => {
   it('should handle onPostedOrPatched', async () => {
     const { instance } = await shallow.mock(DetailMockComponent, {}).render();
     const disableSpy = spyOn(instance, 'disable').and.callFake(() => {});
-    const router = TestBed.get(Router);
-    const activatedRoute = TestBed.get(ActivatedRoute);
+    const router = TestBed.inject(Router);
+    const activatedRoute = TestBed.inject(ActivatedRoute);
 
     expect(disableSpy).toHaveBeenCalledTimes(0);
     instance.detailId = 'fakeId';

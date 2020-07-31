@@ -11,7 +11,7 @@ import { BaseModel } from '../../models/api/base.model';
   templateUrl: './api-obs-helper.component.html',
   styleUrls: ['./api-obs-helper.component.scss'],
 })
-export class ApiObsHelperComponent<T> {
+export class ApiObsHelperComponent<T extends BaseModel> {
   /** The apiService corresponding to the current resource */
   _apiService: ApiService<T>;
 

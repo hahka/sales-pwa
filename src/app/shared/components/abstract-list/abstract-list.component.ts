@@ -1,7 +1,8 @@
 import { ApiDataSource } from '../../models/api/api-datasource.model';
+import { BaseModel } from '../../models/api/base.model';
 import { FullColumn } from '../datatable/full-column.model';
 
-export abstract class AbstractListComponent<T> {
+export abstract class AbstractListComponent<T extends BaseModel> {
   /** DataSource that will be used to display data and centralize communication between app and api */
   abstract dataSource: ApiDataSource<T>;
 

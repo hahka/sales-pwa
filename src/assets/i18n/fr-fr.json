@@ -10,7 +10,10 @@
         },
         "information": "Informations",
         "name": "Nom",
-        "search": "Rechercher"
+        "price": "Prix",
+        "product_category": "Catégorie de produit",
+        "search": "Rechercher",
+        "stock_quantity": "Quantité en stock"
     },
     "features": {
         "markets": {
@@ -20,6 +23,14 @@
                 }
             },
             "title": "Marchés"
+        },
+        "products": {
+            "form": {
+                "errors": {
+                    "name_duplicated": "Un produit portant ce nom est déjà existant"
+                }
+            },
+            "title": "Produits"
         }
     }
 }

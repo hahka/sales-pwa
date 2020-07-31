@@ -3,14 +3,21 @@ import { Shallow } from 'shallow-render';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { ApiDataSource } from '../../models/api/api-datasource.model';
+import { BaseModel } from '../../models/api/base.model';
 import { DatatableComponent } from './datatable.component';
 import { DatatableModule } from './datatable.module';
 
+export class Fake extends BaseModel {
+  fakeField1: any;
+  fakeField2: any;
+  fakeField3: any;
+}
+
 describe('DatatableComponent', () => {
-  let shallow: Shallow<DatatableComponent>;
+  let shallow: Shallow<DatatableComponent<Fake>>;
 
   beforeEach(() => {
-    shallow = new Shallow(DatatableComponent, DatatableModule)
+    shallow = new Shallow<DatatableComponent<Fake>>(DatatableComponent, DatatableModule)
       .provide(ActivatedRoute)
       .provide(Router)
       .provide(ApiDataSource)
@@ -34,20 +41,6 @@ describe('DatatableComponent', () => {
       { field: 'fakeField2', label: 'fakeLabel2' },
     ];
     expect(instance.displayedColumns).toEqual(['fakeField1', 'fakeField2']);
-  });
-
-  it('should add select to displayedColumns when selectable', async () => {
-    const { instance } = await shallow.render();
-    expect(instance.displayedColumns).toEqual([]);
-    instance.fullColumns = [];
-    expect(instance.displayedColumns).toEqual([]);
-    instance.fullColumns = [
-      { field: 'fakeField1', label: 'fakeLabel1' },
-      { field: 'fakeField2', label: 'fakeLabel2' },
-    ];
-    expect(instance.displayedColumns).toEqual(['fakeField1', 'fakeField2']);
-    instance.selectable = true;
-    expect(instance.displayedColumns).toEqual(['select', 'fakeField1', 'fakeField2']);
   });
 
   it('should handle onSortChange', async () => {

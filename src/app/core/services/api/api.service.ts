@@ -11,7 +11,7 @@ import { EnvironmentService } from '../environment/environment.service';
 @Injectable({
   providedIn: 'root',
 })
-export abstract class ApiService<T> {
+export abstract class ApiService<T extends BaseModel> {
   /** API base endpoint for resource */
   abstract resource: string;
 
