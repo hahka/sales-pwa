@@ -1,18 +1,22 @@
-import { Shallow } from 'shallow-render';
-
 import { Location } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Shallow } from 'shallow-render';
+
 import { MockOfActivatedRoute } from 'tests/mocks/activated-route.mock';
+import { BaseModel } from '../../models/api/base.model';
 import { PageHeaderAction } from '../page-header/page-header-action.enum';
 import { DetailMockComponent } from './detail-mock/detail-mock.component';
 import { DetailComponent } from './detail.component';
 import { DetailModule } from './detail.module';
 
+export class FakeDetail extends BaseModel {}
+
 describe('DetailComponent', () => {
-  let shallow: Shallow<DetailComponent<any>>;
+  let shallow: Shallow<DetailComponent<FakeDetail>>;
 
   const childComponent = jasmine.createSpyObj('ApiObsHelper', ['archive', 'postOrPatch']);
 
@@ -25,6 +29,7 @@ describe('DetailComponent', () => {
         back: () => {},
       })
       .import(RouterTestingModule)
+      .import(HttpClientTestingModule)
       .mock(Router, {
         navigate: jasmine.createSpy('navigate'),
       });
@@ -101,12 +106,12 @@ describe('DetailComponent', () => {
 
     expect(disableSpy).toHaveBeenCalledTimes(0);
     instance.detailId = 'fakeId';
-    instance.onPostedOrPatched({ _id: '' });
+    instance.onPostedOrPatched({ id: '' });
     expect(disableSpy).toHaveBeenCalledTimes(1);
 
     expect(disableSpy).toHaveBeenCalledTimes(1);
     instance.detailId = 'new';
-    instance.onPostedOrPatched({ _id: 'createdId' });
+    instance.onPostedOrPatched({ id: 'createdId' });
     expect(router.navigate).toHaveBeenCalledWith(['..', 'createdId'], {
       relativeTo: activatedRoute,
       replaceUrl: true,

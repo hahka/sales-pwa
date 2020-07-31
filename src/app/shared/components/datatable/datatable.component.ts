@@ -42,7 +42,7 @@ export class DatatableComponent<T extends BaseModel> implements OnDestroy {
   @Input() clickEvent = DatatableClickEvent.REDIRECT;
 
   /** DataSource to fetch data from the api and handle search and sort */
-  @Input() dataSource: ApiDataSource<BaseModel>;
+  @Input() dataSource: ApiDataSource<T>;
 
   /** Boolean to show/hide the columns header (mat-header-row) */
   @Input() headerRowOptions = { isDisplayed: true, canSort: true };
@@ -85,7 +85,7 @@ export class DatatableComponent<T extends BaseModel> implements OnDestroy {
   /**
    * Sorts the wanted field with the wanted direction, or undefined if no direction (no default sort)
    */
-  onSortChange(active: any, direction: 'asc' | 'desc' | ''): void {
+  onSortChange(active: keyof T, direction: 'asc' | 'desc' | ''): void {
     if (this.headerRowOptions && this.headerRowOptions.canSort) {
       if (!direction) {
         this.dataSource.sortBy(undefined);

@@ -1,25 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { Shallow } from 'shallow-render';
 
+import { ApiServiceMock } from 'tests/mocks/api-service.mock';
+import { MarketsService } from '../../core/services/features/markets.service';
 import { MarketsComponent } from './markets.component';
+import { MarketsModule } from './markets.module';
 
 describe('MarketsComponent', () => {
-  let component: MarketsComponent;
-  let fixture: ComponentFixture<MarketsComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ MarketsComponent ]
-    })
-    .compileComponents();
-  }));
+  let shallow: Shallow<MarketsComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MarketsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    shallow = new Shallow(MarketsComponent, MarketsModule).provide([
+      { provide: MarketsService, useClass: ApiServiceMock },
+    ]);
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should create', async () => {
+    const { instance } = await shallow.render();
+    expect(instance).toBeTruthy();
   });
 });
