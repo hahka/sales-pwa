@@ -9,16 +9,11 @@
     <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="detail$ | async as detail">
       <h3>{{ 'common.information' | translate }}</h3>
       <div class="container">
-        <div class="form-group">
-          <input type="file" name="image" (change)="fileProgress($event)" accept=".jpg,.png" />
-        </div>
-        <div *ngIf="fileUploadProgress">Upload progress: {{ fileUploadProgress }}</div>
         <div class="image-preview" *ngIf="previewUrl">
           <img [src]="previewUrl" />
         </div>
-
-        <div *ngIf="uploadedFilePath">
-          {{ uploadedFilePath }}
+        <div class="form-group" *ngIf="form.enabled">
+          <input type="file" name="image" (change)="onFileInputChange($event)" accept=".jpg,.png" />
         </div>
       </div>
       <mat-form-field appearance="outline" floatLabel="always">

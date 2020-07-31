@@ -21,10 +21,9 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
 
   fileData: File | undefined = undefined;
   previewUrl: any = null;
-  fileUploadProgress: string | undefined = undefined;
-  uploadedFilePath: string | undefined = undefined;
 
-  imageToUpload: any;
+  /** Tells wether the image should be patched. */
+  imageShouldBePatched: boolean;
 
   constructor(
     protected readonly activatedRoute: ActivatedRoute,
@@ -49,10 +48,16 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
   }
 
   getFormattedData(): Product {
-    return this.form.value;
+    const formValue = this.form.value;
+    if (!this.imageShouldBePatched) {
+      delete formValue.image;
+    }
+
+    return formValue;
   }
 
   patchForm(product: Product): void {
+    this.imageShouldBePatched = false;
     this.form.patchValue(product);
     this.productsService.getImage(product.id).subscribe((data: any) => {
       this.previewUrl = data
@@ -73,12 +78,14 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
     }
   }
 
-  fileProgress(fileInput: any) {
+  onFileInputChange(fileInput: any) {
     this.fileData = fileInput.target.files[0] as File;
-    this.preview();
+    this.imageShouldBePatched = true;
+    this.previewAndPatchValue();
   }
 
-  preview() {
+  /** Previews the image to upload and patches form's value. */
+  previewAndPatchValue() {
     if (this.fileData) {
       // Show preview
       const mimeType = this.fileData.type;
@@ -87,12 +94,10 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
       }
 
       const reader = new FileReader();
-      // reader.readAsDataURL(this.fileData);
       reader.readAsArrayBuffer(this.fileData);
       reader.onload = (_event) => {
         const result = reader.result;
         if (result) {
-          // this.previewUrl = result;
           const data = new Uint8Array(result as ArrayBuffer);
           const len = (result as ArrayBuffer).byteLength;
           let binary = '';
@@ -100,11 +105,9 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
             binary += String.fromCharCode(data[i]);
           }
           const base64 = window.btoa(binary);
-          // this.imageToUpload = base64;
           this.previewUrl = this.domSanitizer.bypassSecurityTrustUrl(
             `data:image/png;base64, ${base64}`,
           );
-          console.log(this.previewUrl);
           this.form.patchValue({ image: base64 });
 
           return base64;
