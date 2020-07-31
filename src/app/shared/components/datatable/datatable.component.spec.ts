@@ -46,7 +46,7 @@ describe('DatatableComponent', () => {
   it('should handle onSortChange', async () => {
     const { instance } = await shallow.render();
     instance.dataSource = new ApiDataSource(() => of(), { initialQuery: { search: '' } });
-    const sortBySpy = spyOn(instance.dataSource, 'sortBy');
+    const sortBySpy = spyOn(instance.dataSource, 'sortBy').and.callFake(() => {});
     expect(sortBySpy).not.toHaveBeenCalled();
     instance.onSortChange('fakeField1', '');
     expect(sortBySpy).toHaveBeenCalledWith(undefined);
