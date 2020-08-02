@@ -17,7 +17,7 @@ export class DetailMockComponent extends DetailComponent<any> {
     protected readonly router: Router,
   ) {
     super(activatedRoute, apiService, location, router);
-    this.form = new FormGroup({ _id: new FormControl('', Validators.required) });
+    this.form = new FormGroup({ id: new FormControl('', Validators.required) });
   }
 
   newData(): any {

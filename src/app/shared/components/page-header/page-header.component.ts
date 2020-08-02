@@ -58,7 +58,7 @@ export class PageHeaderComponent {
       return false;
     }
 
-    const id = this.control.get('_id');
+    const id = this.control.get('id');
 
     return id && id.value;
   }

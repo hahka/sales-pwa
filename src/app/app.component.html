@@ -15,6 +15,7 @@
         <a routerLink="/products">Produits</a>
       </mat-list-item>
     </mat-nav-list>
+    {{ (connectionStatusService.status | async) ? 'Online' : 'Offline' }}
   </mat-sidenav>
 
   <mat-sidenav-content>

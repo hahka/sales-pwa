@@ -13,7 +13,7 @@ export class AppComponent implements OnInit, OnDestroy {
   public offlineEvent: Observable<Event>;
   public subscriptions: Subscription[] = [];
 
-  constructor(private readonly connectionStatusService: ConnectionStatusService) {}
+  constructor(public readonly connectionStatusService: ConnectionStatusService) {}
 
   ngOnInit(): void {
     this.onlineEvent = fromEvent(window, 'online');
