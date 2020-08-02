@@ -8,6 +8,7 @@
   "scripts": {
     "ng": "ng",
     "bs": "ng build && npm run start",
+    "bs:pwa": "ng build --prod && npm run http-serve",
     "start": "node server.js",
     "build": "ng build --prod",
     "test": "ng test",
