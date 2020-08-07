@@ -8,4 +8,8 @@ import { StoresEnum } from '../idb.service';
 })
 export class MarketsService extends ApiService<Market> {
   resource = StoresEnum.MARKETS;
+
+  idbSearch(data: Market, keyword: string): boolean {
+    return data.name.toUpperCase().indexOf(keyword.toUpperCase()) !== -1;
+  }
 }

@@ -22,6 +22,8 @@ export abstract class ApiService<T extends BaseModel> {
     private readonly idbService: IdbService<T>,
   ) {}
 
+  abstract idbSearch(data: T, keyword: string): boolean;
+
   /**
    * Archives/Unarchives a resource corresponding to the given id
    * @param id Id of the resource to archive
@@ -66,7 +68,7 @@ export abstract class ApiService<T extends BaseModel> {
    * Posts or patches a resource via API
    * @param data The data to patch
    */
-  public postOrPatch(data: BaseModel): Observable<T> {
+  public postOrPatch(data: T): Observable<T> {
     const dataId = data.id;
     delete data.id;
     if (navigator.onLine) {
@@ -114,6 +116,8 @@ export abstract class ApiService<T extends BaseModel> {
       );
     }
 
-    return from(this.idbService.search(this.resource, pageRequest, dto) as Promise<any>);
+    return from(
+      this.idbService.search(this.resource, pageRequest, dto, this.idbSearch) as Promise<any>,
+    );
   }
 }

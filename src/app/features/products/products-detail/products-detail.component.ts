@@ -53,7 +53,7 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
       delete formValue.image;
     }
 
-    return formValue;
+    return new Product(formValue);
   }
 
   patchForm(product: Product): void {

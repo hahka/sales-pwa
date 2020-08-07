@@ -14,4 +14,8 @@ export class ProductsService extends ApiService<Product> {
       responseType: 'text',
     });
   }
+
+  idbSearch(data: Product, keyword: string): boolean {
+    return data.name.toUpperCase().indexOf(keyword.toUpperCase()) !== -1;
+  }
 }
