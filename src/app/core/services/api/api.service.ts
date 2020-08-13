@@ -16,10 +16,15 @@ export abstract class ApiService<T extends BaseModel> {
   /** API base endpoint for resource */
   abstract resource: StoresEnum;
 
+  abstract offlineRights: {
+    read: boolean;
+    manage: boolean;
+  };
+
   constructor(
     protected readonly environmentService: EnvironmentService,
     protected readonly httpClient: HttpClient,
-    private readonly idbService: IdbService<T>,
+    protected readonly idbService: IdbService<T>,
   ) {}
 
   abstract idbSearch(data: T, keyword: string): boolean;
@@ -91,7 +96,7 @@ export abstract class ApiService<T extends BaseModel> {
     return from(this.idbService.put(this.resource, data, dataId) as Promise<any>);
   }
 
-  /** Fetches all resources from the API for the giver resource */
+  /** Fetches all resources from the API for the given resource */
   public getAll(): Observable<T[]> {
     if (navigator.onLine) {
       return this.httpClient.get<T[]>(`${this.environmentService.apiUrl}${this.resource}`);
@@ -119,5 +124,9 @@ export abstract class ApiService<T extends BaseModel> {
     return from(
       this.idbService.search(this.resource, pageRequest, dto, this.idbSearch) as Promise<any>,
     );
+  }
+
+  public canManage() {
+    return navigator.onLine || (this.offlineRights && this.offlineRights.manage);
   }
 }

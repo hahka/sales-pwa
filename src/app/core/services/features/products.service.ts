@@ -8,6 +8,10 @@ import { StoresEnum } from '../idb.service';
 })
 export class ProductsService extends ApiService<Product> {
   resource = StoresEnum.PRODUCTS;
+  offlineRights = {
+    read: true,
+    manage: false,
+  };
 
   getImage(id: string) {
     return this.httpClient.get(`${this.environmentService.apiUrl}${this.resource}/${id}/image`, {

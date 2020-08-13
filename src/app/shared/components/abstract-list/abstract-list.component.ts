@@ -1,3 +1,4 @@
+import { ApiService } from '../../../core/services/api/api.service';
 import { ApiDataSource } from '../../models/api/api-datasource.model';
 import { BaseModel } from '../../models/api/base.model';
 import { FullColumn } from '../datatable/full-column.model';
@@ -11,4 +12,10 @@ export abstract class AbstractListComponent<T extends BaseModel> {
 
   /** Key used */
   abstract listPersistenceKey: string;
+
+  canManage: boolean;
+
+  constructor(private readonly apiService: ApiService<T>) {
+    this.canManage = this.apiService.canManage();
+  }
 }

@@ -122,4 +122,8 @@ export class IdbService<T extends BaseModel> {
       pagination: { page: 0, length: data.length, total },
     };
   }
+
+  public clearObjectStore(storeName: StoresEnum): Promise<void> {
+    return this.onlineIdb.clear(storeName);
+  }
 }
