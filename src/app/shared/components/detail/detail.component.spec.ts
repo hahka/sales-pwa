@@ -13,7 +13,10 @@ import { DetailMockComponent } from './detail-mock/detail-mock.component';
 import { DetailComponent } from './detail.component';
 import { DetailModule } from './detail.module';
 
-export class FakeDetail extends BaseModel {}
+export class FakeDetail implements BaseModel {
+  id: string;
+  public prepareForIdb() {}
+}
 
 describe('DetailComponent', () => {
   let shallow: Shallow<DetailComponent<FakeDetail>>;
@@ -106,12 +109,12 @@ describe('DetailComponent', () => {
 
     expect(disableSpy).toHaveBeenCalledTimes(0);
     instance.detailId = 'fakeId';
-    instance.onPostedOrPatched({ id: '' });
+    instance.onPostedOrPatched({ id: '' } as FakeDetail);
     expect(disableSpy).toHaveBeenCalledTimes(1);
 
     expect(disableSpy).toHaveBeenCalledTimes(1);
     instance.detailId = 'new';
-    instance.onPostedOrPatched({ id: 'createdId' });
+    instance.onPostedOrPatched({ id: 'createdId' } as FakeDetail);
     expect(router.navigate).toHaveBeenCalledWith(['..', 'createdId'], {
       relativeTo: activatedRoute,
       replaceUrl: true,

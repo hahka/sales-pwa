@@ -32,7 +32,7 @@ export class MarketsDetailComponent extends DetailComponent<Market> {
   }
 
   getFormattedData(): Market {
-    return this.form.value;
+    return new Market(this.form.value);
   }
 
   patchForm(market: Market): void {

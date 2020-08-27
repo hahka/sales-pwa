@@ -23,19 +23,14 @@ export interface LoadMore<T extends BaseModel> extends PageRequest<T> {
   canLoadMore: boolean;
 }
 
-export interface ApiResult {
-  /** True if the request is successfull, false otherwise */
-  success: boolean;
-}
-
-export interface Page<T extends BaseModel> extends ApiResult {
+export interface Page<T extends BaseModel> {
   /** Data fetched by the API */
   data: T[];
   /** Information about the pagination returned by the api */
   pagination: ApiPagination;
 }
 
-export interface Detail<T extends BaseModel> extends ApiResult {
+export interface Detail<T extends BaseModel> {
   /** Data fetched by the API */
   data: T;
 }

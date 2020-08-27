@@ -33,7 +33,7 @@ export abstract class DetailComponent<T extends BaseModel> implements AfterViewI
   /** Wether the object is instanciated and needs some processing (dialog when trying to archive, prevent some properties updates...) */
   isInstantiated: boolean;
 
-  /** Wether the objcdt is archived or not. Needs to be updated at GET/PATCH */
+  /** Wether the object is archived or not. Needs to be updated at GET/PATCH */
   isArchived = false;
 
   /** Observable of the object post/patch, called via async pipe if {loading === true} */

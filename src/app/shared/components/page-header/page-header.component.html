@@ -2,7 +2,7 @@
   <!-- Left cell: back button and title -->
   <div class="items left">
     <button
-      *ngIf="displayBack"
+      *ngIf="!forList"
       mat-mini-fab
       class="btn-back mat-elevation-z"
       color="white"
@@ -37,7 +37,7 @@
         mat-flat-button
         color="primary"
         class="btn--size-l"
-        [disabled]="disableValidate || (control && !control.valid) || !!isArchived"
+        [disabled]="(control && !control.valid) || !!isArchived"
         (click)="onClick(PageHeaderAction.SAVE)"
       >
         {{ 'common.action.save' | translate }}

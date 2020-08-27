@@ -24,7 +24,7 @@ export class MarketsComponent extends AbstractListComponent<Market> {
   listPersistenceKey: 'markets';
 
   constructor(private readonly marketsService: MarketsService) {
-    super();
+    super(marketsService);
     this.dataSource = new ApiDataSource<Market>(
       (request, query) => {
         return this.marketsService.search(request, query);

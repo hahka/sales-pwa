@@ -7,10 +7,13 @@ import { BaseModel } from '../../models/api/base.model';
 import { DatatableComponent } from './datatable.component';
 import { DatatableModule } from './datatable.module';
 
-export class Fake extends BaseModel {
+export class Fake implements BaseModel {
+  id: string;
   fakeField1: any;
   fakeField2: any;
   fakeField3: any;
+
+  prepareForIdb() {}
 }
 
 describe('DatatableComponent', () => {

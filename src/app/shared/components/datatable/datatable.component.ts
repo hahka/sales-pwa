@@ -41,6 +41,9 @@ export class DatatableComponent<T extends BaseModel> implements OnDestroy {
   /** DataSource to fetch data from the api and handle search and sort */
   @Input() clickEvent = DatatableClickEvent.REDIRECT;
 
+  // TODO: refactor input with an options input?
+  @Input() showAddButton = true;
+
   /** DataSource to fetch data from the api and handle search and sort */
   @Input() dataSource: ApiDataSource<T>;
 

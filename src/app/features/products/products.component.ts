@@ -24,7 +24,7 @@ export class ProductsComponent extends AbstractListComponent<Product> {
   listPersistenceKey: 'products';
 
   constructor(private readonly productsService: ProductsService) {
-    super();
+    super(productsService);
     this.dataSource = new ApiDataSource<Product>(
       (request, query) => {
         return this.productsService.search(request, query);

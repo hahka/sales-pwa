@@ -71,7 +71,7 @@ export class ApiObsHelperComponent<T extends BaseModel> {
    * Called on form submit, used to post/patch defect category
    * @param value The new value of the resource
    */
-  postOrPatch(value: BaseModel): void {
+  postOrPatch(value: T): void {
     this.posting$ = this.apiService
       .postOrPatch(value)
       .pipe(
