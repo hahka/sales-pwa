@@ -158,19 +158,24 @@ export abstract class DetailComponent<T extends BaseModel> implements AfterViewI
   }
 
   /**
-   * Event when api has been called to post or patch a resource. Need to redirect if resource creation.
+   * Redirects to parent page
    * @param data The created/updated resource returned by the api
    */
-  onPostedOrPatched(data: T): void {
-    if (this.detailId === 'new' && data.id) {
-      this.router.navigate(['..', data.id], {
-        relativeTo: this.activatedRoute,
-        replaceUrl: true,
-      });
-    } else {
-      this.patchForm(data);
-      this.disable();
-    }
+  onPostedOrPatched(_data: T): void {
+    // Old behavior, redirecting to newly created data, or disabling the form
+    // if (this.detailId === 'new' && data.id) {
+    //   this.router.navigate(['..', data.id], {
+    //     relativeTo: this.activatedRoute,
+    //     replaceUrl: true,
+    //   });
+    // } else {
+    //   this.patchForm(data);
+    //   this.disable();
+    // }
+
+    this.router.navigate(['..'], {
+      relativeTo: this.activatedRoute,
+    });
   }
 
   /** Called on form submit, used to post/patch defect category */
