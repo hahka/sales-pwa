@@ -6,6 +6,7 @@ export class Product implements BaseModel {
   name: string;
   price: number;
   category: PRODUCT_CATEGORIES;
+  image?: string;
 
   constructor(obj?: Product) {
     Object.assign(this, obj);
