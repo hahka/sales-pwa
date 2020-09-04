@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DoCheck, Input, IterableDiffer, IterableDiffers, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
 import { Product } from '../../shared/models/product.model';
@@ -30,6 +31,12 @@ export class StockComponent implements OnInit, DoCheck {
 
   isStockInitialized = false;
 
+  /** Used to know where categories of stock change between two items, to display the category */
+  indexOfDividers: number[] = [];
+
+  /** Width of the grid */
+  gridCols = 3;
+
   private categoriesDiff: IterableDiffer<STOCK_CATEGORIES>;
 
   constructor(
@@ -37,6 +44,7 @@ export class StockComponent implements OnInit, DoCheck {
     private readonly stockService: StockService,
     private readonly domSanitizer: DomSanitizer,
     private readonly iterableDiffers: IterableDiffers,
+    private readonly translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -72,7 +80,7 @@ export class StockComponent implements OnInit, DoCheck {
 
   onHttpError(_httpError: HttpErrorResponse): void {}
 
-  putStock() {
+  public updateStock() {
     const stockControl = this.form.get('stock') as FormArray | null;
     if (stockControl) {
       const newStock = new Stock();
@@ -83,6 +91,25 @@ export class StockComponent implements OnInit, DoCheck {
         this.initializeStock(true);
       });
     }
+  }
+
+  public resetFreshStock() {
+    const stockControl = this.form.get('stock') as FormArray | null;
+    if (stockControl) {
+      stockControl.controls.forEach((control) => {
+        if (control.value.category === STOCK_CATEGORIES.FRESH) {
+          control.patchValue({ quantity: 0 });
+        }
+      });
+    }
+  }
+
+  translateCategoryName(category: STOCK_CATEGORIES) {
+    return this.translateService.instant(`categories.stock.${category}`);
+  }
+
+  processMissingDividers(index: number) {
+    return index % this.gridCols;
   }
 
   increaseQuantity(i: number) {
@@ -127,20 +154,27 @@ export class StockComponent implements OnInit, DoCheck {
             });
           });
         });
-        dataBeforeSort
-          .sort((a, b) => {
-            return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
-          })
-          .forEach((data) => {
-            stockFormArray.push(
-              new FormGroup({
-                productId: new FormControl(data.productId),
-                name: new FormControl(data.name),
-                quantity: new FormControl(data.quantity),
-                category: new FormControl(data.category),
-              }),
-            );
-          });
+        const dataAfterSort = dataBeforeSort.sort((a, b) => {
+          return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
+        });
+        dataAfterSort.forEach((data, index) => {
+          if (this.categories.includes(data.category)) {
+            if (
+              index === 0 ||
+              dataAfterSort[index - 1].category !== dataAfterSort[index].category
+            ) {
+              this.indexOfDividers.push(index);
+            }
+          }
+          stockFormArray.push(
+            new FormGroup({
+              productId: new FormControl(data.productId),
+              name: new FormControl(data.name),
+              quantity: new FormControl(data.quantity),
+              category: new FormControl(data.category),
+            }),
+          );
+        });
         this.stock.stock.forEach((stockItem) => {
           const control = stockFormArray.controls.find(
             (fc) =>

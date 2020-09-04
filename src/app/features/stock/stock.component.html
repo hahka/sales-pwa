@@ -1,8 +1,16 @@
-<button (click)="putStock()">PUT</button>
 <form [formGroup]="form" *ngIf="form">
   <ng-container formArrayName="stock">
-    <mat-grid-list cols="3">
+    <mat-grid-list [cols]="gridCols">
       <ng-container *ngFor="let stockItem of form.get('stock')?.controls; let i = index">
+        <mat-grid-tile
+          [colspan]="processMissingDividers(i)"
+          class="grid-list__divider"
+          *ngIf="indexOfDividers.includes(i)"
+        ></mat-grid-tile
+        ><mat-grid-tile class="grid-list__divider" *ngIf="indexOfDividers.includes(i)">
+          {{ translateCategoryName(stockItem.value.category) }}
+        </mat-grid-tile>
+
         <mat-grid-tile *ngIf="categories.includes(stockItem.value.category)">
           <mat-card [formGroupName]="i">
             <mat-card-header>{{ stockItem.value.name }}</mat-card-header>
