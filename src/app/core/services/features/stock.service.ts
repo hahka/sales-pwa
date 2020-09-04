@@ -17,7 +17,7 @@ export class StockService {
     protected readonly idbService: IdbService<Stock>,
   ) {}
 
-  public getStock(): Observable<Stock> {
+  public getStock(): Observable<Stock | null> {
     if (navigator.onLine) {
       return this.httpClient.get<Stock>(`${this.environmentService.apiUrl}${this.resource}`);
     }
@@ -30,7 +30,6 @@ export class StockService {
    * @param data The data to patch
    */
   public put(data: Stock): Observable<Stock> {
-    console.log(data);
     if (navigator.onLine) {
       let apiCall$: Observable<Stock>;
       apiCall$ = this.httpClient.put<Stock>(

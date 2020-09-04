@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { RouterModule } from '@angular/router';
 import { ApiObsHelperModule } from '../../shared/components/api-obs-helper/api-obs-helper.module';
 import { StockComponent } from './stock.component';
 
@@ -15,12 +14,6 @@ import { StockComponent } from './stock.component';
   declarations: [StockComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: StockComponent,
-      },
-    ]),
     ApiObsHelperModule,
     MatButtonModule,
     MatCardModule,
@@ -31,5 +24,6 @@ import { StockComponent } from './stock.component';
     FormsModule,
     ReactiveFormsModule,
   ],
+  exports: [StockComponent],
 })
 export class StockModule {}

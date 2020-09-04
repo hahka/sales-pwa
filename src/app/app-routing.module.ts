@@ -11,8 +11,9 @@ const routes: Routes = [
     loadChildren: () => import('./features/products/products.module').then((m) => m.ProductsModule),
   },
   {
-    path: 'stock',
-    loadChildren: () => import('./features/stock/stock.module').then((m) => m.StockModule),
+    path: 'producing',
+    loadChildren: () =>
+      import('./features/producing/producing.module').then((m) => m.ProducingModule),
   },
   {
     path: 'sync',
