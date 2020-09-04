@@ -51,4 +51,8 @@ export class ProductsService extends ApiService<Product> {
       // TODO : error, offline
     }
   }
+
+  public getFull() {
+    return this.httpClient.get<Product[]>(`${this.environmentService.apiUrl}${this.resource}/full`);
+  }
 }

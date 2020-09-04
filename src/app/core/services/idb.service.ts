@@ -4,11 +4,13 @@ import { BaseModel } from '../../shared/models/api/base.model';
 import { SearchDto } from '../../shared/models/api/search-dto.model';
 import { Market } from '../../shared/models/market.model';
 import { Product } from '../../shared/models/product.model';
+import { Stock } from '../../shared/models/stock.model';
 import { Page, PageRequest } from './api';
 
 export enum StoresEnum {
   MARKETS = 'markets',
   PRODUCTS = 'products',
+  STOCK = 'stock',
 }
 
 export enum UnsyncedTables {
@@ -23,6 +25,11 @@ interface MyDB extends DBSchema {
   };
   products: {
     value: Product;
+    key: string;
+    indexes: any;
+  };
+  stock: {
+    value: Stock;
     key: string;
     indexes: any;
   };
@@ -46,6 +53,7 @@ export class IdbService<T extends BaseModel> {
           marketsStore.createIndex('nameSortable', 'nameSortable');
           const productsStore = db.createObjectStore('products');
           productsStore.createIndex('nameSortable', 'nameSortable');
+          db.createObjectStore('stock');
         },
       });
     }

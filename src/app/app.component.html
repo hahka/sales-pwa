@@ -8,6 +8,7 @@
       <mat-list-item routerLink="/">Accueil </mat-list-item>
       <mat-list-item routerLink="/markets">Marchés </mat-list-item>
       <mat-list-item routerLink="/products">Produits </mat-list-item>
+      <mat-list-item routerLink="/stock">Stock </mat-list-item>
       <mat-list-item routerLink="/sync">Synchro </mat-list-item>
     </mat-nav-list>
     {{ (connectionStatusService.status | async) ? 'Online' : 'Offline' }}
