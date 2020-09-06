@@ -34,8 +34,12 @@ export class StockComponent implements OnInit, DoCheck {
   /** Used to know where categories of stock change between two items, to display the category */
   indexOfDividers: number[] = [];
 
+  indexCorrection: { index: number; correction: number }[] = [];
+
   /** Width of the grid */
-  gridCols = 3;
+  responsiveCols = 3;
+
+  sortedProducts: (StockItem & { name: string })[] = [];
 
   private categoriesDiff: IterableDiffer<STOCK_CATEGORIES>;
 
@@ -47,7 +51,15 @@ export class StockComponent implements OnInit, DoCheck {
     private readonly translateService: TranslateService,
   ) {}
 
+  /** Handle Resizing */
+  onResize(event: any): void {
+    this.responsiveCols = Math.trunc(event.target.innerWidth / 400);
+    this.processCorrections();
+  }
+
   ngOnInit(): void {
+    this.responsiveCols = Math.trunc(window.innerWidth / 400);
+
     this.categoriesDiff = this.iterableDiffers.find(this.categories).create();
 
     this.productsService.getFull().subscribe((products) => {
@@ -109,7 +121,9 @@ export class StockComponent implements OnInit, DoCheck {
   }
 
   processMissingDividers(index: number) {
-    return index % this.gridCols;
+    const correction = this.indexCorrection.find((data) => index === data.index);
+
+    return correction ? correction.correction : 0;
   }
 
   increaseQuantity(i: number) {
@@ -154,18 +168,11 @@ export class StockComponent implements OnInit, DoCheck {
             });
           });
         });
-        const dataAfterSort = dataBeforeSort.sort((a, b) => {
+        this.sortedProducts = dataBeforeSort.sort((a, b) => {
           return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
         });
-        dataAfterSort.forEach((data, index) => {
-          if (this.categories.includes(data.category)) {
-            if (
-              index === 0 ||
-              dataAfterSort[index - 1].category !== dataAfterSort[index].category
-            ) {
-              this.indexOfDividers.push(index);
-            }
-          }
+        this.processCorrections();
+        this.sortedProducts.forEach((data) => {
           stockFormArray.push(
             new FormGroup({
               productId: new FormControl(data.productId),
@@ -188,5 +195,27 @@ export class StockComponent implements OnInit, DoCheck {
         this.isStockInitialized = true;
       }
     }
+  }
+
+  private processCorrections() {
+    let dataDisplayed = 0;
+    this.indexOfDividers = [];
+    this.indexCorrection = [];
+    this.sortedProducts.forEach((data, index) => {
+      if (this.categories.includes(data.category)) {
+        if (
+          index === 0 ||
+          this.sortedProducts[index - 1].category !== this.sortedProducts[index].category
+        ) {
+          this.indexOfDividers.push(index);
+          const push =
+            (this.responsiveCols - (dataDisplayed % this.responsiveCols)) % this.responsiveCols;
+          dataDisplayed += push;
+          this.indexCorrection.push({ index, correction: push });
+          dataDisplayed += 1;
+        }
+        dataDisplayed += 1;
+      }
+    });
   }
 }

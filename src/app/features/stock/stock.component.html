@@ -1,15 +1,16 @@
 <form [formGroup]="form" *ngIf="form">
   <ng-container formArrayName="stock">
-    <mat-grid-list [cols]="gridCols">
+    <mat-grid-list [cols]="responsiveCols" (window:resize)="onResize($event)">
       <ng-container *ngFor="let stockItem of form.get('stock')?.controls; let i = index">
-        <mat-grid-tile
-          [colspan]="processMissingDividers(i)"
-          class="grid-list__divider"
-          *ngIf="indexOfDividers.includes(i)"
-        ></mat-grid-tile
-        ><mat-grid-tile class="grid-list__divider" *ngIf="indexOfDividers.includes(i)">
-          {{ translateCategoryName(stockItem.value.category) }}
-        </mat-grid-tile>
+        <ng-container *ngIf="indexOfDividers.includes(i)">
+          <mat-grid-tile
+            [colspan]="processMissingDividers(i)"
+            class="grid-list__divider"
+          ></mat-grid-tile
+          ><mat-grid-tile class="grid-list__divider">
+            {{ translateCategoryName(stockItem.value.category) }}
+          </mat-grid-tile>
+        </ng-container>
 
         <mat-grid-tile *ngIf="categories.includes(stockItem.value.category)">
           <mat-card [formGroupName]="i">
