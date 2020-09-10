@@ -53,6 +53,12 @@ export class ProductsService extends ApiService<Product> {
   }
 
   public getFull() {
-    return this.httpClient.get<Product[]>(`${this.environmentService.apiUrl}${this.resource}/full`);
+    if (navigator.onLine) {
+      return this.httpClient.get<Product[]>(
+        `${this.environmentService.apiUrl}${this.resource}/full`,
+      );
+    }
+
+    return this.getAll();
   }
 }

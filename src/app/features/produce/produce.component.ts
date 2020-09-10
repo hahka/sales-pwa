@@ -4,7 +4,6 @@ import { StockComponent } from '../stock/stock.component';
 
 export enum ProduceAction {
   SAVE = 'SAVE',
-  RESET_FRESH = 'RESET_FRESH',
 }
 
 @Component({
@@ -23,10 +22,6 @@ export class ProduceComponent {
     if (producingAction === ProduceAction.SAVE) {
       if (this.stockComponent) {
         this.stockComponent.updateStock();
-      }
-    } else if (producingAction === ProduceAction.RESET_FRESH) {
-      if (this.stockComponent) {
-        this.stockComponent.resetFreshStock();
       }
     }
   }

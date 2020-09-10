@@ -39,6 +39,7 @@ export class StockService {
 
       return apiCall$.pipe(take(1));
     }
+    data.lastUpdate = new Date().toISOString();
 
     return from(this.idbService.put(this.resource, data, 'STOCK') as Promise<any>);
   }

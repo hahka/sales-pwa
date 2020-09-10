@@ -9,12 +9,21 @@
           ></mat-grid-tile
           ><mat-grid-tile class="grid-list__divider">
             {{ translateCategoryName(stockItem.value.category) }}
+            <button
+              mat-icon-button
+              color="error"
+              class="btn--size-l"
+              (click)="onClick(StockAction.RESET, stockItem.value.category)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
           </mat-grid-tile>
         </ng-container>
 
         <mat-grid-tile *ngIf="categories.includes(stockItem.value.category)">
           <mat-card [formGroupName]="i">
-            <mat-card-header>{{ stockItem.value.name }}</mat-card-header>
+            <!-- <mat-card-header>{{ stockItem.value.name }}</mat-card-header> -->
+            <div>{{ stockItem.value.name }}</div>
             <mat-card-content *ngIf="sanitizedImages[stockItem.value.productId]">
               <div class="image-preview" *ngIf="sanitizedImages[stockItem.value.productId]">
                 <img [src]="sanitizedImages[stockItem.value.productId]" />

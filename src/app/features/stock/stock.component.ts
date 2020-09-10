@@ -8,8 +8,13 @@ import { StockService } from '../../core/services/features/stock.service';
 import { Product } from '../../shared/models/product.model';
 import { StockItem } from '../../shared/models/stock-item.model';
 import { Stock } from '../../shared/models/stock.model';
-import { STOCK_CATEGORIES } from '../../utils/enums';
+import { STOCK_CATEGORIES, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { CATEGORIES_MATCHING, STOCK_ORDER } from '../../utils/stocks.util';
+
+export enum StockAction {
+  SAVE = 'SAVE',
+  RESET = 'RESET',
+}
 
 @Component({
   selector: 'app-stock',
@@ -17,7 +22,9 @@ import { CATEGORIES_MATCHING, STOCK_ORDER } from '../../utils/stocks.util';
   styleUrls: ['./stock.component.scss'],
 })
 export class StockComponent implements OnInit, DoCheck {
+  StockAction = StockAction;
   @Input() categories: STOCK_CATEGORIES[] = [];
+  @Input() functionnality: STOCK_FUNCTIONALITIES = STOCK_FUNCTIONALITIES.PRODUCE;
 
   quantities = Array.from(Array(51).keys());
   products: Product[];
@@ -43,6 +50,8 @@ export class StockComponent implements OnInit, DoCheck {
 
   private categoriesDiff: IterableDiffer<STOCK_CATEGORIES>;
 
+  private readonly tileSize = 350;
+
   constructor(
     private readonly productsService: ProductsService,
     private readonly stockService: StockService,
@@ -53,12 +62,12 @@ export class StockComponent implements OnInit, DoCheck {
 
   /** Handle Resizing */
   onResize(event: any): void {
-    this.responsiveCols = Math.trunc(event.target.innerWidth / 400);
+    this.responsiveCols = Math.trunc(event.target.innerWidth / this.tileSize);
     this.processCorrections();
   }
 
   ngOnInit(): void {
-    this.responsiveCols = Math.trunc(window.innerWidth / 400);
+    this.responsiveCols = Math.trunc(window.innerWidth / this.tileSize);
 
     this.categoriesDiff = this.iterableDiffers.find(this.categories).create();
 
@@ -105,11 +114,11 @@ export class StockComponent implements OnInit, DoCheck {
     }
   }
 
-  public resetFreshStock() {
+  public resetStock(stock: STOCK_CATEGORIES) {
     const stockControl = this.form.get('stock') as FormArray | null;
     if (stockControl) {
       stockControl.controls.forEach((control) => {
-        if (control.value.category === STOCK_CATEGORIES.FRESH) {
+        if (control.value.category === stock) {
           control.patchValue({ quantity: 0 });
         }
       });
@@ -132,6 +141,19 @@ export class StockComponent implements OnInit, DoCheck {
 
   decreaseQuantity(i: number) {
     this.addToQuantityValue(i, -1);
+  }
+
+  onClick(action: StockAction, stockCategory: STOCK_CATEGORIES) {
+    switch (action) {
+      case StockAction.RESET:
+        if (
+          this.functionnality === STOCK_FUNCTIONALITIES.PRODUCE ||
+          this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION
+        ) {
+          this.resetStock(stockCategory);
+        }
+        break;
+    }
   }
 
   private addToQuantityValue(i: number, quantity: number) {
