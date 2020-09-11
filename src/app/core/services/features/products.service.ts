@@ -36,17 +36,15 @@ export class ProductsService extends ApiService<Product> {
     if (navigator.onLine) {
       await this.idbService.clearObjectStore(StoresEnum.MARKETS);
       let productsSub: Subscription;
-      productsSub = this.httpClient
-        .get<Product[]>(`${this.environmentService.apiUrl}${this.resource}/full`)
-        .subscribe((products) => {
-          if (productsSub && !productsSub.closed) {
-            productsSub.unsubscribe();
-          }
-          products.forEach((product) => {
-            const productForIdb = new Product(product);
-            this.idbService.put(StoresEnum.PRODUCTS, productForIdb, product.id);
-          });
+      productsSub = this.getFull().subscribe((products) => {
+        if (productsSub && !productsSub.closed) {
+          productsSub.unsubscribe();
+        }
+        products.forEach((product) => {
+          const productForIdb = new Product(product);
+          this.idbService.put(StoresEnum.PRODUCTS, productForIdb, product.id);
         });
+      });
     } else {
       // TODO : error, offline
     }

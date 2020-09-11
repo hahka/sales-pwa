@@ -1,6 +1,18 @@
-<mat-toolbar class="tester__toolbar">
-  <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
-  <h3>L'Escargot de Bar</h3>
+<mat-toolbar class="app__toolbar">
+  <div class="app__toolbar__name">
+    <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+    <h3>L'Escargot de Bar</h3>
+  </div>
+  <div class="app__toolbar__status">
+    <ng-container *ngIf="connectionStatusService.status$ | async; else offline">
+      <a routerLink="/sync" *ngIf="syncService.isSynchronizationNeeded$ | async">
+        <mat-icon color="error">sync_alt</mat-icon>
+      </a>
+    </ng-container>
+    <ng-template #offline>
+      <mat-icon>signal_wifi_off</mat-icon>
+    </ng-template>
+  </div>
 </mat-toolbar>
 <mat-sidenav-container>
   <mat-sidenav #sidenav mode="above" (click)="sidenav.toggle()">
@@ -11,7 +23,6 @@
       <mat-list-item routerLink="/produce">Fabrication </mat-list-item>
       <mat-list-item routerLink="/sync">Synchro </mat-list-item>
     </mat-nav-list>
-    {{ (connectionStatusService.status | async) ? 'Online' : 'Offline' }}
   </mat-sidenav>
 
   <mat-sidenav-content>

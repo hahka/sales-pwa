@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConnectionStatusService {
-  public status: BehaviorSubject<boolean> = new BehaviorSubject(navigator.onLine);
+  public status$: Observable<boolean>;
+
+  private readonly status: BehaviorSubject<boolean> = new BehaviorSubject(navigator.onLine);
   private _connectionStatus: string = navigator.onLine ? 'online' : 'offline';
+
+  constructor() {
+    this.status$ = this.status.asObservable();
+  }
 
   set connectionStatus(connectionStatus: string) {
     this._connectionStatus = connectionStatus;

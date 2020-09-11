@@ -22,17 +22,15 @@ export class MarketsService extends ApiService<Market> {
     if (navigator.onLine) {
       await this.idbService.clearObjectStore(StoresEnum.MARKETS);
       let marketsSub: Subscription;
-      marketsSub = this.httpClient
-        .get<Market[]>(`${this.environmentService.apiUrl}${this.resource}`)
-        .subscribe((markets) => {
-          if (marketsSub && !marketsSub.closed) {
-            marketsSub.unsubscribe();
-          }
-          markets.forEach((market) => {
-            const marketForIdb = new Market(market);
-            this.idbService.put(StoresEnum.MARKETS, marketForIdb, market.id);
-          });
+      marketsSub = this.getAll().subscribe((markets) => {
+        if (marketsSub && !marketsSub.closed) {
+          marketsSub.unsubscribe();
+        }
+        markets.forEach((market) => {
+          const marketForIdb = new Market(market);
+          this.idbService.put(StoresEnum.MARKETS, marketForIdb, market.id);
         });
+      });
     } else {
       // TODO : error, offline
     }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { from, Observable, Subscription } from 'rxjs';
+import { take, map } from 'rxjs/operators';
 import { Stock } from '../../../shared/models/stock.model';
 import { EnvironmentService } from '../environment/environment.service';
 import { IdbService, StoresEnum } from '../idb.service';
@@ -11,6 +11,9 @@ import { IdbService, StoresEnum } from '../idb.service';
 })
 export class StockService {
   resource = StoresEnum.STOCK;
+
+  stockOnlyId = 'STOCK';
+
   constructor(
     protected readonly environmentService: EnvironmentService,
     protected readonly httpClient: HttpClient,
@@ -18,11 +21,22 @@ export class StockService {
   ) {}
 
   public getStock(): Observable<Stock | null> {
-    if (navigator.onLine) {
-      return this.httpClient.get<Stock>(`${this.environmentService.apiUrl}${this.resource}`);
-    }
+    return from(
+      (this.idbService.getById(this.resource, this.stockOnlyId) as Promise<Stock>).then(
+        (
+          /** Stock found in local IDB */
+          localStock,
+        ) => {
+          if (!navigator.onLine || !!localStock) {
+            return localStock;
+          }
 
-    return from(this.idbService.getById(this.resource, 'STOCK') as Promise<Stock>);
+          return this.httpClient
+            .get<Stock>(`${this.environmentService.apiUrl}${this.resource}`)
+            .toPromise();
+        },
+      ),
+    );
   }
 
   /**
@@ -32,15 +46,58 @@ export class StockService {
   public put(data: Stock): Observable<Stock> {
     if (navigator.onLine) {
       let apiCall$: Observable<Stock>;
-      apiCall$ = this.httpClient.put<Stock>(
-        `${this.environmentService.apiUrl}${this.resource}`,
-        data,
+      apiCall$ = this.httpClient.put<Stock>(`${this.environmentService.apiUrl}${this.resource}`, {
+        stock: data.stock,
+      });
+
+      return apiCall$.pipe(
+        map((stock) => {
+          this.updateLocalStock(stock, true);
+
+          return stock;
+        }),
+        take(1),
       );
-
-      return apiCall$.pipe(take(1));
     }
-    data.lastUpdate = new Date().toISOString();
 
-    return from(this.idbService.put(this.resource, data, 'STOCK') as Promise<any>);
+    return this.updateLocalStock(data);
+  }
+
+  public getLocalStock() {
+    return from(this.idbService.getById(this.resource, this.stockOnlyId) as Promise<Stock>);
+  }
+
+  /**
+   * Updates local stock without modifying its values, e.g. after an online update, to keep idb up to date.
+   */
+  public updateLocalStock(stock: Stock, shouldKeepDate = false): Observable<Stock> {
+    if (shouldKeepDate) {
+      stock.lastLocalUpdate = stock.lastUpdate;
+    } else {
+      stock.lastLocalUpdate = new Date().toISOString();
+    }
+
+    return from(
+      this.idbService.put(this.resource, new Stock(stock), this.stockOnlyId) as Promise<Stock>,
+    ).pipe(take(1));
+  }
+
+  async synchronizeDown() {
+    if (navigator.onLine) {
+      await this.idbService.clearObjectStore(StoresEnum.MARKETS);
+      let stockSub: Subscription;
+      stockSub = this.getStock().subscribe((stock) => {
+        if (stockSub && !stockSub.closed) {
+          stockSub.unsubscribe();
+        }
+        if (stock) {
+          const stockForIdb = new Stock(stock);
+          stockForIdb.lastLocalUpdate = stock.lastUpdate;
+          this.idbService.put(StoresEnum.STOCK, stockForIdb, this.stockOnlyId);
+        }
+      });
+    } else {
+      // TODO : error, offline
+    }
   }
 }

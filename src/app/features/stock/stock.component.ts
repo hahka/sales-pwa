@@ -85,7 +85,7 @@ export class StockComponent implements OnInit, DoCheck {
         });
 
         this.stockService.getStock().subscribe((stock) => {
-          this.stock = stock || new Stock();
+          this.stock = stock ? new Stock(stock) : new Stock();
           this.initializeStock();
         });
       } else {
@@ -104,10 +104,12 @@ export class StockComponent implements OnInit, DoCheck {
   public updateStock() {
     const stockControl = this.form.get('stock') as FormArray | null;
     if (stockControl) {
-      const newStock = new Stock();
-      newStock.stock = stockControl.value;
-      this.stockService.put(newStock).subscribe((stock) => {
-        this.stock = stock;
+      if (!this.stock) {
+        this.stock = new Stock();
+      }
+      this.stock.stock = stockControl.value;
+      this.stockService.put(this.stock).subscribe((localStock) => {
+        this.stock = localStock;
         stockControl.clear();
         this.initializeStock(true);
       });
@@ -219,7 +221,10 @@ export class StockComponent implements OnInit, DoCheck {
     }
   }
 
-  private processCorrections() {
+  /**
+   * Processes where divs should beadded and what size they should have to have categories separated
+   */
+  private processCorrections(): void {
     let dataDisplayed = 0;
     this.indexOfDividers = [];
     this.indexCorrection = [];
