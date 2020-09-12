@@ -15,4 +15,19 @@ export class Stock {
   prepareForIdb() {
     return this;
   }
+
+  /**
+   * Clean items in order to remove properties (like name) that have been added in order to display more easily the form
+   */
+  cleanItems() {
+    if (this.stock) {
+      this.stock = this.stock.map((stockItem) => {
+        return {
+          category: stockItem.category,
+          productId: stockItem.productId,
+          quantity: stockItem.quantity,
+        };
+      });
+    }
+  }
 }

@@ -23,7 +23,7 @@ export class SyncService {
   syncDown() {
     this.marketsService.synchronizeDown();
     this.productsService.synchronizeDown();
-    this.stockService.synchronizeDown();
+    this.stockService.synchronize();
   }
 
   checkIfSynchronizationIsNeeded() {

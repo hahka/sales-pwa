@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { from, Observable, Subscription } from 'rxjs';
-import { take, map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { Stock } from '../../../shared/models/stock.model';
 import { EnvironmentService } from '../environment/environment.service';
 import { IdbService, StoresEnum } from '../idb.service';
@@ -82,18 +82,17 @@ export class StockService {
     ).pipe(take(1));
   }
 
-  async synchronizeDown() {
+  async synchronize() {
     if (navigator.onLine) {
-      await this.idbService.clearObjectStore(StoresEnum.MARKETS);
       let stockSub: Subscription;
       stockSub = this.getStock().subscribe((stock) => {
         if (stockSub && !stockSub.closed) {
           stockSub.unsubscribe();
         }
-        if (stock) {
-          const stockForIdb = new Stock(stock);
-          stockForIdb.lastLocalUpdate = stock.lastUpdate;
-          this.idbService.put(StoresEnum.STOCK, stockForIdb, this.stockOnlyId);
+        if (stock && !stock.lastLocalUpdate) {
+          /* If lastLocalUpdate is missing, it means that there's no stock in IDB
+          and that the stock has been fetched from server, so we need to put it in IDB */
+          this.updateLocalStock(new Stock(stock), true);
         }
       });
     } else {
