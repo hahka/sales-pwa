@@ -15,6 +15,13 @@ const routes: Routes = [
     loadChildren: () => import('./features/produce/produce.module').then((m) => m.ProduceModule),
   },
   {
+    path: 'market_preparation',
+    loadChildren: () =>
+      import('./features/market-preparation/market-preparation.module').then(
+        (m) => m.MarketPreparationModule,
+      ),
+  },
+  {
     path: 'sync',
     loadChildren: () => import('./features/sync/sync.module').then((m) => m.SyncModule),
   },

@@ -3,6 +3,7 @@ import { Component, DoCheck, Input, IterableDiffer, IterableDiffers, OnInit } fr
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
+import { ToastrService } from 'ngx-toastr';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
 import { Product } from '../../shared/models/product.model';
@@ -58,6 +59,7 @@ export class StockComponent implements OnInit, DoCheck {
     private readonly domSanitizer: DomSanitizer,
     private readonly iterableDiffers: IterableDiffers,
     private readonly translateService: TranslateService,
+    private readonly toasterService: ToastrService,
   ) {}
 
   /** Handle Resizing */
@@ -159,17 +161,46 @@ export class StockComponent implements OnInit, DoCheck {
     }
   }
 
-  private addToQuantityValue(i: number, quantity: number) {
+  private addToQuantityValue(i: number, quantity: number): void {
     const stockFormArray = this.form.get('stock') as FormArray | null;
     const quantityControl = stockFormArray && stockFormArray.at(i);
     if (quantityControl) {
-      const newValue = quantityControl.value.quantity + quantity;
-      if (newValue >= 0) {
-        quantityControl.patchValue({ quantity: quantityControl.value.quantity + quantity });
+      const value = quantityControl.value;
+      if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
+        if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
+          const control = (stockFormArray as FormArray).controls.find(
+            (fc) =>
+              fc.value.productId === value.productId &&
+              fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
+          );
+          if (control) {
+            const newValueForThisStock = value.quantity + quantity;
+            const newValueForOtherStock = control.value.quantity - quantity;
+            if (newValueForOtherStock >= 0 && newValueForThisStock >= 0) {
+              quantityControl.patchValue({ quantity: newValueForThisStock });
+              control.patchValue({ quantity: newValueForOtherStock });
+
+              return;
+            }
+            if (newValueForOtherStock < 0) {
+              this.toasterService.error(`Stock d'origin insuffisant`);
+            }
+
+            return;
+          }
+        }
+      } else {
+        const newValue = value.quantity + quantity;
+        if (newValue >= 0) {
+          quantityControl.patchValue({ quantity: value.quantity + quantity });
+
+          return;
+        }
       }
     } else {
       console.error('FormArray element missing');
     }
+    console.error('some quantity is < 0');
   }
 
   private initializeStock(force?: boolean) {
