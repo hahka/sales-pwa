@@ -33,11 +33,18 @@
             "title": "Produits"
         },
         "produce": {
-            "title": "Fabrication",
-            "reset_fresh": { "button": "Stock de frais", "question": "Remettre à zéro le stock de frais?" }
+            "title": "Fabrication"
+        },
+        "market_preparation": {
+            "title": "Préparation de marché"
         }
     },
     "categories": {
+        "product": {
+            "FRESH": "Frais",
+            "FROZEN": "Surgelé",
+            "PASTEURIZED": "Pasteurisé"
+        },
         "stock": {
             "FRESH": "Frais",
             "SMALL_FREEZER": "Petit congélateur",

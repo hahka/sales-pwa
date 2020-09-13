@@ -48,6 +48,7 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
           const productsStore = db.createObjectStore('products');
           productsStore.createIndex('nameSortable', 'nameSortable');
           db.createObjectStore('stock');
+          db.createObjectStore('marketSales');
         },
       });
     }

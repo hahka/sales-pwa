@@ -106,9 +106,7 @@ export class StockComponent implements OnInit, DoCheck {
   public updateStock() {
     const stockControl = this.form.get('stock') as FormArray | null;
     if (stockControl) {
-      if (!this.stock) {
-        this.stock = new Stock();
-      }
+      this.stock = new Stock(this.stock);
       this.stock.stock = stockControl.value;
       this.stock.cleanItems();
       this.stockService.put(this.stock).subscribe((localStock) => {

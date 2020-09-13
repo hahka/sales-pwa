@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { SettingsDialogModule } from '../../shared/components/settings-dialog/settings-dialog.module';
 import { StockModule } from '../stock/stock.module';
 import { MarketPreparationComponent } from './market-preparation.component';
 
@@ -19,6 +20,7 @@ import { MarketPreparationComponent } from './market-preparation.component';
         component: MarketPreparationComponent,
       },
     ]),
+    SettingsDialogModule,
     StockModule,
     TranslateModule,
   ],

@@ -1,5 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
-import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from 'src/app/utils/enums';
+import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { MarketSalesService } from '../../core/services/features/market-sales.service';
+import { SettingsDialogData } from '../../shared/components/settings-dialog/settings-dialog-data.model';
+import { SettingsDialogComponent } from '../../shared/components/settings-dialog/settings-dialog.component';
+import { MarketSales } from '../../shared/models/market-sales.model';
+import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { StockComponent } from '../stock/stock.component';
 
 export enum Action {
@@ -19,11 +25,51 @@ export class MarketPreparationComponent {
   Action = Action;
   categories: SC[] = [SC.FRESH, SC.SMALL_FREEZER, SC.PASTEURIZED];
 
+  market = new FormControl();
+
+  marketSales: MarketSales;
+
+  constructor(
+    private readonly matDialog: MatDialog,
+    private readonly marketSalesService: MarketSalesService,
+  ) {
+    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
+      this.marketSales = new MarketSales(marketSales);
+    });
+  }
+
   onClick(producingAction: Action) {
     if (producingAction === Action.SAVE) {
       if (this.stockComponent) {
         this.stockComponent.updateStock();
+        this.marketSalesService.put(this.marketSales);
       }
     }
+  }
+
+  openSettings() {
+    if (this.marketSales) {
+      const dialogRef = this.matDialog.open(SettingsDialogComponent, {
+        data: {
+          marketId: this.marketSales.marketId,
+          categories: this.marketSales.categories,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: SettingsDialogData) => {
+        if (result) {
+          this.marketSales.marketId = result.marketId;
+          this.marketSales.categories = result.categories;
+          this.marketSales.marketName = result.marketName;
+        }
+        console.log('Dialog result', result);
+      });
+    }
+  }
+
+  isValid() {
+    const ms = this.marketSales;
+
+    return ms && ms.marketId && ms.categories && ms.categories.length;
   }
 }

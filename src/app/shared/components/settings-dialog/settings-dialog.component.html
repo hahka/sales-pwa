@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Paramétrage du marché</h1>
+<div class="settings-dialog__content" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Marché</mat-label>
+    <mat-select [(value)]="data.marketId">
+      <mat-option *ngFor="let market of markets" [value]="market.id">{{ market?.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Catégories</mat-label>
+    <mat-select [(value)]="data.categories" multiple>
+      <mat-option *ngFor="let pCategory of pCategories" [value]="pCategory">{{
+        translateCategoryName(pCategory)
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Annuler</button>
+  <button mat-button (click)="submit()" cdkFocusInitial>Valider</button>
+</div>
