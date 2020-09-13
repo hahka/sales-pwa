@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DoCheck, Input, IterableDiffer, IterableDiffers, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
@@ -186,19 +186,25 @@ export class StockComponent implements OnInit, DoCheck {
 
             return;
           }
+        } else {
+          return this.patchQuantity(quantityControl, value.quantity + quantity);
         }
       } else {
-        const newValue = value.quantity + quantity;
-        if (newValue >= 0) {
-          quantityControl.patchValue({ quantity: value.quantity + quantity });
-
-          return;
-        }
+        return this.patchQuantity(quantityControl, value.quantity + quantity);
       }
     } else {
       console.error('FormArray element missing');
     }
     console.error('some quantity is < 0');
+  }
+
+  private patchQuantity(quantityControl: AbstractControl, newQuantity: number) {
+    if (newQuantity >= 0) {
+      quantityControl.patchValue({ quantity: newQuantity });
+
+      return;
+    }
+    console.error('new quantity is < 0');
   }
 
   private initializeStock(force?: boolean) {

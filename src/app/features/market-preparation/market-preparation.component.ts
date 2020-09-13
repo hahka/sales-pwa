@@ -5,7 +5,11 @@ import { MarketSalesService } from '../../core/services/features/market-sales.se
 import { SettingsDialogData } from '../../shared/components/settings-dialog/settings-dialog-data.model';
 import { SettingsDialogComponent } from '../../shared/components/settings-dialog/settings-dialog.component';
 import { MarketSales } from '../../shared/models/market-sales.model';
-import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from '../../utils/enums';
+import {
+  PRODUCT_CATEGORIES as PC,
+  STOCK_CATEGORIES as SC,
+  STOCK_FUNCTIONALITIES,
+} from '../../utils/enums';
 import { StockComponent } from '../stock/stock.component';
 
 export enum Action {
@@ -23,7 +27,7 @@ export class MarketPreparationComponent {
   stockFunctionnality = STOCK_FUNCTIONALITIES.MARKET_PREPARATION;
 
   Action = Action;
-  categories: SC[] = [SC.FRESH, SC.SMALL_FREEZER, SC.PASTEURIZED];
+  categories: SC[] = []; // = [SC.FRESH, SC.SMALL_FREEZER, SC.PASTEURIZED];
 
   market = new FormControl();
 
@@ -35,6 +39,7 @@ export class MarketPreparationComponent {
   ) {
     this.marketSalesService.getMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
+      this.updateCategories();
     });
   }
 
@@ -62,9 +67,23 @@ export class MarketPreparationComponent {
           this.marketSales.categories = result.categories;
           this.marketSales.marketName = result.marketName;
         }
-        console.log('Dialog result', result);
+        this.updateCategories();
       });
     }
+  }
+
+  updateCategories() {
+    this.categories = this.marketSales.categories.map((category) => {
+      switch (category) {
+        case PC.FROZEN:
+          return SC.SMALL_FREEZER;
+        case PC.PASTEURIZED:
+          return SC.PASTEURIZED;
+        case PC.FRESH:
+        default:
+          return SC.FRESH;
+      }
+    });
   }
 
   isValid() {
