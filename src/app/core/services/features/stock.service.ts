@@ -3,21 +3,22 @@ import { Injectable } from '@angular/core';
 import { from, Observable, Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { Stock } from '../../../shared/models/stock.model';
+import { IdbStoresEnum } from '../../../utils/enums';
 import { EnvironmentService } from '../environment/environment.service';
-import { IdbService, StoresEnum } from '../idb.service';
+import { IdbCommonService } from '../idb-common.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StockService {
-  resource = StoresEnum.STOCK;
+  resource = IdbStoresEnum.STOCK;
 
   stockOnlyId = 'STOCK';
 
   constructor(
     protected readonly environmentService: EnvironmentService,
     protected readonly httpClient: HttpClient,
-    protected readonly idbService: IdbService<Stock>,
+    protected readonly idbService: IdbCommonService<Stock>,
   ) {}
 
   public getStock(): Observable<Stock | null> {
@@ -78,7 +79,9 @@ export class StockService {
     }
 
     return from(
-      this.idbService.put(this.resource, new Stock(stock), this.stockOnlyId) as Promise<Stock>,
+      this.idbService.putCommon(this.resource, new Stock(stock), this.stockOnlyId) as Promise<
+        Stock
+      >,
     ).pipe(take(1));
   }
 

@@ -16,3 +16,14 @@ export enum STOCK_FUNCTIONALITIES {
   MARKET_PREPARATION = 'MARKET_PREPARATION',
   MARKET = 'MARKET',
 }
+
+export enum IdbStoresEnum {
+  MARKETS = 'markets',
+  PRODUCTS = 'products',
+  STOCK = 'stock',
+  MARKET_SALES = 'marketSales',
+}
+
+export enum UnsyncedTables {
+  UNSYNCED_MARKETS = 'unsynced_markets',
+}

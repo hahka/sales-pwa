@@ -79,7 +79,7 @@ export class StockComponent implements OnInit, DoCheck {
 
       if (stockFormArray) {
         products.forEach((product) => {
-          if (product.image) {
+          if (product.image && product.id) {
             this.sanitizedImages[product.id] = this.domSanitizer.bypassSecurityTrustResourceUrl(
               `data:image/png;base64, ${product.image}`,
             );
@@ -215,14 +215,17 @@ export class StockComponent implements OnInit, DoCheck {
       const dataBeforeSort: (StockItem & { name: string })[] = [];
       if (stockFormArray) {
         this.products.forEach((product) => {
-          CATEGORIES_MATCHING[product.category].forEach((category) => {
-            dataBeforeSort.push({
-              productId: product.id,
-              name: product.name,
-              category,
-              quantity: 0,
+          if (!!product.id) {
+            const productId = product.id;
+            CATEGORIES_MATCHING[product.category].forEach((category) => {
+              dataBeforeSort.push({
+                productId,
+                name: product.name,
+                category,
+                quantity: 0,
+              });
             });
-          });
+          }
         });
         this.sortedProducts = dataBeforeSort.sort((a, b) => {
           return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
