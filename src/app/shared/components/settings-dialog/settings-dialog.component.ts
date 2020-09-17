@@ -15,7 +15,7 @@ export class SettingsDialogComponent {
   pCategories = [PC.FRESH, PC.FROZEN, PC.PASTEURIZED];
   markets: Market[];
 
-  get disabled() {
+  public get disabled() {
     return !this.data.marketId || !this.data.categories || !this.data.categories.length;
   }
 
@@ -30,18 +30,18 @@ export class SettingsDialogComponent {
     });
   }
 
-  cancel(): void {
+  public cancel(): void {
     this.dialogRef.close();
   }
 
-  submit(): void {
+  public submit(): void {
     this.dialogRef.close({
       ...this.data,
       marketName: this.markets.find((market) => this.data.marketId === market.id)?.name,
     });
   }
 
-  translateCategoryName(category: PC) {
+  public translateCategoryName(category: PC) {
     return this.translateService.instant(`categories.product.${category}`);
   }
 }

@@ -27,7 +27,7 @@ export class MarketPreparationComponent {
   stockFunctionnality = STOCK_FUNCTIONALITIES.MARKET_PREPARATION;
 
   Action = Action;
-  categories: SC[] = []; // = [SC.FRESH, SC.SMALL_FREEZER, SC.PASTEURIZED];
+  categories: SC[] = [];
 
   market = new FormControl();
 

@@ -48,12 +48,6 @@ export class MarketSalesService {
         if (stockSub && !stockSub.closed) {
           stockSub.unsubscribe();
         }
-        // TODO
-        // if (stock && !stock.lastLocalUpdate) {
-        //   /* If lastLocalUpdate is missing, it means that there's no stock in IDB
-        //   and that the stock has been fetched from server, so we need to put it in IDB */
-        //   this.put(new Stock(stock));
-        // }
       });
     } else {
       // TODO : error, offline
