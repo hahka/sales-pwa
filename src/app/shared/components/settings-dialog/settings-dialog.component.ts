@@ -15,6 +15,10 @@ export class SettingsDialogComponent {
   pCategories = [PC.FRESH, PC.FROZEN, PC.PASTEURIZED];
   markets: Market[];
 
+  get disabled() {
+    return !this.data.marketId || !this.data.categories || !this.data.categories.length;
+  }
+
   constructor(
     public dialogRef: MatDialogRef<SettingsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SettingsDialogData,

@@ -39,7 +39,11 @@ export class MarketPreparationComponent {
   ) {
     this.marketSalesService.getMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
-      this.updateCategories();
+      if (!this.marketSales.categories || !this.marketSales.categories.length) {
+        this.openSettings();
+      } else {
+        this.updateCategories();
+      }
     });
   }
 
@@ -73,17 +77,21 @@ export class MarketPreparationComponent {
   }
 
   updateCategories() {
-    this.categories = this.marketSales.categories.map((category) => {
-      switch (category) {
-        case PC.FROZEN:
-          return SC.SMALL_FREEZER;
-        case PC.PASTEURIZED:
-          return SC.PASTEURIZED;
-        case PC.FRESH:
-        default:
-          return SC.FRESH;
-      }
-    });
+    if (this.marketSales.categories) {
+      this.categories = this.marketSales.categories.map((category) => {
+        switch (category) {
+          case PC.FROZEN:
+            return SC.SMALL_FREEZER;
+          case PC.PASTEURIZED:
+            return SC.PASTEURIZED;
+          case PC.FRESH:
+          default:
+            return SC.FRESH;
+        }
+      });
+    } else {
+      this.categories = [];
+    }
   }
 
   isValid() {
