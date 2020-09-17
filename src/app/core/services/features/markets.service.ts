@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Market } from 'src/app/shared/models/market.model';
+import { IdbStoresEnum } from '../../../utils/enums';
 import { ApiService } from '../api/api.service';
-import { StoresEnum } from '../idb.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MarketsService extends ApiService<Market> {
-  resource = StoresEnum.MARKETS;
+  resource = IdbStoresEnum.MARKETS;
   offlineRights = {
     read: true,
     manage: false,
@@ -20,7 +20,7 @@ export class MarketsService extends ApiService<Market> {
 
   async synchronizeDown() {
     if (navigator.onLine) {
-      await this.idbService.clearObjectStore(StoresEnum.MARKETS);
+      await this.idbService.clearObjectStore(IdbStoresEnum.MARKETS);
       let marketsSub: Subscription;
       marketsSub = this.getAll().subscribe((markets) => {
         if (marketsSub && !marketsSub.closed) {
@@ -28,7 +28,7 @@ export class MarketsService extends ApiService<Market> {
         }
         markets.forEach((market) => {
           const marketForIdb = new Market(market);
-          this.idbService.put(StoresEnum.MARKETS, marketForIdb, market.id);
+          this.idbService.put(IdbStoresEnum.MARKETS, marketForIdb, market.id);
         });
       });
     } else {

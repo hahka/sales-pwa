@@ -1,99 +1,36 @@
 import { Injectable } from '@angular/core';
-import { DBSchema, IDBPDatabase, openDB } from 'idb';
-import { BaseModel } from '../../shared/models/api/base.model';
 import { SearchDto } from '../../shared/models/api/search-dto.model';
 import { Market } from '../../shared/models/market.model';
 import { Product } from '../../shared/models/product.model';
-import { Stock } from '../../shared/models/stock.model';
+import { IdbStoresEnum } from '../../utils/enums';
 import { Page, PageRequest } from './api';
-
-export enum StoresEnum {
-  MARKETS = 'markets',
-  PRODUCTS = 'products',
-  STOCK = 'stock',
-}
-
-export enum UnsyncedTables {
-  UNSYNCED_MARKETS = 'unsynced_markets',
-}
-
-interface MyDB extends DBSchema {
-  markets: {
-    value: Market;
-    key: string;
-    indexes: any;
-  };
-  products: {
-    value: Product;
-    key: string;
-    indexes: any;
-  };
-  stock: {
-    value: Stock;
-    key: string;
-    indexes: any;
-  };
-}
+import { IdbCommonService } from './idb-common.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class IdbService<T extends BaseModel> {
-  onlineIdb: IDBPDatabase<MyDB>;
-
+export class IdbService<T extends Market | Product> extends IdbCommonService<T> {
   constructor() {
-    this.connectToIDB();
+    super();
   }
 
-  public async connectToIDB() {
-    if (!this.onlineIdb) {
-      this.onlineIdb = await openDB<MyDB>('OnlineIdb', 1, {
-        upgrade(db) {
-          const marketsStore = db.createObjectStore('markets');
-          marketsStore.createIndex('nameSortable', 'nameSortable');
-          const productsStore = db.createObjectStore('products');
-          productsStore.createIndex('nameSortable', 'nameSortable');
-          db.createObjectStore('stock');
-        },
-      });
-    }
-  }
-
-  public async disconnectFromIDB() {
-    this.onlineIdb.close();
-  }
-
-  public async getAll(store: StoresEnum) {
-    await this.connectToIDB();
-
-    return this.onlineIdb.getAll(store);
-  }
-
-  public async getById(store: StoresEnum, id: string) {
-    await this.connectToIDB();
-
-    return this.onlineIdb.get(store, id);
-  }
-
-  public async put(store: StoresEnum, data: T, id?: string) {
-    await this.connectToIDB();
+  public async put(store: IdbStoresEnum, data: T, id?: string) {
     let dataId = id;
     if (!dataId) {
       dataId = Date.now().toString();
       data.id = dataId;
     }
-    await this.onlineIdb.put(store, data.prepareForIdb(), dataId);
 
-    return this.onlineIdb.get(store, dataId);
+    return super.putCommon(store, data.prepareForIdb() as any, dataId);
   }
 
   public async search(
-    storeName: StoresEnum,
+    storeName: IdbStoresEnum,
     pageRequest: PageRequest<T>,
     _dto: SearchDto,
     idbSearch: (data: any, keyword: string) => boolean,
   ): Promise<Page<any>> {
-    await this.connectToIDB();
+    await super.connectToIDB();
     const store = this.onlineIdb.transaction(storeName, 'readonly').store;
 
     const sort = pageRequest.sort;
@@ -129,9 +66,5 @@ export class IdbService<T extends BaseModel> {
       data,
       pagination: { page: 0, length: data.length, total },
     };
-  }
-
-  public clearObjectStore(storeName: StoresEnum): Promise<void> {
-    return this.onlineIdb.clear(storeName);
   }
 }

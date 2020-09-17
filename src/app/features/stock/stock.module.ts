@@ -8,6 +8,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { ToastrModule } from 'ngx-toastr';
 import { ApiObsHelperModule } from '../../shared/components/api-obs-helper/api-obs-helper.module';
 import { StockComponent } from './stock.component';
 
@@ -25,6 +26,7 @@ import { StockComponent } from './stock.component';
     FormsModule,
     ReactiveFormsModule,
     TranslateModule,
+    ToastrModule,
   ],
   exports: [StockComponent],
 })

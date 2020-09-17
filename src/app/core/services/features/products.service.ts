@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { from, Subscription } from 'rxjs';
 import { pluck, take } from 'rxjs/operators';
 import { Product } from '../../../shared/models/product.model';
+import { IdbStoresEnum } from '../../../utils/enums';
 import { ApiService } from '../api/api.service';
-import { StoresEnum } from '../idb.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductsService extends ApiService<Product> {
-  resource = StoresEnum.PRODUCTS;
+  resource = IdbStoresEnum.PRODUCTS;
   offlineRights = {
     read: true,
     manage: false,
@@ -34,7 +34,7 @@ export class ProductsService extends ApiService<Product> {
 
   async synchronizeDown() {
     if (navigator.onLine) {
-      await this.idbService.clearObjectStore(StoresEnum.MARKETS);
+      await this.idbService.clearObjectStore(IdbStoresEnum.MARKETS);
       let productsSub: Subscription;
       productsSub = this.getFull().subscribe((products) => {
         if (productsSub && !productsSub.closed) {
@@ -42,7 +42,7 @@ export class ProductsService extends ApiService<Product> {
         }
         products.forEach((product) => {
           const productForIdb = new Product(product);
-          this.idbService.put(StoresEnum.PRODUCTS, productForIdb, product.id);
+          this.idbService.put(IdbStoresEnum.PRODUCTS, productForIdb, product.id);
         });
       });
     } else {

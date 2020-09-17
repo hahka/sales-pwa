@@ -6,7 +6,7 @@
   <div class="app__toolbar__status">
     <ng-container *ngIf="connectionStatusService.status$ | async; else offline">
       <a routerLink="/sync" *ngIf="syncService.isSynchronizationNeeded$ | async">
-        <mat-icon color="error">sync_alt</mat-icon>
+        <mat-icon class="sync-btn--error" color="error">sync_alt</mat-icon>
       </a>
     </ng-container>
     <ng-template #offline>
@@ -21,6 +21,7 @@
       <mat-list-item routerLink="/markets">Marchés </mat-list-item>
       <mat-list-item routerLink="/products">Produits </mat-list-item>
       <mat-list-item routerLink="/produce">Fabrication </mat-list-item>
+      <mat-list-item routerLink="/market_preparation">Préparation </mat-list-item>
       <mat-list-item routerLink="/sync">Synchro </mat-list-item>
     </mat-nav-list>
   </mat-sidenav>

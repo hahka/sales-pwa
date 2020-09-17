@@ -1,7 +1,7 @@
 import { BaseModel } from './api/base.model';
 
 export class Market implements BaseModel {
-  id: string;
+  id?: string;
   name: string;
 
   constructor(obj?: Market) {

@@ -13,6 +13,10 @@ mat-toolbar.app__toolbar {
   a {
     text-decoration: none;
   }
+
+  .sync-btn--error {
+    display: block;
+  }
 }
 
 mat-sidenav-container {

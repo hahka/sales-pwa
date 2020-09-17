@@ -3,18 +3,20 @@ import { Injectable } from '@angular/core';
 
 import { from, Observable } from 'rxjs';
 import { pluck, take } from 'rxjs/operators';
-import { BaseModel } from 'src/app/shared/models/api/base.model';
 import { SearchDto } from 'src/app/shared/models/api/search-dto.model';
 import { Detail, Page, PageRequest } from '.';
+import { Market } from '../../../shared/models/market.model';
+import { Product } from '../../../shared/models/product.model';
+import { IdbStoresEnum } from '../../../utils/enums';
 import { EnvironmentService } from '../environment/environment.service';
-import { IdbService, StoresEnum } from '../idb.service';
+import { IdbService } from '../idb.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export abstract class ApiService<T extends BaseModel> {
+export abstract class ApiService<T extends Product | Market> {
   /** API base endpoint for resource */
-  abstract resource: StoresEnum;
+  abstract resource: IdbStoresEnum;
 
   abstract offlineRights: {
     read: boolean;

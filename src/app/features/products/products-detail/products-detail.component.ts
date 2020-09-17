@@ -59,11 +59,13 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
   patchForm(product: Product): void {
     this.imageShouldBePatched = false;
     this.form.patchValue(product);
-    this.productsService.getImage(product.id).subscribe((data: any) => {
-      this.previewUrl = data
-        ? this.domSanitizer.bypassSecurityTrustResourceUrl(`data:image/png;base64, ${data}`)
-        : null;
-    });
+    if (product.id) {
+      this.productsService.getImage(product.id).subscribe((data: any) => {
+        this.previewUrl = data
+          ? this.domSanitizer.bypassSecurityTrustResourceUrl(`data:image/png;base64, ${data}`)
+          : null;
+      });
+    }
   }
 
   onHttpError(httpError: HttpErrorResponse): void {
