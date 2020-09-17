@@ -1,0 +1,20 @@
+<div class="pageHeaderContent">
+  <!-- Left cell: back button and title -->
+  <div class="items left">
+    <span class="page-header-title">{{ 'features.sale.title' | translate }}</span>
+  </div>
+  <div class="items buttons-wrapper buttons-wrapper--end">
+    <div class="buttons-container">
+      <button
+        mat-flat-button
+        color="primary"
+        class="btn--size-l"
+        (click)="onClick(ProduceAction.SAVE)"
+      >
+        {{ 'common.action.update' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-stock [categories]="categories" [functionnality]="stockFunctionnality"></app-stock>

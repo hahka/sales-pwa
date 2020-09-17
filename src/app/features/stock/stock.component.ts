@@ -24,10 +24,10 @@ export enum StockAction {
 })
 export class StockComponent implements OnInit, DoCheck {
   StockAction = StockAction;
+
   @Input() categories: STOCK_CATEGORIES[] = [];
   @Input() functionnality: STOCK_FUNCTIONALITIES = STOCK_FUNCTIONALITIES.PRODUCE;
 
-  quantities = Array.from(Array(51).keys());
   products: Product[];
   sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
 
@@ -49,9 +49,14 @@ export class StockComponent implements OnInit, DoCheck {
 
   sortedProducts: (StockItem & { name: string })[] = [];
 
+  get stockControl() {
+    return this.form.get('stock') as FormArray | null;
+  }
+
   private categoriesDiff: IterableDiffer<STOCK_CATEGORIES>;
 
   private readonly tileSize = 350;
+  private readonly maxQuantity = 50;
 
   constructor(
     private readonly productsService: ProductsService,
@@ -61,6 +66,15 @@ export class StockComponent implements OnInit, DoCheck {
     private readonly translateService: TranslateService,
     private readonly toasterService: ToastrService,
   ) {}
+
+  public quantities(index: number): number[] {
+    const stockControl = this.stockControl;
+    const productControl = stockControl && stockControl.at(index);
+
+    const max = !!productControl && !!productControl.value && productControl.value.maxQuantity;
+
+    return Array.from(Array((max || 0) + 1).keys());
+  }
 
   /** Handle Resizing */
   onResize(event: any): void {
@@ -75,9 +89,8 @@ export class StockComponent implements OnInit, DoCheck {
 
     this.productsService.getFull().subscribe((products) => {
       this.products = products || [];
-      const stockFormArray = this.form.get('stock') as FormArray | null;
 
-      if (stockFormArray) {
+      if (this.stockControl) {
         products.forEach((product) => {
           if (product.image && product.id) {
             this.sanitizedImages[product.id] = this.domSanitizer.bypassSecurityTrustResourceUrl(
@@ -104,23 +117,21 @@ export class StockComponent implements OnInit, DoCheck {
   onHttpError(_httpError: HttpErrorResponse): void {}
 
   public updateStock() {
-    const stockControl = this.form.get('stock') as FormArray | null;
+    const stockControl = this.stockControl;
     if (stockControl) {
       this.stock = new Stock(this.stock);
       this.stock.stock = stockControl.value;
       this.stock.cleanItems();
       this.stockService.put(this.stock).subscribe((localStock) => {
         this.stock = localStock;
-        stockControl.clear();
         this.initializeStock(true);
       });
     }
   }
 
   public resetStock(stock: STOCK_CATEGORIES) {
-    const stockControl = this.form.get('stock') as FormArray | null;
-    if (stockControl) {
-      stockControl.controls.forEach((control) => {
+    if (this.stockControl) {
+      this.stockControl.controls.forEach((control) => {
         if (control.value.category === stock) {
           control.patchValue({ quantity: 0 });
         }
@@ -138,10 +149,12 @@ export class StockComponent implements OnInit, DoCheck {
     return correction ? correction.correction : 0;
   }
 
+  /** Increases quantity via user click */
   increaseQuantity(i: number) {
     this.addToQuantityValue(i, 1);
   }
 
+  /** Decreases quantity via user click */
   decreaseQuantity(i: number) {
     this.addToQuantityValue(i, -1);
   }
@@ -160,13 +173,13 @@ export class StockComponent implements OnInit, DoCheck {
   }
 
   private addToQuantityValue(i: number, quantity: number): void {
-    const stockFormArray = this.form.get('stock') as FormArray | null;
-    const quantityControl = stockFormArray && stockFormArray.at(i);
-    if (quantityControl) {
-      const value = quantityControl.value;
+    const stockControl = this.stockControl;
+    const productControl = stockControl && stockControl.at(i);
+    if (productControl) {
+      const value = productControl.value;
       if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
         if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
-          const control = (stockFormArray as FormArray).controls.find(
+          const control = (stockControl as FormArray).controls.find(
             (fc) =>
               fc.value.productId === value.productId &&
               fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
@@ -175,7 +188,7 @@ export class StockComponent implements OnInit, DoCheck {
             const newValueForThisStock = value.quantity + quantity;
             const newValueForOtherStock = control.value.quantity - quantity;
             if (newValueForOtherStock >= 0 && newValueForThisStock >= 0) {
-              quantityControl.patchValue({ quantity: newValueForThisStock });
+              productControl.patchValue({ quantity: newValueForThisStock });
               control.patchValue({ quantity: newValueForOtherStock });
 
               return;
@@ -187,10 +200,10 @@ export class StockComponent implements OnInit, DoCheck {
             return;
           }
         } else {
-          return this.patchQuantity(quantityControl, value.quantity + quantity);
+          return this.patchQuantity(productControl, value.quantity + quantity);
         }
       } else {
-        return this.patchQuantity(quantityControl, value.quantity + quantity);
+        return this.patchQuantity(productControl, value.quantity + quantity);
       }
     } else {
       console.error('FormArray element missing');
@@ -215,9 +228,12 @@ export class StockComponent implements OnInit, DoCheck {
       !!this.stock &&
       this.categories.length > 0
     ) {
-      const stockFormArray = this.form.get('stock') as FormArray | null;
+      const stockControl = this.stockControl;
       const dataBeforeSort: (StockItem & { name: string })[] = [];
-      if (stockFormArray) {
+      if (stockControl) {
+        if (force) {
+          stockControl.clear();
+        }
         this.products.forEach((product) => {
           if (!!product.id) {
             const productId = product.id;
@@ -236,27 +252,78 @@ export class StockComponent implements OnInit, DoCheck {
         });
         this.processCorrections();
         this.sortedProducts.forEach((data) => {
-          stockFormArray.push(
+          stockControl.push(
             new FormGroup({
               productId: new FormControl(data.productId),
               name: new FormControl(data.name),
               quantity: new FormControl(data.quantity),
+              maxQuantity: new FormControl(data.quantity),
               category: new FormControl(data.category),
             }),
           );
         });
-        this.stock.stock.forEach((stockItem) => {
-          const control = stockFormArray.controls.find(
-            (fc) =>
-              fc.value.productId === stockItem.productId &&
-              fc.value.category === stockItem.category,
-          );
-          if (control) {
-            control.patchValue({ quantity: stockItem.quantity });
-          }
-        });
+        this.prepareStockQuantities(stockControl);
+        this.prepareStockMaxQuantities(stockControl);
+
         this.isStockInitialized = true;
       }
+    }
+  }
+
+  private prepareStockQuantities(stockControl: FormArray) {
+    if (this.stock) {
+      this.stock.stock.forEach((stockItem) => {
+        const productControl = stockControl.controls.find(
+          (fc) =>
+            fc.value.productId === stockItem.productId && fc.value.category === stockItem.category,
+        );
+        if (productControl) {
+          if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET) {
+            productControl.patchValue({ quantity: stockItem.quantity });
+          }
+        }
+      });
+    }
+  }
+
+  private prepareStockMaxQuantities(stockControl: FormArray) {
+    if (this.stock) {
+      this.stock.stock.forEach((stockItem) => {
+        const productControl = stockControl.controls.find(
+          (fc) =>
+            fc.value.productId === stockItem.productId && fc.value.category === stockItem.category,
+        );
+        if (productControl) {
+          if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET) {
+            productControl.patchValue({ maxQuantity: stockItem.quantity });
+          } else if (this.functionnality === STOCK_FUNCTIONALITIES.PRODUCE) {
+            productControl.patchValue({ maxQuantity: this.maxQuantity });
+          } else {
+            // Market preparation. We can't put more products in SMALL_FREEZER than what is in LARGE_FREEZER
+
+            const value = productControl.value;
+            if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
+              const referenceControl = (stockControl as FormArray).controls.find(
+                (fc) =>
+                  fc.value.productId === value.productId &&
+                  fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
+              );
+              if (referenceControl) {
+                const referenceValue = referenceControl.value.quantity;
+                if (referenceValue) {
+                  productControl.patchValue({ maxQuantity: referenceValue });
+
+                  return;
+                }
+
+                return;
+              }
+            } else {
+              productControl.patchValue({ maxQuantity: this.maxQuantity });
+            }
+          }
+        }
+      });
     }
   }
 

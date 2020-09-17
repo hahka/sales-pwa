@@ -37,7 +37,7 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Quantité</mat-label>
                   <mat-select formControlName="quantity" required>
-                    <mat-option *ngFor="let quantity of quantities" [value]="quantity">
+                    <mat-option *ngFor="let quantity of quantities(i)" [value]="quantity">
                       {{ quantity }}
                     </mat-option>
                   </mat-select>
