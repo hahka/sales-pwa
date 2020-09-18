@@ -22,6 +22,10 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'sale',
+    loadChildren: () => import('./features/sale/sale.module').then((m) => m.SaleModule),
+  },
+  {
     path: 'sync',
     loadChildren: () => import('./features/sync/sync.module').then((m) => m.SyncModule),
   },

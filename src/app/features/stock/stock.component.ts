@@ -4,8 +4,10 @@ import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/for
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
+import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
+import { MarketSales, Sale, SaleItem } from '../../shared/models/market-sales.model';
 import { Product } from '../../shared/models/product.model';
 import { StockItem } from '../../shared/models/stock-item.model';
 import { Stock } from '../../shared/models/stock.model';
@@ -56,7 +58,9 @@ export class StockComponent implements OnInit, DoCheck {
   private categoriesDiff: IterableDiffer<STOCK_CATEGORIES>;
 
   private readonly tileSize = 350;
-  private readonly maxQuantity = 50;
+  private readonly maxQuantity = 100;
+
+  private marketSales: MarketSales;
 
   constructor(
     private readonly productsService: ProductsService,
@@ -65,7 +69,12 @@ export class StockComponent implements OnInit, DoCheck {
     private readonly iterableDiffers: IterableDiffers,
     private readonly translateService: TranslateService,
     private readonly toasterService: ToastrService,
-  ) {}
+    private readonly marketSalesService: MarketSalesService,
+  ) {
+    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
+      this.marketSales = new MarketSales(marketSales);
+    });
+  }
 
   public quantities(index: number): number[] {
     const stockControl = this.stockControl;
@@ -120,11 +129,21 @@ export class StockComponent implements OnInit, DoCheck {
     const stockControl = this.stockControl;
     if (stockControl) {
       this.stock = new Stock(this.stock);
-      this.stock.stock = stockControl.value;
+      const { stock, sale } = this.prepareStockForUpdate(stockControl.value);
+
+      this.stock.stock = stock;
       this.stock.cleanItems();
       this.stockService.put(this.stock).subscribe((localStock) => {
-        this.stock = localStock;
-        this.initializeStock(true);
+        if (!this.marketSales.sales) {
+          this.marketSales.sales = [];
+        }
+
+        if (sale) this.marketSales.sales.push(sale);
+
+        this.marketSalesService.put(this.marketSales).subscribe(() => {
+          this.stock = localStock;
+          this.initializeStock(true);
+        });
       });
     }
   }
@@ -172,43 +191,26 @@ export class StockComponent implements OnInit, DoCheck {
     }
   }
 
+  /** Patches the quantity value if it is >= 0 or <= maxQuantity */
   private addToQuantityValue(i: number, quantity: number): void {
     const stockControl = this.stockControl;
     const productControl = stockControl && stockControl.at(i);
     if (productControl) {
       const value = productControl.value;
-      if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
-        if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
-          const control = (stockControl as FormArray).controls.find(
-            (fc) =>
-              fc.value.productId === value.productId &&
-              fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
-          );
-          if (control) {
-            const newValueForThisStock = value.quantity + quantity;
-            const newValueForOtherStock = control.value.quantity - quantity;
-            if (newValueForOtherStock >= 0 && newValueForThisStock >= 0) {
-              productControl.patchValue({ quantity: newValueForThisStock });
-              control.patchValue({ quantity: newValueForOtherStock });
-
-              return;
-            }
-            if (newValueForOtherStock < 0) {
-              this.toasterService.error(`Stock d'origin insuffisant`);
-            }
-
-            return;
+      const newValueForThisStock = value.quantity + quantity;
+      if (newValueForThisStock > value.maxQuantity) {
+        if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
+          if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
+            this.toasterService.error(`Stock d'origin insuffisant`);
           }
-        } else {
-          return this.patchQuantity(productControl, value.quantity + quantity);
         }
-      } else {
-        return this.patchQuantity(productControl, value.quantity + quantity);
+
+        return;
       }
-    } else {
-      console.error('FormArray element missing');
+
+      return this.patchQuantity(productControl, value.quantity + quantity);
     }
-    console.error('some quantity is < 0');
+    console.error('FormArray element missing');
   }
 
   private patchQuantity(quantityControl: AbstractControl, newQuantity: number) {
@@ -263,7 +265,7 @@ export class StockComponent implements OnInit, DoCheck {
           );
         });
         this.prepareStockQuantities(stockControl);
-        this.prepareStockMaxQuantities(stockControl);
+        this.patchStockMaxQuantities(stockControl);
 
         this.isStockInitialized = true;
       }
@@ -286,7 +288,7 @@ export class StockComponent implements OnInit, DoCheck {
     }
   }
 
-  private prepareStockMaxQuantities(stockControl: FormArray) {
+  private patchStockMaxQuantities(stockControl: FormArray) {
     if (this.stock) {
       this.stock.stock.forEach((stockItem) => {
         const productControl = stockControl.controls.find(
@@ -350,5 +352,58 @@ export class StockComponent implements OnInit, DoCheck {
         dataDisplayed += 1;
       }
     });
+  }
+
+  private prepareStockForUpdate(
+    stock: StockItem[],
+  ): { stock: StockItem[]; sale: Sale | undefined } {
+    const filteredSale = Stock.staticCleanItems(stock).filter((stockItem) => stockItem.quantity);
+    if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET || filteredSale.length === 0) {
+      return { stock, sale: undefined };
+    }
+
+    if (this.stock) {
+      // After a sale. We need to substract stock quantities to this.stock quantities.
+      stock.forEach((stockItem) => {
+        if (this.stock) {
+          const index = this.stock.stock.findIndex((sstockItem) => {
+            return (
+              sstockItem.productId === stockItem.productId &&
+              sstockItem.category === stockItem.category
+            );
+          });
+          this.stock.stock[index].quantity -= stockItem.quantity;
+        }
+      });
+
+      if (filteredSale) {
+        const products = this.products;
+        const saleItems = filteredSale
+          .map((f) => {
+            const product = products.find((p) => p.id === f.productId);
+            if (product) {
+              return new SaleItem({
+                product: { id: f.productId, name: product.name },
+                quantity: f.quantity,
+                price: product.price * f.quantity,
+              });
+            }
+
+            return undefined;
+          })
+          .filter((si) => !!si) as SaleItem[];
+
+        return {
+          stock: this.stock.stock,
+          sale: new Sale({
+            items: saleItems,
+            date: new Date().toISOString(),
+            discount: 0,
+          }),
+        };
+      }
+    }
+
+    return { stock, sale: undefined };
   }
 }

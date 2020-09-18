@@ -1,10 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { STOCK_CATEGORIES as SC } from 'src/app/utils/enums';
-import { StockComponent } from '../stock/stock.component';
-
-export enum ProduceAction {
-  SAVE = 'SAVE',
-}
+import { StockAction, StockComponent } from '../stock/stock.component';
 
 @Component({
   selector: 'app-produce',
@@ -14,12 +10,12 @@ export enum ProduceAction {
 export class ProduceComponent {
   @ViewChild(StockComponent, { static: true }) stockComponent: StockComponent;
 
-  ProduceAction = ProduceAction;
+  StockAction = StockAction;
 
   categories: SC[] = [SC.FRESH, SC.LARGE_FREEZER, SC.PASTEURIZED];
 
-  onClick(producingAction: ProduceAction) {
-    if (producingAction === ProduceAction.SAVE) {
+  onClick(producingAction: StockAction) {
+    if (producingAction === StockAction.SAVE) {
       if (this.stockComponent) {
         this.stockComponent.updateStock();
       }

@@ -10,11 +10,7 @@ import {
   STOCK_CATEGORIES as SC,
   STOCK_FUNCTIONALITIES,
 } from '../../utils/enums';
-import { StockComponent } from '../stock/stock.component';
-
-export enum Action {
-  SAVE = 'SAVE',
-}
+import { StockAction, StockComponent } from '../stock/stock.component';
 
 @Component({
   selector: 'app-market-preparation',
@@ -26,7 +22,7 @@ export class MarketPreparationComponent {
 
   stockFunctionnality = STOCK_FUNCTIONALITIES.MARKET_PREPARATION;
 
-  Action = Action;
+  StockAction = StockAction;
   categories: SC[] = [];
 
   market = new FormControl();
@@ -47,8 +43,8 @@ export class MarketPreparationComponent {
     });
   }
 
-  onClick(producingAction: Action) {
-    if (producingAction === Action.SAVE) {
+  onClick(action: StockAction) {
+    if (action === StockAction.SAVE) {
       if (this.stockComponent) {
         this.stockComponent.updateStock();
         this.marketSalesService.put(this.marketSales);

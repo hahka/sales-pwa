@@ -1,6 +1,16 @@
 import { StockItem } from './stock-item.model';
 
 export class Stock {
+  static staticCleanItems(items: StockItem[]) {
+    return items.map((stockItem) => {
+      return {
+        category: stockItem.category,
+        productId: stockItem.productId,
+        quantity: stockItem.quantity,
+      };
+    });
+  }
+
   id: string;
   stock: StockItem[] = [];
   lastUpdate: string;
@@ -21,13 +31,7 @@ export class Stock {
    */
   cleanItems() {
     if (this.stock) {
-      this.stock = this.stock.map((stockItem) => {
-        return {
-          category: stockItem.category,
-          productId: stockItem.productId,
-          quantity: stockItem.quantity,
-        };
-      });
+      this.stock = Stock.staticCleanItems(this.stock);
     }
   }
 }

@@ -34,7 +34,9 @@ export class MarketSalesService {
    * @param data The data to patch
    */
   public put(data: MarketSales) {
-    return this.idbService.putCommon(this.resource, new MarketSales(data), this.marketSalesOnlyId);
+    return from(
+      this.idbService.putCommon(this.resource, new MarketSales(data), this.marketSalesOnlyId),
+    );
   }
 
   public getLocalStock() {
