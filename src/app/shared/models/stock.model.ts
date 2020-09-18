@@ -1,13 +1,13 @@
 import { StockItem } from './stock-item.model';
 
 export class Stock {
-  static staticCleanItems(items: StockItem[]) {
+  static staticCleanItems(items: StockItem[]): StockItem[] {
     return items.map((stockItem) => {
-      return {
+      return new StockItem({
         category: stockItem.category,
         productId: stockItem.productId,
         quantity: stockItem.quantity,
-      };
+      });
     });
   }
 

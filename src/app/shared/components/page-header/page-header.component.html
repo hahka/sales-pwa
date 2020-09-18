@@ -1,6 +1,6 @@
-<div class="pageHeaderContent">
+<div class="page-header">
   <!-- Left cell: back button and title -->
-  <div class="items left">
+  <div class="page-header__content">
     <button
       *ngIf="!forList"
       mat-mini-fab
@@ -10,13 +10,13 @@
     >
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <span class="page-header-title">{{ title }}</span>
+    <span class="page-header__title">{{ title }}</span>
   </div>
   <!-- Right cell: primary and secondary buttons -->
-  <div class="items buttons-wrapper buttons-wrapper--end" *ngIf="forList">
+  <div class="buttons-wrapper buttons-wrapper--end" *ngIf="forList">
     <ng-content select="[buttons]"></ng-content>
   </div>
-  <div class="items buttons-wrapper buttons-wrapper--end" *ngIf="displayCrudBtn && !forList">
+  <div class="buttons-wrapper buttons-wrapper--end" *ngIf="displayCrudBtn && !forList">
     <ng-content select="[buttons]"></ng-content>
     <div *ngIf="readonly">
       <button mat-stroked-button color="primary" (click)="onClick(PageHeaderAction.UPDATE)">

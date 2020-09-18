@@ -2,7 +2,7 @@
   background-color: inherit;
 }
 
-.pageHeaderContent {
+.page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -11,15 +11,21 @@
   top: 24px;
   background: inherit;
   z-index: 100;
+
+  &__content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: 24px;
+    vertical-align: middle;
+  }
 }
 
 .btn-back {
   margin-right: 16px;
-}
-
-.page-header-title {
-  font-size: 24px;
-  vertical-align: middle;
 }
 
 .buttons-container {

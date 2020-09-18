@@ -1,1 +1,7 @@
 @import '../../shared/components/page-header/page-header.component.scss';
+
+.price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}

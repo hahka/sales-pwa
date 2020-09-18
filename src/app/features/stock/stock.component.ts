@@ -1,5 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DoCheck, Input, IterableDiffer, IterableDiffers, OnInit } from '@angular/core';
+import {
+  Component,
+  DoCheck,
+  EventEmitter,
+  Input,
+  IterableDiffer,
+  IterableDiffers,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
@@ -30,6 +39,8 @@ export class StockComponent implements OnInit, DoCheck {
 
   @Input() categories: STOCK_CATEGORIES[] = [];
   @Input() functionnality: STOCK_FUNCTIONALITIES = STOCK_FUNCTIONALITIES.PRODUCE;
+
+  @Output() saleUpdate: EventEmitter<Sale> = new EventEmitter();
 
   products: Product[];
   sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
@@ -75,6 +86,9 @@ export class StockComponent implements OnInit, DoCheck {
   ) {
     this.marketSalesService.getMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
+    });
+    this.form.valueChanges.subscribe(() => {
+      this.emitSale();
     });
   }
 
@@ -266,12 +280,12 @@ export class StockComponent implements OnInit, DoCheck {
             maxQuantity: new FormControl(data.quantity),
             category: new FormControl(data.category),
           });
+          stockControl.push(productFormGroup);
           productFormGroup.valueChanges
             .pipe(startWith(productFormGroup.value), pairwise())
             .subscribe(([oldValue, newValue]) => {
               this.updateLinkedStock(oldValue, newValue);
             });
-          stockControl.push(productFormGroup);
         });
 
         this.patchStockMaxQuantities(stockControl);
@@ -371,8 +385,8 @@ export class StockComponent implements OnInit, DoCheck {
   private prepareStockForUpdate(
     stock: StockItem[],
   ): { stock: StockItem[]; sale: Sale | undefined } {
-    const filteredSale = Stock.staticCleanItems(stock).filter((stockItem) => stockItem.quantity);
-    if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET || filteredSale.length === 0) {
+    const filteredItems = Stock.staticCleanItems(stock).filter((stockItem) => stockItem.quantity);
+    if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET || filteredItems.length === 0) {
       return { stock, sale: undefined };
     }
 
@@ -390,27 +404,11 @@ export class StockComponent implements OnInit, DoCheck {
         }
       });
 
-      if (filteredSale) {
-        const products = this.products;
-        const saleItems = filteredSale
-          .map((f) => {
-            const product = products.find((p) => p.id === f.productId);
-            if (product) {
-              return new SaleItem({
-                product: { id: f.productId, name: product.name },
-                quantity: f.quantity,
-                price: product.price * f.quantity,
-              });
-            }
-
-            return undefined;
-          })
-          .filter((si) => !!si) as SaleItem[];
-
+      if (filteredItems) {
         return {
           stock: this.stock.stock,
           sale: new Sale({
-            items: saleItems,
+            items: this.prepareStockItemsForSale(filteredItems),
             date: new Date().toISOString(),
             discount: 0,
           }),
@@ -419,6 +417,46 @@ export class StockComponent implements OnInit, DoCheck {
     }
 
     return { stock, sale: undefined };
+  }
+
+  /**
+   * Transforms stock items to sale items so they can be used by Sale model
+   * @param items Items being sold
+   */
+  private prepareStockItemsForSale(items: StockItem[]): SaleItem[] {
+    return items
+      .map((item) => {
+        const product = this.products.find((p) => p.id === item.productId);
+        if (product) {
+          return new SaleItem({
+            product: { id: item.productId, name: product.name },
+            quantity: item.quantity,
+            price: product.price * item.quantity,
+          });
+        }
+
+        return undefined;
+      })
+      .filter((si) => !!si) as SaleItem[];
+  }
+
+  /**
+   * Called whenever form values change.
+   */
+  private emitSale() {
+    const stock = this.stockControl;
+    if (stock) {
+      const filteredItems = Stock.staticCleanItems(stock.value).filter(
+        (stockItem) => stockItem.quantity,
+      );
+      this.saleUpdate.emit(
+        new Sale({
+          items: this.prepareStockItemsForSale(filteredItems),
+          date: new Date().toISOString(),
+          discount: 0,
+        }),
+      );
+    }
   }
 
   /**

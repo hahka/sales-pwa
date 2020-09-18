@@ -1,9 +1,13 @@
-<div class="pageHeaderContent">
+<div class="page-header">
   <!-- Left cell: back button and title -->
-  <div class="items left">
-    <span class="page-header-title">{{ 'features.sale.title' | translate }}</span>
+  <div class="page-header__content">
+    <span class="page-header__title">{{ 'features.sale.title' | translate }}</span>
+    <div class="price-container">
+      <span>Prix TTC: {{ currentPrice }}€</span>
+      <span>TVA: {{ computeTva }}€</span>
+    </div>
   </div>
-  <div class="items buttons-wrapper buttons-wrapper--end">
+  <div class="buttons-wrapper buttons-wrapper--end">
     <div class="buttons-container">
       <button
         mat-flat-button
@@ -17,4 +21,8 @@
   </div>
 </div>
 
-<app-stock [categories]="categories" [functionnality]="stockFunctionnality"></app-stock>
+<app-stock
+  [categories]="categories"
+  [functionnality]="stockFunctionnality"
+  (saleUpdate)="onSaleUpdate($event)"
+></app-stock>

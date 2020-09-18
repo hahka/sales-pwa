@@ -1,11 +1,11 @@
-<div class="pageHeaderContent">
-  <div class="items left">
-    <span class="page-header-title">
+<div class="page-header">
+  <div class="page-header__content">
+    <span class="page-header__title">
       {{ 'features.market_preparation.title' | translate }}
       {{ marketSales?.marketName ? ' : ' + marketSales.marketName : '' }}
     </span>
   </div>
-  <div class="items buttons-wrapper buttons-wrapper--end">
+  <div class="buttons-wrapper buttons-wrapper--end">
     <div class="buttons-container">
       <button mat-icon-button (click)="openSettings()"><mat-icon>settings</mat-icon></button>
       <button
