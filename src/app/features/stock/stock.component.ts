@@ -4,6 +4,7 @@ import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/for
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
+import { pairwise, startWith } from 'rxjs/operators';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
@@ -33,6 +34,7 @@ export class StockComponent implements OnInit, DoCheck {
   products: Product[];
   sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
 
+  /** The stock fetched from server. This is manually updated only when selling items */
   stock: Stock | undefined;
 
   form = new FormGroup({
@@ -208,7 +210,7 @@ export class StockComponent implements OnInit, DoCheck {
         return;
       }
 
-      return this.patchQuantity(productControl, value.quantity + quantity);
+      return this.patchQuantity(productControl, newValueForThisStock);
     }
     console.error('FormArray element missing');
   }
@@ -230,6 +232,7 @@ export class StockComponent implements OnInit, DoCheck {
       !!this.stock &&
       this.categories.length > 0
     ) {
+      this.isStockInitialized = false;
       const stockControl = this.stockControl;
       const dataBeforeSort: (StockItem & { name: string })[] = [];
       if (stockControl) {
@@ -252,19 +255,25 @@ export class StockComponent implements OnInit, DoCheck {
         this.sortedProducts = dataBeforeSort.sort((a, b) => {
           return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
         });
+        const stockPreparation = this.prepareStockQuantities(this.sortedProducts);
+
         this.processCorrections();
-        this.sortedProducts.forEach((data) => {
-          stockControl.push(
-            new FormGroup({
-              productId: new FormControl(data.productId),
-              name: new FormControl(data.name),
-              quantity: new FormControl(data.quantity),
-              maxQuantity: new FormControl(data.quantity),
-              category: new FormControl(data.category),
-            }),
-          );
+        stockPreparation.forEach((data) => {
+          const productFormGroup = new FormGroup({
+            productId: new FormControl(data.productId),
+            name: new FormControl(data.name),
+            quantity: new FormControl(data.quantity),
+            maxQuantity: new FormControl(data.quantity),
+            category: new FormControl(data.category),
+          });
+          productFormGroup.valueChanges
+            .pipe(startWith(productFormGroup.value), pairwise())
+            .subscribe(([oldValue, newValue]) => {
+              this.updateLinkedStock(oldValue, newValue);
+            });
+          stockControl.push(productFormGroup);
         });
-        this.prepareStockQuantities(stockControl);
+
         this.patchStockMaxQuantities(stockControl);
 
         this.isStockInitialized = true;
@@ -272,20 +281,21 @@ export class StockComponent implements OnInit, DoCheck {
     }
   }
 
-  private prepareStockQuantities(stockControl: FormArray) {
+  private prepareStockQuantities(products: (StockItem & { name: string })[]) {
     if (this.stock) {
       this.stock.stock.forEach((stockItem) => {
-        const productControl = stockControl.controls.find(
-          (fc) =>
-            fc.value.productId === stockItem.productId && fc.value.category === stockItem.category,
+        const productIndex = products.findIndex(
+          (fc) => fc.productId === stockItem.productId && fc.category === stockItem.category,
         );
-        if (productControl) {
+        if (productIndex !== -1) {
           if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET) {
-            productControl.patchValue({ quantity: stockItem.quantity });
+            products[productIndex].quantity = stockItem.quantity;
           }
         }
       });
     }
+
+    return products;
   }
 
   private patchStockMaxQuantities(stockControl: FormArray) {
@@ -313,7 +323,7 @@ export class StockComponent implements OnInit, DoCheck {
               if (referenceControl) {
                 const referenceValue = referenceControl.value.quantity;
                 if (referenceValue) {
-                  productControl.patchValue({ maxQuantity: referenceValue });
+                  productControl.patchValue({ maxQuantity: referenceValue + value.quantity });
 
                   return;
                 }
@@ -354,6 +364,10 @@ export class StockComponent implements OnInit, DoCheck {
     });
   }
 
+  /**
+   * Prepares the stock once a sale is made.
+   * @param stock Value of the FormArray which contains the items of the sale
+   */
   private prepareStockForUpdate(
     stock: StockItem[],
   ): { stock: StockItem[]; sale: Sale | undefined } {
@@ -405,5 +419,38 @@ export class StockComponent implements OnInit, DoCheck {
     }
 
     return { stock, sale: undefined };
+  }
+
+  /**
+   * Updates stock that are linked when a change is made on a d product.
+   * e.g. when a product from SMALL_FREEZER changes in quantity, the same product in LARGE_FREEZER should change accordingly in quantity.
+   * +quantity in S_FREEZER => -quantity in L_FREEZER
+   * @param oldControlValue Ancient value of the product FormGroup
+   * @param newControlValue New value of the product FormGroup
+   */
+  private updateLinkedStock(oldControlValue: any, newControlValue: any) {
+    if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
+      if (this.isStockInitialized && this.stockControl) {
+        const stockCategory = newControlValue.category;
+        if (stockCategory === STOCK_CATEGORIES.SMALL_FREEZER) {
+          const oldQuantity = oldControlValue.quantity;
+          const newQuantity = newControlValue.quantity;
+
+          /** Diff should be added from linked stock */
+          const diff = (oldQuantity || 0) - (newQuantity || 0);
+          if (diff !== 0) {
+            const productId = newControlValue.productId;
+            const linkedControl = this.stockControl.controls.find(
+              (fc) =>
+                fc.value.productId === productId &&
+                fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
+            );
+            if (linkedControl) {
+              linkedControl.patchValue({ quantity: linkedControl.value.quantity + diff });
+            }
+          }
+        }
+      }
+    }
   }
 }
