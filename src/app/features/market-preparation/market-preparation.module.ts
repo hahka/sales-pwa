@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +10,6 @@ import { MarketPreparationComponent } from './market-preparation.component';
 @NgModule({
   declarations: [MarketPreparationComponent],
   imports: [
-    CommonModule,
     MatIconModule,
     MatButtonModule,
     RouterModule.forChild([

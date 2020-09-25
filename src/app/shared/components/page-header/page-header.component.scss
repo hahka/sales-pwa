@@ -15,7 +15,10 @@
   &__content {
     flex: 1;
     display: flex;
-    justify-content: space-between;
+
+    & > * {
+      line-height: 40px;
+    }
   }
 
   &__title {

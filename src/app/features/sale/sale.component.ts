@@ -1,14 +1,19 @@
 import { Component, ViewChild } from '@angular/core';
-import { Sale } from 'src/app/shared/models/market-sales.model';
-import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from 'src/app/utils/enums';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { MarketSalesService } from '../../core/services/features/market-sales.service';
+import { MarketSalesComponent } from '../../shared/components/market-sales/market-sales.component';
+import { Sale } from '../../shared/models/market-sales.model';
+import { AppRoutes, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { StockAction, StockComponent } from '../stock/stock.component';
+import { NotReadyDialogComponent } from './not-ready-dialog/not-ready-dialog.component';
 
 @Component({
   selector: 'app-sale',
   templateUrl: './sale.component.html',
   styleUrls: ['./sale.component.scss'],
 })
-export class SaleComponent {
+export class SaleComponent extends MarketSalesComponent {
   @ViewChild(StockComponent, { static: true }) stockComponent: StockComponent;
 
   StockAction = StockAction;
@@ -17,12 +22,26 @@ export class SaleComponent {
 
   currentPrice: number;
 
-  stockFunctionnality = STOCK_FUNCTIONALITIES.MARKET;
-
-  categories: SC[] = [SC.FRESH, SC.SMALL_FREEZER, SC.PASTEURIZED];
+  SF = STOCK_FUNCTIONALITIES;
 
   get computeTva() {
     return ((this.currentPrice * 5.5) / 100).toFixed(2);
+  }
+
+  constructor(
+    protected readonly matDialog: MatDialog,
+    protected readonly marketSalesService: MarketSalesService,
+    private readonly router: Router,
+  ) {
+    super(matDialog, marketSalesService);
+  }
+
+  marketNotReadyHandler(): void {
+    const dialogRef = this.matDialog.open(NotReadyDialogComponent);
+
+    dialogRef.afterClosed().subscribe((_) => {
+      this.router.navigate(['..', AppRoutes.MARKET_PREPARATION]);
+    });
   }
 
   onClick(action: StockAction) {

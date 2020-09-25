@@ -1,15 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { SettingsDialogData } from 'src/app/shared/components/settings-dialog/settings-dialog-data.model';
+import { SettingsDialogComponent } from 'src/app/shared/components/settings-dialog/settings-dialog.component';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
-import { SettingsDialogData } from '../../shared/components/settings-dialog/settings-dialog-data.model';
-import { SettingsDialogComponent } from '../../shared/components/settings-dialog/settings-dialog.component';
+import { MarketSalesComponent } from '../../shared/components/market-sales/market-sales.component';
 import { MarketSales } from '../../shared/models/market-sales.model';
-import {
-  PRODUCT_CATEGORIES as PC,
-  STOCK_CATEGORIES as SC,
-  STOCK_FUNCTIONALITIES,
-} from '../../utils/enums';
+import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { StockAction, StockComponent } from '../stock/stock.component';
 
 @Component({
@@ -17,10 +14,10 @@ import { StockAction, StockComponent } from '../stock/stock.component';
   templateUrl: './market-preparation.component.html',
   styleUrls: ['./market-preparation.component.scss'],
 })
-export class MarketPreparationComponent {
+export class MarketPreparationComponent extends MarketSalesComponent {
   @ViewChild(StockComponent, { static: true }) stockComponent: StockComponent;
 
-  stockFunctionnality = STOCK_FUNCTIONALITIES.MARKET_PREPARATION;
+  SF = STOCK_FUNCTIONALITIES;
 
   StockAction = StockAction;
   categories: SC[] = [];
@@ -30,17 +27,14 @@ export class MarketPreparationComponent {
   marketSales: MarketSales;
 
   constructor(
-    private readonly matDialog: MatDialog,
-    private readonly marketSalesService: MarketSalesService,
+    protected readonly matDialog: MatDialog,
+    protected readonly marketSalesService: MarketSalesService,
   ) {
-    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
-      this.marketSales = new MarketSales(marketSales);
-      if (!this.marketSales.categories || !this.marketSales.categories.length) {
-        this.openSettings();
-      } else {
-        this.updateCategories();
-      }
-    });
+    super(matDialog, marketSalesService);
+  }
+
+  marketNotReadyHandler(): void {
+    this.openSettings();
   }
 
   onClick(action: StockAction) {
@@ -69,24 +63,6 @@ export class MarketPreparationComponent {
         }
         this.updateCategories();
       });
-    }
-  }
-
-  updateCategories() {
-    if (this.marketSales.categories) {
-      this.categories = this.marketSales.categories.map((category) => {
-        switch (category) {
-          case PC.FROZEN:
-            return SC.SMALL_FREEZER;
-          case PC.PASTEURIZED:
-            return SC.PASTEURIZED;
-          case PC.FRESH:
-          default:
-            return SC.FRESH;
-        }
-      });
-    } else {
-      this.categories = [];
     }
   }
 

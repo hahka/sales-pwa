@@ -32,3 +32,7 @@ export enum IdbStoresEnum {
 export enum UnsyncedTables {
   UNSYNCED_MARKETS = 'unsynced_markets',
 }
+
+export enum AppRoutes {
+  MARKET_PREPARATION = 'market_preparation',
+}

@@ -38,6 +38,9 @@
         },
         "market_preparation": {
             "title": "Préparation de marché"
+        },
+        "sale": {
+            "title": "Vente"
         }
     },
     "categories": {
