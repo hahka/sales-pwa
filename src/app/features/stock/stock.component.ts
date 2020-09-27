@@ -10,6 +10,7 @@ import {
   Output,
 } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
@@ -23,10 +24,12 @@ import { StockItem } from '../../shared/models/stock-item.model';
 import { Stock } from '../../shared/models/stock.model';
 import { STOCK_CATEGORIES, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { CATEGORIES_MATCHING, STOCK_ORDER } from '../../utils/stocks.util';
+import { ResetStockDialogComponent } from './reset-stock-dialog/reset-stock-dialog.component';
 
 export enum StockAction {
   SAVE = 'SAVE',
   RESET = 'RESET',
+  RESET_ALL = 'RESET_ALL',
 }
 
 @Component({
@@ -83,6 +86,7 @@ export class StockComponent implements OnInit, DoCheck {
     private readonly translateService: TranslateService,
     private readonly toasterService: ToastrService,
     private readonly marketSalesService: MarketSalesService,
+    private readonly matDialog: MatDialog,
   ) {
     this.marketSalesService.getMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
@@ -150,27 +154,38 @@ export class StockComponent implements OnInit, DoCheck {
       this.stock.stock = stock;
       this.stock.cleanItems();
       this.stockService.put(this.stock).subscribe((localStock) => {
-        if (!this.marketSales.sales) {
-          this.marketSales.sales = [];
+        if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET) {
+          if (!this.marketSales.sales) {
+            this.marketSales.sales = [];
+          }
+
+          if (sale) this.marketSales.sales.push(sale);
+
+          this.marketSalesService.put(this.marketSales).subscribe(() => {
+            this.stock = localStock;
+            this.initializeStock(true);
+          });
         }
-
-        if (sale) this.marketSales.sales.push(sale);
-
-        this.marketSalesService.put(this.marketSales).subscribe(() => {
-          this.stock = localStock;
-          this.initializeStock(true);
-        });
       });
     }
   }
 
-  public resetStock(stock: STOCK_CATEGORIES) {
-    if (this.stockControl) {
-      this.stockControl.controls.forEach((control) => {
-        if (control.value.category === stock) {
-          control.patchValue({ quantity: 0 });
+  public resetStock(stock?: STOCK_CATEGORIES) {
+    if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET) {
+      const dialogRef = this.matDialog.open(ResetStockDialogComponent, {
+        data: {
+          stock,
+          forSale: false,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: boolean) => {
+        if (result) {
+          this.confirmResetStock(stock);
         }
       });
+    } else {
+      this.confirmResetStock(stock);
     }
   }
 
@@ -195,6 +210,7 @@ export class StockComponent implements OnInit, DoCheck {
   }
 
   onClick(action: StockAction, stockCategory: STOCK_CATEGORIES) {
+    console.log(this.stockControl);
     switch (action) {
       case StockAction.RESET:
         if (
@@ -292,6 +308,16 @@ export class StockComponent implements OnInit, DoCheck {
 
         this.isStockInitialized = true;
       }
+    }
+  }
+
+  private confirmResetStock(stock?: STOCK_CATEGORIES) {
+    if (this.stockControl) {
+      this.stockControl.controls.forEach((control) => {
+        if (!stock || control.value.category === stock) {
+          control.patchValue({ quantity: 0 });
+        }
+      });
     }
   }
 

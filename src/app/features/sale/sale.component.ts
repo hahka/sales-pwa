@@ -45,10 +45,19 @@ export class SaleComponent extends MarketSalesComponent {
   }
 
   onClick(action: StockAction) {
-    if (action === StockAction.SAVE) {
-      if (this.stockComponent) {
-        this.stockComponent.updateStock();
-      }
+    switch (action) {
+      case StockAction.SAVE:
+        if (this.stockComponent) {
+          this.stockComponent.updateStock();
+        }
+        break;
+      case StockAction.RESET_ALL:
+        if (this.stockComponent) {
+          this.stockComponent.resetStock();
+        }
+        break;
+      default:
+        break;
     }
   }
 
