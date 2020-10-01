@@ -15,10 +15,9 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { pairwise, startWith } from 'rxjs/operators';
-import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
-import { MarketSales, Sale, SaleItem } from '../../shared/models/market-sales.model';
+import { Sale, SaleItem } from '../../shared/models/market-sales.model';
 import { Product } from '../../shared/models/product.model';
 import { StockItem } from '../../shared/models/stock-item.model';
 import { Stock } from '../../shared/models/stock.model';
@@ -76,8 +75,6 @@ export class StockComponent implements OnInit, DoCheck {
   private readonly tileSize = 350;
   private readonly maxQuantity = 100;
 
-  private marketSales: MarketSales;
-
   constructor(
     private readonly productsService: ProductsService,
     private readonly stockService: StockService,
@@ -85,12 +82,8 @@ export class StockComponent implements OnInit, DoCheck {
     private readonly iterableDiffers: IterableDiffers,
     private readonly translateService: TranslateService,
     private readonly toasterService: ToastrService,
-    private readonly marketSalesService: MarketSalesService,
     private readonly matDialog: MatDialog,
   ) {
-    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
-      this.marketSales = new MarketSales(marketSales);
-    });
     this.form.valueChanges.subscribe(() => {
       this.emitSale();
     });
@@ -145,27 +138,18 @@ export class StockComponent implements OnInit, DoCheck {
 
   onHttpError(_httpError: HttpErrorResponse): void {}
 
+  /**
+   * Updates the stock after either the stock has been updated manually or after a sale.
+   */
   public updateStock() {
     const stockControl = this.stockControl;
     if (stockControl) {
       this.stock = new Stock(this.stock);
-      const { stock, sale } = this.prepareStockForUpdate(stockControl.value);
 
-      this.stock.stock = stock;
+      this.stock.stock = this.prepareStockAfterSale(stockControl.value);
       this.stock.cleanItems();
-      this.stockService.put(this.stock).subscribe((localStock) => {
-        if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET) {
-          if (!this.marketSales.sales) {
-            this.marketSales.sales = [];
-          }
-
-          if (sale) this.marketSales.sales.push(sale);
-
-          this.marketSalesService.put(this.marketSales).subscribe(() => {
-            this.stock = localStock;
-            this.initializeStock(true);
-          });
-        }
+      this.stockService.put(this.stock).subscribe((_) => {
+        this.initializeStock(true);
       });
     }
   }
@@ -210,7 +194,6 @@ export class StockComponent implements OnInit, DoCheck {
   }
 
   onClick(action: StockAction, stockCategory: STOCK_CATEGORIES) {
-    console.log(this.stockControl);
     switch (action) {
       case StockAction.RESET:
         if (
@@ -221,6 +204,27 @@ export class StockComponent implements OnInit, DoCheck {
         }
         break;
     }
+  }
+
+  /**
+   * Prepares a sale that can be used by SaleComponent
+   */
+  prepareSale() {
+    const stockControl = this.stockControl;
+    if (stockControl) {
+      const filteredItems = Stock.staticCleanItems(stockControl.value).filter(
+        (stockItem) => stockItem.quantity,
+      );
+      if (filteredItems) {
+        return new Sale({
+          items: this.prepareStockItemsForSale(filteredItems),
+          date: new Date().toISOString(),
+          discount: 0,
+        });
+      }
+    }
+
+    return null;
   }
 
   /** Patches the quantity value if it is >= 0 or <= maxQuantity */
@@ -405,15 +409,15 @@ export class StockComponent implements OnInit, DoCheck {
   }
 
   /**
-   * Prepares the stock once a sale is made.
+   * Prepares the stock after a sale has been made.
+   * Should have effect only in MARKET mode and if a sale is being made.
+   * Should reset the sale after the stock has been prepared
    * @param stock Value of the FormArray which contains the items of the sale
    */
-  private prepareStockForUpdate(
-    stock: StockItem[],
-  ): { stock: StockItem[]; sale: Sale | undefined } {
-    const filteredItems = Stock.staticCleanItems(stock).filter((stockItem) => stockItem.quantity);
-    if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET || filteredItems.length === 0) {
-      return { stock, sale: undefined };
+  private prepareStockAfterSale(stock: StockItem[]): StockItem[] {
+    const sale = this.prepareSale();
+    if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET || !sale) {
+      return stock;
     }
 
     if (this.stock) {
@@ -430,21 +434,11 @@ export class StockComponent implements OnInit, DoCheck {
         }
       });
 
-      if (filteredItems) {
-        return {
-          stock: this.stock.stock,
-          sale: new Sale({
-            items: this.prepareStockItemsForSale(filteredItems),
-            date: new Date().toISOString(),
-            discount: 0,
-          }),
-        };
-      }
+      return this.stock.stock;
     }
 
-    return { stock, sale: undefined };
+    return stock;
   }
-
   /**
    * Transforms stock items to sale items so they can be used by Sale model
    * @param items Items being sold

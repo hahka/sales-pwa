@@ -39,6 +39,7 @@ export class MarketPreparationComponent extends MarketSalesComponent {
 
   onClick(action: StockAction) {
     if (action === StockAction.SAVE) {
+      // Market has been prepared, need to update stock and market informations (market and categories)
       if (this.stockComponent) {
         this.stockComponent.updateStock();
         this.marketSalesService.put(this.marketSales);

@@ -1,12 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { computeTva } from 'src/app/utils/utils';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { MarketSalesComponent } from '../../shared/components/market-sales/market-sales.component';
-import { Sale } from '../../shared/models/market-sales.model';
+import { MarketSales, Sale } from '../../shared/models/market-sales.model';
 import { AppRoutes, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { StockAction, StockComponent } from '../stock/stock.component';
 import { NotReadyDialogComponent } from './not-ready-dialog/not-ready-dialog.component';
+import { SaleConfirmationDialogComponent } from './sale-confirmation-dialog/sale-confirmation-dialog.component';
 
 @Component({
   selector: 'app-sale',
@@ -24,8 +26,8 @@ export class SaleComponent extends MarketSalesComponent {
 
   SF = STOCK_FUNCTIONALITIES;
 
-  get computeTva() {
-    return ((this.currentPrice * 5.5) / 100).toFixed(2);
+  get tva() {
+    return computeTva(this.currentPrice);
   }
 
   constructor(
@@ -34,6 +36,9 @@ export class SaleComponent extends MarketSalesComponent {
     private readonly router: Router,
   ) {
     super(matDialog, marketSalesService);
+    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
+      this.marketSales = new MarketSales(marketSales);
+    });
   }
 
   marketNotReadyHandler(): void {
@@ -47,9 +52,36 @@ export class SaleComponent extends MarketSalesComponent {
   onClick(action: StockAction) {
     switch (action) {
       case StockAction.SAVE:
-        if (this.stockComponent) {
-          this.stockComponent.updateStock();
+        if (!this.marketSales.sales) {
+          this.marketSales.sales = [];
         }
+        if (this.stockComponent) {
+          const sale = this.stockComponent.prepareSale();
+          if (sale) {
+            const dialogRef = this.matDialog.open(SaleConfirmationDialogComponent, {
+              data: { sale },
+            });
+
+            dialogRef.afterClosed().subscribe((response) => {
+              if (!!response.confirm) {
+                this.marketSales.sales.push({ ...sale, discount: response.discount });
+                this.marketSalesService
+                  .put(this.marketSales)
+                  .subscribe((marketSales: MarketSales) => {
+                    this.marketSales = marketSales;
+                    if (this.stockComponent) {
+                      this.stockComponent.updateStock();
+                    } else {
+                      console.error('Stock component cannot be reached');
+                    }
+                  });
+              }
+            });
+          }
+        } else {
+          console.error('Stock component is missing');
+        }
+
         break;
       case StockAction.RESET_ALL:
         if (this.stockComponent) {
