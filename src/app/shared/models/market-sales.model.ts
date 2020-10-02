@@ -1,10 +1,12 @@
 import { PRODUCT_CATEGORIES } from '../../utils/enums';
 
 export class MarketSales {
+  id?: string;
   marketId: string;
   marketName: string;
   sales: Sale[];
   categories?: PRODUCT_CATEGORIES[];
+  endDate: string;
 
   constructor(obj?: MarketSales) {
     Object.assign(this, obj);

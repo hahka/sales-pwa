@@ -55,11 +55,8 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
   }
 
   public async putCommon(store: IdbStoresEnum, data: T, id?: string) {
-    let dataId = id;
-    if (!dataId) {
-      dataId = Date.now().toString();
-    }
-    await this.onlineIdb.put(store, data, id);
+    const dataId = id || Date.now().toString();
+    await this.onlineIdb.put(store, data, dataId);
 
     return this.onlineIdb.get(store, dataId);
   }

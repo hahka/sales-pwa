@@ -8,6 +8,7 @@ import { MarketSalesComponent } from '../../shared/components/market-sales/marke
 import { MarketSales } from '../../shared/models/market-sales.model';
 import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { StockAction, StockComponent } from '../stock/stock.component';
+import { CloseMarketDialogComponent } from './close-market-dialog/close-market-dialog.component';
 
 @Component({
   selector: 'app-market-preparation',
@@ -71,5 +72,19 @@ export class MarketPreparationComponent extends MarketSalesComponent {
     const ms = this.marketSales;
 
     return ms && ms.marketId && ms.categories && ms.categories.length;
+  }
+
+  closeMarket() {
+    if (this.marketSales) {
+      const dialogRef = this.matDialog.open(CloseMarketDialogComponent);
+
+      dialogRef.afterClosed().subscribe((result: { confirm: boolean }) => {
+        if (result && result.confirm) {
+          this.marketSalesService.closeMarket(this.marketSales).subscribe((_) => {
+            this.loadMarketSales();
+          });
+        }
+      });
+    }
   }
 }

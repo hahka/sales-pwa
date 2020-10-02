@@ -30,6 +30,16 @@
   &__title {
     font-size: 24px;
     vertical-align: middle;
+
+    &--multi-lines {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .small {
+      font-size: medium;
+      line-height: normal;
+    }
   }
 }
 

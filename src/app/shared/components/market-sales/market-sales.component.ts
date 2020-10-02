@@ -11,14 +11,7 @@ export abstract class MarketSalesComponent {
     protected readonly matDialog: MatDialog,
     protected readonly marketSalesService: MarketSalesService,
   ) {
-    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
-      this.marketSales = new MarketSales(marketSales);
-      if (!this.marketSales.categories || !this.marketSales.categories.length) {
-        this.marketNotReadyHandler();
-      } else {
-        this.updateCategories();
-      }
-    });
+    this.loadMarketSales();
   }
 
   abstract marketNotReadyHandler(): void;
@@ -39,5 +32,16 @@ export abstract class MarketSalesComponent {
     } else {
       this.categories = [];
     }
+  }
+
+  protected loadMarketSales() {
+    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
+      this.marketSales = new MarketSales(marketSales);
+      if (!this.marketSales.categories || !this.marketSales.categories.length) {
+        this.marketNotReadyHandler();
+      } else {
+        this.updateCategories();
+      }
+    });
   }
 }

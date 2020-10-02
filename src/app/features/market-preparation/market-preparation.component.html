@@ -1,8 +1,13 @@
 <div class="page-header">
   <div class="page-header__content">
-    <span class="page-header__title">
-      {{ 'features.market_preparation.title' | translate }}
-      {{ marketSales?.marketName ? ' : ' + marketSales.marketName : '' }}
+    <span class="page-header__title page-header__title">
+      <div>
+        {{ 'features.market_preparation.title' | translate }}
+        {{ marketSales?.marketName ? ' : ' + marketSales.marketName : '' }}
+      </div>
+      <button mat-flat-button color="error" class="small" (click)="closeMarket()">
+        Clore le marché actuel
+      </button>
     </span>
   </div>
   <div class="buttons-wrapper buttons-wrapper--end">
