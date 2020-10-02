@@ -1,4 +1,8 @@
-mat-card-content {
+mat-card {
+  min-width: 75%;
+}
+
+mat-card-header {
   width: 100%;
   padding-top: 75%;
   position: relative;
@@ -15,6 +19,16 @@ mat-card-content {
     img {
       object-fit: contain;
     }
+  }
+}
+
+mat-card-content {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0;
+
+  span {
+    font-size: large;
   }
 }
 

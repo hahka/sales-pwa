@@ -31,6 +31,11 @@ export enum StockAction {
   RESET_ALL = 'RESET_ALL',
 }
 
+export class StockItemForForm extends StockItem {
+  name: string;
+  price: number;
+}
+
 @Component({
   selector: 'app-stock',
   templateUrl: './stock.component.html',
@@ -64,7 +69,7 @@ export class StockComponent implements OnInit, DoCheck {
   /** Width of the grid */
   responsiveCols = 3;
 
-  sortedProducts: (StockItem & { name: string })[] = [];
+  sortedProducts: StockItemForForm[] = [];
 
   get stockControl() {
     return this.form.get('stock') as FormArray | null;
@@ -268,18 +273,19 @@ export class StockComponent implements OnInit, DoCheck {
     ) {
       this.isStockInitialized = false;
       const stockControl = this.stockControl;
-      const dataBeforeSort: (StockItem & { name: string })[] = [];
+      const dataBeforeSort: StockItemForForm[] = [];
       if (stockControl) {
         if (force) {
           stockControl.clear();
         }
         this.products.forEach((product) => {
           if (!!product.id) {
-            const productId = product.id;
+            const { id, name, price } = product;
             CATEGORIES_MATCHING[product.category].forEach((category) => {
               dataBeforeSort.push({
-                productId,
-                name: product.name,
+                productId: id,
+                name,
+                price,
                 category,
                 quantity: 0,
               });
@@ -296,6 +302,7 @@ export class StockComponent implements OnInit, DoCheck {
           const productFormGroup = new FormGroup({
             productId: new FormControl(data.productId),
             name: new FormControl(data.name),
+            price: new FormControl(data.price),
             quantity: new FormControl(data.quantity),
             maxQuantity: new FormControl(data.quantity),
             category: new FormControl(data.category),
@@ -325,7 +332,7 @@ export class StockComponent implements OnInit, DoCheck {
     }
   }
 
-  private prepareStockQuantities(products: (StockItem & { name: string })[]) {
+  private prepareStockQuantities(products: StockItemForForm[]) {
     if (this.stock) {
       this.stock.stock.forEach((stockItem) => {
         const productIndex = products.findIndex(
