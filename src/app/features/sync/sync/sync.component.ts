@@ -14,4 +14,8 @@ export class SyncComponent implements OnInit {
   syncDown() {
     this.syncService.syncDown();
   }
+
+  syncUp() {
+    this.syncService.syncUp();
+  }
 }

@@ -35,7 +35,7 @@ export abstract class MarketSalesComponent {
   }
 
   protected loadMarketSales() {
-    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
+    this.marketSalesService.getCurrentMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
       if (!this.marketSales.categories || !this.marketSales.categories.length) {
         this.marketNotReadyHandler();

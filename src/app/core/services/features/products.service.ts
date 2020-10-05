@@ -17,7 +17,7 @@ export class ProductsService extends ApiService<Product> {
 
   getImage(id: string) {
     if (navigator.onLine) {
-      return this.httpClient.get(`${this.environmentService.apiUrl}${this.resource}/${id}/image`, {
+      return this.httpClient.get(`${this.getFormattedUrl()}/${id}/image`, {
         responseType: 'text',
       });
     }
@@ -52,9 +52,7 @@ export class ProductsService extends ApiService<Product> {
 
   public getFull() {
     if (navigator.onLine) {
-      return this.httpClient.get<Product[]>(
-        `${this.environmentService.apiUrl}${this.resource}/full`,
-      );
+      return this.httpClient.get<Product[]>(`${this.getFormattedUrl()}/full`);
     }
 
     return this.getAll();

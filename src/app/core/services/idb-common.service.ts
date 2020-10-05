@@ -33,7 +33,22 @@ interface MyDB extends DBSchema {
   providedIn: 'root',
 })
 export class IdbCommonService<T extends Market | MarketSales | Stock | Product> {
+  static upgradeToV1(db: IDBPDatabase<MyDB>) {
+    const marketsStore = db.createObjectStore(IdbStoresEnum.MARKETS);
+    marketsStore.createIndex('nameSortable', 'nameSortable');
+    const productsStore = db.createObjectStore(IdbStoresEnum.PRODUCTS);
+    productsStore.createIndex('nameSortable', 'nameSortable');
+  }
+
+  static upgradeToV2(db: IDBPDatabase<MyDB>) {
+    db.createObjectStore(IdbStoresEnum.STOCK);
+    db.createObjectStore(IdbStoresEnum.MARKET_SALES);
+  }
+
   onlineIdb: IDBPDatabase<MyDB>;
+
+  databaseName = 'OnlineIdb';
+  databaseVersion = 2;
 
   constructor() {
     this.connectToIDB();
@@ -41,14 +56,27 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
 
   public async connectToIDB() {
     if (!this.onlineIdb) {
-      this.onlineIdb = await openDB<MyDB>('OnlineIdb', 1, {
-        upgrade(db) {
-          const marketsStore = db.createObjectStore('markets');
-          marketsStore.createIndex('nameSortable', 'nameSortable');
-          const productsStore = db.createObjectStore('products');
-          productsStore.createIndex('nameSortable', 'nameSortable');
-          db.createObjectStore('stock');
-          db.createObjectStore('marketSales');
+      this.onlineIdb = await openDB<MyDB>(this.databaseName, this.databaseVersion, {
+        upgrade(db, oldVersion, newVersion) {
+          if (newVersion) {
+            console.log(newVersion);
+            let currentVersion = oldVersion;
+
+            while (currentVersion < newVersion) {
+              switch (currentVersion) {
+                case 0:
+                  IdbCommonService.upgradeToV1(db);
+                  break;
+                case 1:
+                  IdbCommonService.upgradeToV2(db);
+                  break;
+                default:
+                  break;
+              }
+
+              currentVersion++;
+            }
+          }
         },
       });
     }
@@ -75,6 +103,12 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
     await this.connectToIDB();
 
     return this.onlineIdb.get(store, id);
+  }
+
+  public async deleteByID(store: IdbStoresEnum, id: string) {
+    await this.connectToIDB();
+
+    return this.onlineIdb.delete(store, id);
   }
 
   public clearObjectStore(storeName: IdbStoresEnum): Promise<void> {

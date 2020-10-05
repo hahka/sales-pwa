@@ -36,7 +36,7 @@ export class SaleComponent extends MarketSalesComponent {
     private readonly router: Router,
   ) {
     super(matDialog, marketSalesService);
-    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
+    this.marketSalesService.getCurrentMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
     });
   }

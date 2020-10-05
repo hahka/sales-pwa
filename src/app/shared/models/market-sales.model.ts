@@ -1,6 +1,7 @@
 import { PRODUCT_CATEGORIES } from '../../utils/enums';
+import { BaseModel } from './api/base.model';
 
-export class MarketSales {
+export class MarketSales implements BaseModel {
   id?: string;
   marketId: string;
   marketName: string;
@@ -10,6 +11,12 @@ export class MarketSales {
 
   constructor(obj?: MarketSales) {
     Object.assign(this, obj);
+  }
+
+  prepareForIdb() {
+    return {
+      ...this,
+    };
   }
 }
 

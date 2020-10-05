@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SearchDto } from '../../shared/models/api/search-dto.model';
+import { MarketSales } from '../../shared/models/market-sales.model';
 import { Market } from '../../shared/models/market.model';
 import { Product } from '../../shared/models/product.model';
 import { IdbStoresEnum } from '../../utils/enums';
@@ -9,7 +10,7 @@ import { IdbCommonService } from './idb-common.service';
 @Injectable({
   providedIn: 'root',
 })
-export class IdbService<T extends Market | Product> extends IdbCommonService<T> {
+export class IdbService<T extends Market | Product | MarketSales> extends IdbCommonService<T> {
   constructor() {
     super();
   }

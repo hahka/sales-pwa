@@ -7,19 +7,14 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Shallow } from 'shallow-render';
 
 import { MockOfActivatedRoute } from 'tests/mocks/activated-route.mock';
-import { BaseModel } from '../../models/api/base.model';
+import { Product } from '../../models/product.model';
 import { PageHeaderAction } from '../page-header/page-header-action.enum';
 import { DetailMockComponent } from './detail-mock/detail-mock.component';
 import { DetailComponent } from './detail.component';
 import { DetailModule } from './detail.module';
 
-export class FakeDetail implements BaseModel {
-  id: string;
-  public prepareForIdb() {}
-}
-
 describe('DetailComponent', () => {
-  let shallow: Shallow<DetailComponent<FakeDetail>>;
+  let shallow: Shallow<DetailComponent<Product>>;
 
   const childComponent = jasmine.createSpyObj('ApiObsHelper', ['archive', 'postOrPatch']);
 
@@ -109,12 +104,12 @@ describe('DetailComponent', () => {
 
     expect(disableSpy).toHaveBeenCalledTimes(0);
     instance.detailId = 'fakeId';
-    instance.onPostedOrPatched({ id: '' } as FakeDetail);
+    instance.onPostedOrPatched({ id: '' } as Product);
     expect(disableSpy).toHaveBeenCalledTimes(1);
 
     expect(disableSpy).toHaveBeenCalledTimes(1);
     instance.detailId = 'new';
-    instance.onPostedOrPatched({ id: 'createdId' } as FakeDetail);
+    instance.onPostedOrPatched({ id: 'createdId' } as Product);
     expect(router.navigate).toHaveBeenCalledWith(['..', 'createdId'], {
       relativeTo: activatedRoute,
       replaceUrl: true,
