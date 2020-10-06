@@ -1,7 +1,10 @@
+import { ApiService } from '../../../core/services/api/api.service';
 import { ApiDataSource } from '../../models/api/api-datasource.model';
+import { Market } from '../../models/market.model';
+import { Product } from '../../models/product.model';
 import { FullColumn } from '../datatable/full-column.model';
 
-export abstract class AbstractListComponent<T> {
+export abstract class AbstractListComponent<T extends Product | Market> {
   /** DataSource that will be used to display data and centralize communication between app and api */
   abstract dataSource: ApiDataSource<T>;
 
@@ -10,4 +13,10 @@ export abstract class AbstractListComponent<T> {
 
   /** Key used */
   abstract listPersistenceKey: string;
+
+  canManage: boolean;
+
+  constructor(private readonly apiService: ApiService<T>) {
+    this.canManage = this.apiService.canManage();
+  }
 }

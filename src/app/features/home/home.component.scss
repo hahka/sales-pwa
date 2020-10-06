@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  flex-direction: column;
+  width: 100%;
+}
+
+mat-grid-list {
+  max-width: 700px;
+  text-align: center;
+  margin: auto;
+}
+
+button {
+  min-height: 60%;
+  min-width: 60%;
+}

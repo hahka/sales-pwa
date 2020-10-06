@@ -1,18 +1,20 @@
-import { Shallow } from 'shallow-render';
-
 import { Location } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Shallow } from 'shallow-render';
+
 import { MockOfActivatedRoute } from 'tests/mocks/activated-route.mock';
+import { Product } from '../../models/product.model';
 import { PageHeaderAction } from '../page-header/page-header-action.enum';
 import { DetailMockComponent } from './detail-mock/detail-mock.component';
 import { DetailComponent } from './detail.component';
 import { DetailModule } from './detail.module';
 
 describe('DetailComponent', () => {
-  let shallow: Shallow<DetailComponent<any>>;
+  let shallow: Shallow<DetailComponent<Product>>;
 
   const childComponent = jasmine.createSpyObj('ApiObsHelper', ['archive', 'postOrPatch']);
 
@@ -25,6 +27,7 @@ describe('DetailComponent', () => {
         back: () => {},
       })
       .import(RouterTestingModule)
+      .import(HttpClientTestingModule)
       .mock(Router, {
         navigate: jasmine.createSpy('navigate'),
       });
@@ -60,7 +63,7 @@ describe('DetailComponent', () => {
     const disableSpy = spyOn(instance, 'disable').and.callFake(() => {});
     const submitSpy = spyOn(instance, 'submit').and.callFake(() => {});
     const nextSpy = spyOn(instance.refresh, 'next').and.callFake(() => {});
-    const location = TestBed.get(Location);
+    const location = TestBed.inject(Location);
 
     expect(location.back).toHaveBeenCalledTimes(0);
     instance.onPageHeaderEvent({ action: PageHeaderAction.BACK });
@@ -96,17 +99,17 @@ describe('DetailComponent', () => {
   it('should handle onPostedOrPatched', async () => {
     const { instance } = await shallow.mock(DetailMockComponent, {}).render();
     const disableSpy = spyOn(instance, 'disable').and.callFake(() => {});
-    const router = TestBed.get(Router);
-    const activatedRoute = TestBed.get(ActivatedRoute);
+    const router = TestBed.inject(Router);
+    const activatedRoute = TestBed.inject(ActivatedRoute);
 
     expect(disableSpy).toHaveBeenCalledTimes(0);
     instance.detailId = 'fakeId';
-    instance.onPostedOrPatched({ _id: '' });
+    instance.onPostedOrPatched({ id: '' } as Product);
     expect(disableSpy).toHaveBeenCalledTimes(1);
 
     expect(disableSpy).toHaveBeenCalledTimes(1);
     instance.detailId = 'new';
-    instance.onPostedOrPatched({ _id: 'createdId' });
+    instance.onPostedOrPatched({ id: 'createdId' } as Product);
     expect(router.navigate).toHaveBeenCalledWith(['..', 'createdId'], {
       relativeTo: activatedRoute,
       replaceUrl: true,

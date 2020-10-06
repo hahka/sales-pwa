@@ -7,6 +7,8 @@
   },
   "scripts": {
     "ng": "ng",
+    "bs": "ng build && npm run start",
+    "bs:pwa": "ng build --prod && npm run http-serve",
     "start": "node server.js",
     "build": "ng build --prod",
     "test": "ng test",
@@ -34,6 +36,8 @@
     "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^4.0.0",
     "express": "^4.17.1",
+    "idb": "^5.0.4",
+    "ngx-toastr": "^12.1.0",
     "path": "^0.12.7",
     "rxjs": "~6.5.5",
     "tslib": "^1.11.1",
@@ -41,7 +45,7 @@
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.901.4",
+    "@angular-devkit/build-angular": "^0.901.9",
     "@angular/cli": "~9.1.4",
     "@angular/compiler-cli": "^9.1.4",
     "@angular/language-service": "~9.1.4",
@@ -58,6 +62,7 @@
     "karma-jasmine-html-reporter": "^1.5.3",
     "prettier": "^2.0.5",
     "protractor": "^6.0.0",
+    "shallow-render": "9.0.5",
     "ts-node": "~8.9.1",
     "tslint": "~6.1.2",
     "tslint-config-prettier": "^1.18.0"

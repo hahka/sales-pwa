@@ -1,0 +1,30 @@
+.mat-list-base .mat-list-item {
+  height: 32px;
+}
+
+.sale {
+  &__items {
+    margin-bottom: 25px;
+    .list-item__content {
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
+    }
+  }
+
+  &__information {
+    display: flex;
+    justify-content: space-between;
+    .price-container {
+      margin-left: 25px;
+      display: flex;
+      flex-direction: column;
+      text-align: end;
+      line-height: 2;
+
+      span {
+        font-size: larger;
+      }
+    }
+  }
+}

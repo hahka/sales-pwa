@@ -6,11 +6,15 @@
             "cancel": "Annuler",
             "unarchive": "Restaurer",
             "update": "Mettre à jour",
-            "save": "Enregistrer"
+            "save": "Enregistrer",
+            "sell": "Vendre"
         },
         "information": "Informations",
         "name": "Nom",
-        "search": "Rechercher"
+        "price": "Prix",
+        "product_category": "Catégorie de produit",
+        "search": "Rechercher",
+        "stock_quantity": "Quantité en stock"
     },
     "features": {
         "markets": {
@@ -20,6 +24,36 @@
                 }
             },
             "title": "Marchés"
+        },
+        "products": {
+            "form": {
+                "errors": {
+                    "name_duplicated": "Un produit portant ce nom est déjà existant"
+                }
+            },
+            "title": "Produits"
+        },
+        "produce": {
+            "title": "Fabrication"
+        },
+        "market_preparation": {
+            "title": "Préparation de marché"
+        },
+        "sale": {
+            "title": "Vente"
+        }
+    },
+    "categories": {
+        "product": {
+            "FRESH": "Frais",
+            "FROZEN": "Surgelé",
+            "PASTEURIZED": "Pasteurisé"
+        },
+        "stock": {
+            "FRESH": "Frais",
+            "SMALL_FREEZER": "Petit congélateur",
+            "LARGE_FREEZER": "Gros congélateur",
+            "PASTEURIZED": "Pasteurisé"
         }
     }
 }

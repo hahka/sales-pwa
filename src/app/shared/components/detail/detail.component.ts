@@ -6,12 +6,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api/api.service';
-import { BaseModel } from '../../models/api/base.model';
+import { Market } from '../../models/market.model';
+import { Product } from '../../models/product.model';
 import { ApiObsHelperComponent } from '../api-obs-helper/api-obs-helper.component';
 import { PageHeaderAction } from '../page-header/page-header-action.enum';
 import { PageHeaderEvent } from '../page-header/page-header-event.interface';
 
-export abstract class DetailComponent<T extends BaseModel> implements AfterViewInit, OnInit {
+export abstract class DetailComponent<T extends Market | Product> implements AfterViewInit, OnInit {
   /** ViewChild helping calling the api via observables without subscriptions */
   @ViewChild(ApiObsHelperComponent, { static: true }) apiObsHelper: ApiObsHelperComponent<T>;
 
@@ -30,10 +31,7 @@ export abstract class DetailComponent<T extends BaseModel> implements AfterViewI
   /** FormGroup patched by observables, used to display object information */
   form: FormGroup;
 
-  /** Wether the object is instanciated and needs some processing (dialog when trying to archive, prevent some properties updates...) */
-  isInstantiated: boolean;
-
-  /** Wether the objcdt is archived or not. Needs to be updated at GET/PATCH */
+  /** Wether the object is archived or not. Needs to be updated at GET/PATCH */
   isArchived = false;
 
   /** Observable of the object post/patch, called via async pipe if {loading === true} */
@@ -158,19 +156,24 @@ export abstract class DetailComponent<T extends BaseModel> implements AfterViewI
   }
 
   /**
-   * Event when api has been called to post or patch a resource. Need to redirect if resource creation.
+   * Redirects to parent page
    * @param data The created/updated resource returned by the api
    */
-  onPostedOrPatched(data: T): void {
-    if (this.detailId === 'new' && data.id) {
-      this.router.navigate(['..', data.id], {
-        relativeTo: this.activatedRoute,
-        replaceUrl: true,
-      });
-    } else {
-      this.patchForm(data);
-      this.disable();
-    }
+  onPostedOrPatched(_data: T): void {
+    // Old behavior, redirecting to newly created data, or disabling the form
+    // if (this.detailId === 'new' && data.id) {
+    //   this.router.navigate(['..', data.id], {
+    //     relativeTo: this.activatedRoute,
+    //     replaceUrl: true,
+    //   });
+    // } else {
+    //   this.patchForm(data);
+    //   this.disable();
+    // }
+
+    this.router.navigate(['..'], {
+      relativeTo: this.activatedRoute,
+    });
   }
 
   /** Called on form submit, used to post/patch defect category */

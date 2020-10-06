@@ -7,9 +7,10 @@ import { debounceTime, pluck, share, switchMap } from 'rxjs/operators';
 import { Page, PaginatedEndpoint, Sort } from '../../../core/services/api';
 
 import { ApiDataSourceOptions } from './api-datasource-options.model';
+import { BaseModel } from './base.model';
 import { SearchDto } from './search-dto.model';
 
-export class ApiDataSource<T> extends DataSource<T> {
+export class ApiDataSource<T extends BaseModel> extends DataSource<T> {
   /** Observable that will receive data from the API */
   public page$: Observable<Page<T>>;
 

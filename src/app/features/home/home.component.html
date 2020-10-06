@@ -1,0 +1,7 @@
+<mat-grid-list [cols]="2" (window:resize)="onResize($event)" rowHeight="2:1">
+  <ng-container *ngFor="let button of buttons">
+    <mat-grid-tile>
+      <button mat-stroked-button routerLink="{{ button.routerLink }}">{{ button.label }}</button>
+    </mat-grid-tile>
+  </ng-container>
+</mat-grid-list>

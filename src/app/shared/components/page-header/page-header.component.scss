@@ -2,24 +2,49 @@
   background-color: inherit;
 }
 
-.pageHeaderContent {
+.page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  padding: 24px;
   position: sticky;
-  top: 24px;
-  background: inherit;
+  top: 0px;
+  background: white;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.12);
   z-index: 100;
+
+  &__content {
+    flex: 1;
+    display: flex;
+
+    & > * {
+      line-height: 40px;
+    }
+
+    &__group {
+      display: flex;
+      margin-right: 10px;
+    }
+  }
+
+  &__title {
+    font-size: 24px;
+    vertical-align: middle;
+
+    &--multi-lines {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .small {
+      font-size: medium;
+      line-height: normal;
+    }
+  }
 }
 
 .btn-back {
   margin-right: 16px;
-}
-
-.page-header-title {
-  font-size: 24px;
-  vertical-align: middle;
 }
 
 .buttons-container {

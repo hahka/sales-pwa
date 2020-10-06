@@ -12,12 +12,6 @@ export class PageHeaderComponent {
   /** FormControl/FormGroup of the page, used to know if in edit mode or readonly */
   @Input() control: AbstractControl;
 
-  /** To disable validation (mainly if form is invalid) */
-  @Input() disableValidate: boolean;
-
-  /** Wether the back button should be displayed */
-  @Input() displayBack = true;
-
   /** Wether the unarchiving is allowed */
   @Input() canUnarchive = false;
 
@@ -58,7 +52,7 @@ export class PageHeaderComponent {
       return false;
     }
 
-    const id = this.control.get('_id');
+    const id = this.control.get('id');
 
     return id && id.value;
   }

@@ -1,0 +1,29 @@
+<h1 mat-dialog-title>Récapitulatif vente</h1>
+<div mat-dialog-content>
+  <div class="sale__items" *ngIf="data && data.sale && data.sale.items">
+    <h2>Produits</h2>
+    <mat-list>
+      <mat-list-item *ngFor="let item of data.sale.items">
+        <div class="list-item__content">
+          <div class="left">{{ item.quantity }} x {{ item?.product?.name }}</div>
+          <div class="right">{{ item.price }} €</div>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <h2>Total</h2>
+  <div class="sale__information">
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>Remise</mat-label>
+      <input matInput type="number" [formControl]="discount" />
+    </mat-form-field>
+    <div class="price-container">
+      <span>Prix TTC: {{ price }}€</span>
+      <span>TVA: {{ tva }}€</span>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button color="error" (click)="onClick(false)">Annuler</button>
+  <button mat-button color="primary" (click)="onClick(true)">Confirmer</button>
+</div>

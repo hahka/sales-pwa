@@ -21,15 +21,15 @@ import { FullColumn } from './full-column.model';
   styleUrls: ['./datatable.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DatatableComponent implements OnDestroy {
+export class DatatableComponent<T extends BaseModel> implements OnDestroy {
   ColumnType = ColumnType;
   /** Returns the list of columns to display */
-  get fullColumns(): FullColumn<BaseModel>[] {
+  get fullColumns(): FullColumn<T>[] {
     return this._fullColumns;
   }
 
   /** Sets the list of columns to display and the displayedColumns array used by datatable to identify columns */
-  @Input() set fullColumns(fullColumns: FullColumn<BaseModel>[]) {
+  @Input() set fullColumns(fullColumns: FullColumn<T>[]) {
     this._fullColumns = fullColumns;
     if (this.fullColumns && this.fullColumns.length) {
       this.displayedColumns = this.fullColumns.map((col) => col.field);
@@ -41,8 +41,11 @@ export class DatatableComponent implements OnDestroy {
   /** DataSource to fetch data from the api and handle search and sort */
   @Input() clickEvent = DatatableClickEvent.REDIRECT;
 
+  // TODO: refactor input with an options input?
+  @Input() showAddButton = true;
+
   /** DataSource to fetch data from the api and handle search and sort */
-  @Input() dataSource: ApiDataSource<BaseModel>;
+  @Input() dataSource: ApiDataSource<T>;
 
   /** Boolean to show/hide the columns header (mat-header-row) */
   @Input() headerRowOptions = { isDisplayed: true, canSort: true };
@@ -60,7 +63,7 @@ export class DatatableComponent implements OnDestroy {
   @Input() datatableTitle: string;
 
   /** Activated object, to highlight row if datatable is still displayed */
-  @Input() activatedObject: BaseModel;
+  @Input() activatedObject: T;
 
   /** Fired when a row has been clicked */
   @Output() rowClicked: EventEmitter<BaseModel> = new EventEmitter();
@@ -69,7 +72,7 @@ export class DatatableComponent implements OnDestroy {
   displayedColumns: string[] = [];
 
   /** List of columns to display */
-  private _fullColumns: FullColumn<BaseModel>[];
+  private _fullColumns: FullColumn<T>[];
 
   constructor(private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {}
 
@@ -85,7 +88,7 @@ export class DatatableComponent implements OnDestroy {
   /**
    * Sorts the wanted field with the wanted direction, or undefined if no direction (no default sort)
    */
-  onSortChange(active: keyof BaseModel, direction: 'asc' | 'desc' | ''): void {
+  onSortChange(active: keyof T, direction: 'asc' | 'desc' | ''): void {
     if (this.headerRowOptions && this.headerRowOptions.canSort) {
       if (!direction) {
         this.dataSource.sortBy(undefined);

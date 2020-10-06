@@ -1,1 +1,35 @@
-<router-outlet></router-outlet>
+<mat-toolbar class="app__toolbar">
+  <div class="app__toolbar__name">
+    <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+    <h3>L'Escargot de Bar</h3>
+  </div>
+  <div class="app__toolbar__status">
+    <ng-container *ngIf="connectionStatusService.status$ | async; else offline">
+      <a routerLink="/sync" *ngIf="syncService.isSynchronizationNeeded$ | async">
+        <mat-icon class="sync-btn--error" color="error">sync_alt</mat-icon>
+      </a>
+    </ng-container>
+    <ng-template #offline>
+      <mat-icon>signal_wifi_off</mat-icon>
+    </ng-template>
+  </div>
+</mat-toolbar>
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="above" (click)="sidenav.toggle()">
+    <mat-nav-list>
+      <mat-list-item routerLink="/">Accueil </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item routerLink="/markets">Gestion des Marchés </mat-list-item>
+      <mat-list-item routerLink="/products">Gestion des Produits </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item routerLink="/produce">Fabrication de produits</mat-list-item>
+      <mat-list-item routerLink="/market_preparation">Préparation de marché</mat-list-item>
+      <mat-list-item routerLink="/sale">Marché </mat-list-item>
+      <mat-list-item routerLink="/sync">Synchronisation </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

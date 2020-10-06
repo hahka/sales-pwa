@@ -4,14 +4,15 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api/api.service';
-import { BaseModel } from '../../models/api/base.model';
+import { Market } from '../../models/market.model';
+import { Product } from '../../models/product.model';
 
 @Component({
   selector: 'app-api-obs-helper',
   templateUrl: './api-obs-helper.component.html',
   styleUrls: ['./api-obs-helper.component.scss'],
 })
-export class ApiObsHelperComponent<T> {
+export class ApiObsHelperComponent<T extends Product | Market> {
   /** The apiService corresponding to the current resource */
   _apiService: ApiService<T>;
 
@@ -71,7 +72,7 @@ export class ApiObsHelperComponent<T> {
    * Called on form submit, used to post/patch defect category
    * @param value The new value of the resource
    */
-  postOrPatch(value: BaseModel): void {
+  postOrPatch(value: T): void {
     this.posting$ = this.apiService
       .postOrPatch(value)
       .pipe(
