@@ -59,7 +59,6 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
       this.onlineIdb = await openDB<MyDB>(this.databaseName, this.databaseVersion, {
         upgrade(db, oldVersion, newVersion) {
           if (newVersion) {
-            console.log(newVersion);
             let currentVersion = oldVersion;
 
             while (currentVersion < newVersion) {
