@@ -34,5 +34,10 @@ export enum UnsyncedTables {
 }
 
 export enum AppRoutes {
+  MARKETS_ADMIN = 'markets',
+  PRODUCTS_ADMIN = 'products',
+  SALE = 'sale',
+  SYNC = 'sync',
+  PRODUCE = 'produce',
   MARKET_PREPARATION = 'market_preparation',
 }

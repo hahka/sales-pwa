@@ -4,15 +4,19 @@ import { AppRoutes } from './utils/enums';
 
 const routes: Routes = [
   {
-    path: 'markets',
+    path: '',
+    loadChildren: () => import('./features/home/home.module').then((m) => m.HomeModule),
+  },
+  {
+    path: AppRoutes.MARKETS_ADMIN,
     loadChildren: () => import('./features/markets/markets.module').then((m) => m.MarketsModule),
   },
   {
-    path: 'products',
+    path: AppRoutes.PRODUCTS_ADMIN,
     loadChildren: () => import('./features/products/products.module').then((m) => m.ProductsModule),
   },
   {
-    path: 'produce',
+    path: AppRoutes.PRODUCE,
     loadChildren: () => import('./features/produce/produce.module').then((m) => m.ProduceModule),
   },
   {
@@ -23,11 +27,11 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'sale',
+    path: AppRoutes.SALE,
     loadChildren: () => import('./features/sale/sale.module').then((m) => m.SaleModule),
   },
   {
-    path: 'sync',
+    path: AppRoutes.SYNC,
     loadChildren: () => import('./features/sync/sync.module').then((m) => m.SyncModule),
   },
 ];
