@@ -12,8 +12,13 @@ export enum STOCK_CATEGORIES {
 }
 
 export enum STOCK_FUNCTIONALITIES {
+  /** In this case we just add products to the existing stock */
   PRODUCE = 'PRODUCE',
+
+  /** This is the only case when product may go from one stock to another (e.g. SMALL_FREEZER => LARGE_FREEZER) */
   MARKET_PREPARATION = 'MARKET_PREPARATION',
+
+  /** In this case the stock should be keep as a reference and a new Form should be use for a sale */
   MARKET = 'MARKET',
 }
 
@@ -26,4 +31,8 @@ export enum IdbStoresEnum {
 
 export enum UnsyncedTables {
   UNSYNCED_MARKETS = 'unsynced_markets',
+}
+
+export enum AppRoutes {
+  MARKET_PREPARATION = 'market_preparation',
 }

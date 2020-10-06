@@ -12,7 +12,6 @@
             <button
               mat-icon-button
               color="error"
-              class="btn--size-l"
               (click)="onClick(StockAction.RESET, stockItem.value.category)"
             >
               <mat-icon>delete</mat-icon>
@@ -22,12 +21,14 @@
 
         <mat-grid-tile *ngIf="categories.includes(stockItem.value.category)">
           <mat-card [formGroupName]="i">
-            <!-- <mat-card-header>{{ stockItem.value.name }}</mat-card-header> -->
-            <div>{{ stockItem.value.name }}</div>
-            <mat-card-content *ngIf="sanitizedImages[stockItem.value.productId]">
+            <mat-card-header *ngIf="sanitizedImages[stockItem.value.productId]">
               <div class="image-preview" *ngIf="sanitizedImages[stockItem.value.productId]">
                 <img [src]="sanitizedImages[stockItem.value.productId]" />
               </div>
+            </mat-card-header>
+            <mat-card-content>
+              <span>{{ stockItem.value.name }}</span>
+              <span>{{ stockItem.value.price }} €</span>
             </mat-card-content>
             <mat-card-actions>
               <div class="quantity-selector">
@@ -37,7 +38,7 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Quantité</mat-label>
                   <mat-select formControlName="quantity" required>
-                    <mat-option *ngFor="let quantity of quantities" [value]="quantity">
+                    <mat-option *ngFor="let quantity of quantities(i)" [value]="quantity">
                       {{ quantity }}
                     </mat-option>
                   </mat-select>

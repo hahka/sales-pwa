@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { ToastrModule } from 'ngx-toastr';
 import { ApiObsHelperModule } from '../../shared/components/api-obs-helper/api-obs-helper.module';
+import { ResetStockDialogModule } from './reset-stock-dialog/reset-stock-dialog.module';
 import { StockComponent } from './stock.component';
 
 @NgModule({
@@ -17,16 +18,17 @@ import { StockComponent } from './stock.component';
   imports: [
     CommonModule,
     ApiObsHelperModule,
+    FormsModule,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
     MatGridListModule,
     MatIconModule,
     MatSelectModule,
-    FormsModule,
     ReactiveFormsModule,
     TranslateModule,
     ToastrModule,
+    ResetStockDialogModule,
   ],
   exports: [StockComponent],
 })

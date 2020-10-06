@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AppRoutes } from './utils/enums';
 
 const routes: Routes = [
   {
@@ -15,11 +16,15 @@ const routes: Routes = [
     loadChildren: () => import('./features/produce/produce.module').then((m) => m.ProduceModule),
   },
   {
-    path: 'market_preparation',
+    path: AppRoutes.MARKET_PREPARATION,
     loadChildren: () =>
       import('./features/market-preparation/market-preparation.module').then(
         (m) => m.MarketPreparationModule,
       ),
+  },
+  {
+    path: 'sale',
+    loadChildren: () => import('./features/sale/sale.module').then((m) => m.SaleModule),
   },
   {
     path: 'sync',

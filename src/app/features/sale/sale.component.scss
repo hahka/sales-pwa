@@ -1,0 +1,14 @@
+@import '../../shared/components/page-header/page-header.component.scss';
+
+.price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.page-header__content {
+  justify-content: space-between;
+  .price-container {
+    line-height: 24px;
+  }
+}

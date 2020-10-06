@@ -4,13 +4,14 @@ import { from, Observable, Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { Stock } from '../../../shared/models/stock.model';
 import { IdbStoresEnum } from '../../../utils/enums';
+import { ResourceUrlHelper } from '../api/resource-url-helper';
 import { EnvironmentService } from '../environment/environment.service';
 import { IdbCommonService } from '../idb-common.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class StockService {
+export class StockService extends ResourceUrlHelper {
   resource = IdbStoresEnum.STOCK;
 
   stockOnlyId = 'STOCK';
@@ -19,7 +20,9 @@ export class StockService {
     protected readonly environmentService: EnvironmentService,
     protected readonly httpClient: HttpClient,
     protected readonly idbService: IdbCommonService<Stock>,
-  ) {}
+  ) {
+    super(environmentService);
+  }
 
   public getStock(): Observable<Stock | null> {
     return from(
@@ -32,9 +35,7 @@ export class StockService {
             return localStock;
           }
 
-          return this.httpClient
-            .get<Stock>(`${this.environmentService.apiUrl}${this.resource}`)
-            .toPromise();
+          return this.httpClient.get<Stock>(`${this.getFormattedUrl()}`).toPromise();
         },
       ),
     );
@@ -47,7 +48,7 @@ export class StockService {
   public put(data: Stock): Observable<Stock> {
     if (navigator.onLine) {
       let apiCall$: Observable<Stock>;
-      apiCall$ = this.httpClient.put<Stock>(`${this.environmentService.apiUrl}${this.resource}`, {
+      apiCall$ = this.httpClient.put<Stock>(`${this.getFormattedUrl()}`, {
         stock: data.stock,
       });
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { MarketsService } from '../../core/services/features/markets.service';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
@@ -16,6 +17,7 @@ export class SyncService {
     private readonly marketsService: MarketsService,
     private readonly productsService: ProductsService,
     private readonly stockService: StockService,
+    private readonly marketSalesService: MarketSalesService,
   ) {
     this.isSynchronizationNeeded$ = this.isSynchronizationNeeded.asObservable();
   }
@@ -24,6 +26,10 @@ export class SyncService {
     this.marketsService.synchronizeDown();
     this.productsService.synchronizeDown();
     this.stockService.synchronize();
+  }
+
+  syncUp() {
+    this.marketSalesService.synchronizeUp();
   }
 
   checkIfSynchronizationIsNeeded() {

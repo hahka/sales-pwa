@@ -1,20 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { from, Observable } from 'rxjs';
 import { pluck, take } from 'rxjs/operators';
 import { SearchDto } from 'src/app/shared/models/api/search-dto.model';
 import { Detail, Page, PageRequest } from '.';
+import { MarketSales } from '../../../shared/models/market-sales.model';
 import { Market } from '../../../shared/models/market.model';
 import { Product } from '../../../shared/models/product.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { EnvironmentService } from '../environment/environment.service';
 import { IdbService } from '../idb.service';
+import { ResourceUrlHelper } from './resource-url-helper';
 
 @Injectable({
   providedIn: 'root',
 })
-export abstract class ApiService<T extends Product | Market> {
+export abstract class ApiService<
+  T extends Product | Market | MarketSales
+> extends ResourceUrlHelper {
   /** API base endpoint for resource */
   abstract resource: IdbStoresEnum;
 
@@ -27,7 +30,9 @@ export abstract class ApiService<T extends Product | Market> {
     protected readonly environmentService: EnvironmentService,
     protected readonly httpClient: HttpClient,
     protected readonly idbService: IdbService<T>,
-  ) {}
+  ) {
+    super(environmentService);
+  }
 
   abstract idbSearch(data: T, keyword: string): boolean;
 
@@ -39,9 +44,7 @@ export abstract class ApiService<T extends Product | Market> {
   public archiveById(id: string, unarchive?: boolean): Observable<T> {
     return this.httpClient
       .patch<Detail<T>>(
-        `${this.environmentService.apiUrl}${this.resource}/${
-          !!unarchive ? 'unarchive' : 'archive'
-        }/${id}`,
+        `${this.getFormattedUrl()}/${!!unarchive ? 'unarchive' : 'archive'}/${id}`,
         {},
       )
       .pipe(take(1), pluck('data'));
@@ -54,7 +57,7 @@ export abstract class ApiService<T extends Product | Market> {
    */
   deleteById(id: string): Observable<any> {
     // TODO: type
-    return this.httpClient.delete<any>(`${this.environmentService.apiUrl}${this.resource}/${id}`);
+    return this.httpClient.delete<any>(`${this.getFormattedUrl()}/${id}`);
   }
 
   /**
@@ -63,9 +66,7 @@ export abstract class ApiService<T extends Product | Market> {
    */
   getById(id: string): Observable<T> {
     if (navigator.onLine) {
-      return this.httpClient
-        .get<Detail<T>>(`${this.environmentService.apiUrl}${this.resource}/${id}`)
-        .pipe(pluck('data'));
+      return this.httpClient.get<Detail<T>>(`${this.getFormattedUrl()}/${id}`).pipe(pluck('data'));
     }
 
     return from(this.idbService.getById(this.resource, id) as Promise<any>);
@@ -81,15 +82,9 @@ export abstract class ApiService<T extends Product | Market> {
     if (navigator.onLine) {
       let apiCall$: Observable<T>;
       if (!dataId) {
-        apiCall$ = this.httpClient.post<T>(
-          `${this.environmentService.apiUrl}${this.resource}`,
-          data,
-        );
+        apiCall$ = this.httpClient.post<T>(`${this.getFormattedUrl()}`, data);
       } else {
-        apiCall$ = this.httpClient.patch<T>(
-          `${this.environmentService.apiUrl}${this.resource}/${dataId}`,
-          data,
-        );
+        apiCall$ = this.httpClient.patch<T>(`${this.getFormattedUrl()}/${dataId}`, data);
       }
 
       return apiCall$.pipe(take(1));
@@ -101,7 +96,7 @@ export abstract class ApiService<T extends Product | Market> {
   /** Fetches all resources from the API for the given resource */
   public getAll(): Observable<T[]> {
     if (navigator.onLine) {
-      return this.httpClient.get<T[]>(`${this.environmentService.apiUrl}${this.resource}`);
+      return this.httpClient.get<T[]>(`${this.getFormattedUrl()}`);
     }
 
     return from(this.idbService.getAll(this.resource) as Promise<any>);
@@ -114,13 +109,10 @@ export abstract class ApiService<T extends Product | Market> {
    */
   public search(pageRequest: PageRequest<T>, dto: SearchDto): Observable<Page<T>> {
     if (navigator.onLine) {
-      return this.httpClient.post<Page<T>>(
-        `${this.environmentService.apiUrl}${this.resource}/search`,
-        {
-          ...pageRequest,
-          ...dto,
-        },
-      );
+      return this.httpClient.post<Page<T>>(`${this.getFormattedUrl()}/search`, {
+        ...pageRequest,
+        ...dto,
+      });
     }
 
     return from(

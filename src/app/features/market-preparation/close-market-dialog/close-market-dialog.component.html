@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>Cloturer le marché actuel</h1>
+<div mat-dialog-content>
+  <p>Voulez-vous vraiment cloturer le marché actuel?</p>
+  <p>
+    Attention, vous ne pourrez plus effectuer de ventes pour ce marché et devrez préparer un nouveau
+    marché.
+  </p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button color="error" (click)="onClick(false)">Annuler</button>
+  <button mat-button color="primary" (click)="onClick(true)">Confirmer</button>
+</div>

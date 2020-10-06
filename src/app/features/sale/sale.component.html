@@ -1,0 +1,35 @@
+<div class="page-header">
+  <!-- Left cell: back button and title -->
+  <div class="page-header__content">
+    <span class="page-header__title">{{ 'features.sale.title' | translate }}</span>
+
+    <div class="page-header__content__group">
+      <button mat-icon-button color="error" (click)="onClick(StockAction.RESET_ALL)">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <div class="price-container">
+        <span>Prix TTC: {{ currentPrice }}€</span>
+        <span>TVA: {{ tva }}€</span>
+      </div>
+    </div>
+  </div>
+  <div class="buttons-wrapper buttons-wrapper--end">
+    <div class="buttons-container">
+      <button
+        mat-flat-button
+        color="primary"
+        class="btn--size-l"
+        (click)="onClick(StockAction.SAVE)"
+        [disabled]="!currentPrice"
+      >
+        {{ 'common.action.sell' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-stock
+  [categories]="categories"
+  [functionnality]="SF.MARKET"
+  (saleUpdate)="onSaleUpdate($event)"
+></app-stock>

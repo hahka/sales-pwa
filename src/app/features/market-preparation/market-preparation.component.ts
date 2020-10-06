@@ -1,32 +1,26 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { SettingsDialogData } from 'src/app/shared/components/settings-dialog/settings-dialog-data.model';
+import { SettingsDialogComponent } from 'src/app/shared/components/settings-dialog/settings-dialog.component';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
-import { SettingsDialogData } from '../../shared/components/settings-dialog/settings-dialog-data.model';
-import { SettingsDialogComponent } from '../../shared/components/settings-dialog/settings-dialog.component';
+import { MarketSalesComponent } from '../../shared/components/market-sales/market-sales.component';
 import { MarketSales } from '../../shared/models/market-sales.model';
-import {
-  PRODUCT_CATEGORIES as PC,
-  STOCK_CATEGORIES as SC,
-  STOCK_FUNCTIONALITIES,
-} from '../../utils/enums';
-import { StockComponent } from '../stock/stock.component';
-
-export enum Action {
-  SAVE = 'SAVE',
-}
+import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from '../../utils/enums';
+import { StockAction, StockComponent } from '../stock/stock.component';
+import { CloseMarketDialogComponent } from './close-market-dialog/close-market-dialog.component';
 
 @Component({
   selector: 'app-market-preparation',
   templateUrl: './market-preparation.component.html',
   styleUrls: ['./market-preparation.component.scss'],
 })
-export class MarketPreparationComponent {
+export class MarketPreparationComponent extends MarketSalesComponent {
   @ViewChild(StockComponent, { static: true }) stockComponent: StockComponent;
 
-  stockFunctionnality = STOCK_FUNCTIONALITIES.MARKET_PREPARATION;
+  SF = STOCK_FUNCTIONALITIES;
 
-  Action = Action;
+  StockAction = StockAction;
   categories: SC[] = [];
 
   market = new FormControl();
@@ -34,21 +28,19 @@ export class MarketPreparationComponent {
   marketSales: MarketSales;
 
   constructor(
-    private readonly matDialog: MatDialog,
-    private readonly marketSalesService: MarketSalesService,
+    protected readonly matDialog: MatDialog,
+    protected readonly marketSalesService: MarketSalesService,
   ) {
-    this.marketSalesService.getMarketSales().subscribe((marketSales) => {
-      this.marketSales = new MarketSales(marketSales);
-      if (!this.marketSales.categories || !this.marketSales.categories.length) {
-        this.openSettings();
-      } else {
-        this.updateCategories();
-      }
-    });
+    super(matDialog, marketSalesService);
   }
 
-  onClick(producingAction: Action) {
-    if (producingAction === Action.SAVE) {
+  marketNotReadyHandler(): void {
+    this.openSettings();
+  }
+
+  onClick(action: StockAction) {
+    if (action === StockAction.SAVE) {
+      // Market has been prepared, need to update stock and market informations (market and categories)
       if (this.stockComponent) {
         this.stockComponent.updateStock();
         this.marketSalesService.put(this.marketSales);
@@ -76,27 +68,23 @@ export class MarketPreparationComponent {
     }
   }
 
-  updateCategories() {
-    if (this.marketSales.categories) {
-      this.categories = this.marketSales.categories.map((category) => {
-        switch (category) {
-          case PC.FROZEN:
-            return SC.SMALL_FREEZER;
-          case PC.PASTEURIZED:
-            return SC.PASTEURIZED;
-          case PC.FRESH:
-          default:
-            return SC.FRESH;
-        }
-      });
-    } else {
-      this.categories = [];
-    }
-  }
-
   isValid() {
     const ms = this.marketSales;
 
     return ms && ms.marketId && ms.categories && ms.categories.length;
+  }
+
+  closeMarket() {
+    if (this.marketSales) {
+      const dialogRef = this.matDialog.open(CloseMarketDialogComponent);
+
+      dialogRef.afterClosed().subscribe((result: { confirm: boolean }) => {
+        if (result && result.confirm) {
+          this.marketSalesService.closeMarket(this.marketSales).subscribe((_) => {
+            this.loadMarketSales();
+          });
+        }
+      });
+    }
   }
 }
