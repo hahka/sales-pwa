@@ -18,7 +18,7 @@
   </div>
   <div class="buttons-wrapper buttons-wrapper--end" *ngIf="displayCrudBtn && !forList">
     <ng-content select="[buttons]"></ng-content>
-    <div *ngIf="readonly">
+    <div *ngIf="readonly && online">
       <button mat-stroked-button color="primary" (click)="onClick(PageHeaderAction.UPDATE)">
         {{ 'common.action.update' | translate }}
       </button>
