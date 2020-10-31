@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { ToastrModule } from 'ngx-toastr';
@@ -24,6 +25,7 @@ import { StockComponent } from './stock.component';
     MatFormFieldModule,
     MatGridListModule,
     MatIconModule,
+    MatInputModule,
     MatSelectModule,
     ReactiveFormsModule,
     TranslateModule,
