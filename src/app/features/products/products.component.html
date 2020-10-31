@@ -2,5 +2,5 @@
   [dataSource]="dataSource"
   datatableTitle="{{ 'features.products.title' | translate }}"
   [fullColumns]="fullColumns"
-  [showAddButton]="canManage"
+  [showAddButton]="canManage && isOnline"
 ></app-datatable>

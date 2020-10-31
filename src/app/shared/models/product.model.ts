@@ -19,3 +19,7 @@ export class Product implements BaseModel {
     };
   }
 }
+
+export class SavedProduct extends Product {
+  id: string;
+}

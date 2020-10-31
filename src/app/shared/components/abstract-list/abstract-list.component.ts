@@ -16,7 +16,10 @@ export abstract class AbstractListComponent<T extends Product | Market> {
 
   canManage: boolean;
 
+  isOnline: boolean;
+
   constructor(private readonly apiService: ApiService<T>) {
     this.canManage = this.apiService.canManage();
+    this.isOnline = navigator.onLine;
   }
 }

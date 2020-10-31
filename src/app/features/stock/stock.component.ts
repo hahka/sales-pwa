@@ -18,7 +18,7 @@ import { pairwise, startWith } from 'rxjs/operators';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
 import { Sale, SaleItem } from '../../shared/models/market-sales.model';
-import { Product } from '../../shared/models/product.model';
+import { SavedProduct } from '../../shared/models/product.model';
 import { StockItem } from '../../shared/models/stock-item.model';
 import { Stock } from '../../shared/models/stock.model';
 import { STOCK_CATEGORIES, STOCK_FUNCTIONALITIES } from '../../utils/enums';
@@ -49,7 +49,7 @@ export class StockComponent implements OnInit, DoCheck {
 
   @Output() saleUpdate: EventEmitter<Sale> = new EventEmitter();
 
-  products: Product[];
+  products: SavedProduct[] | undefined;
   sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
 
   /** The stock fetched from server. This is manually updated only when selling items */
@@ -128,7 +128,8 @@ export class StockComponent implements OnInit, DoCheck {
 
         this.stockService.getStock().subscribe((stock) => {
           this.stock = stock ? new Stock(stock) : new Stock();
-          this.initializeStock();
+          this.addProductsToStock();
+          this.initializeStockControl();
         });
       } else {
         console.error('FormArray is missing');
@@ -138,7 +139,7 @@ export class StockComponent implements OnInit, DoCheck {
 
   ngDoCheck() {
     const changes = this.categoriesDiff.diff(this.categories);
-    this.initializeStock(!!changes || !this.isStockInitialized);
+    this.initializeStockControl(!!changes || !this.isStockInitialized);
   }
 
   onHttpError(_httpError: HttpErrorResponse): void {}
@@ -154,7 +155,7 @@ export class StockComponent implements OnInit, DoCheck {
       this.stock.stock = this.prepareStockAfterSale(stockControl.value);
       this.stock.cleanItems();
       this.stockService.put(this.stock).subscribe((_) => {
-        this.initializeStock(true);
+        this.initializeStockControl(true);
       });
     }
   }
@@ -263,7 +264,48 @@ export class StockComponent implements OnInit, DoCheck {
     console.error('new quantity is < 0');
   }
 
-  private initializeStock(force?: boolean) {
+  /**
+   * Adds products to stock if they are missing
+   */
+  private addProductsToStock() {
+    if (!this.products || !this.products.length) {
+      console.error('Products are missing');
+    } else {
+      // Looping through product to then add them to stock if they are missing
+      this.products.forEach((product) => {
+        if (this.stock && this.stock.stock) {
+          // Searching product in the stock
+          const found = this.stock.stock.find((stockItem) => {
+            return (
+              stockItem.productId === product.id &&
+              CATEGORIES_MATCHING[product.category].includes(stockItem.category) &&
+              this.categories.includes(stockItem.category)
+            );
+          });
+          if (!found) {
+            // Product is missing in stock
+            this.categories.forEach((category) => {
+              if (CATEGORIES_MATCHING[product.category].includes(category)) {
+                if (this.stock) {
+                  this.stock.stock.push({
+                    productId: product.id,
+                    category,
+                    quantity: 0,
+                  });
+                } else {
+                  console.error('Stock is missing');
+                }
+              }
+            });
+          }
+        } else {
+          console.error('Stock is missing');
+        }
+      });
+    }
+  }
+
+  private initializeStockControl(force?: boolean) {
     if (
       (!this.isStockInitialized || !!force) &&
       this.products &&
@@ -363,7 +405,6 @@ export class StockComponent implements OnInit, DoCheck {
             productControl.patchValue({ maxQuantity: this.maxQuantity });
           } else {
             // Market preparation. We can't put more products in SMALL_FREEZER than what is in LARGE_FREEZER
-
             const value = productControl.value;
             if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
               const referenceControl = (stockControl as FormArray).controls.find(
@@ -453,13 +494,17 @@ export class StockComponent implements OnInit, DoCheck {
   private prepareStockItemsForSale(items: StockItem[]): SaleItem[] {
     return items
       .map((item) => {
-        const product = this.products.find((p) => p.id === item.productId);
-        if (product) {
-          return new SaleItem({
-            product: { id: item.productId, name: product.name },
-            quantity: item.quantity,
-            price: product.price * item.quantity,
-          });
+        if (this.products) {
+          const product = this.products.find((p) => p.id === item.productId);
+          if (product) {
+            return new SaleItem({
+              product: { id: item.productId, name: product.name },
+              quantity: item.quantity,
+              price: product.price * item.quantity,
+            });
+          }
+        } else {
+          console.error('Products are missing');
         }
 
         return undefined;
