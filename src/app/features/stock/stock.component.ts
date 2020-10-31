@@ -46,14 +46,6 @@ export class StockItemForForm extends StockItem {
   styleUrls: ['./stock.component.scss'],
 })
 export class StockComponent implements OnInit, DoCheck {
-  static isPositiveError(control: AbstractControl): { [key: string]: any } | null {
-    if (Number(control.value) < 0) {
-      return { isPositiveError: true };
-    }
-
-    return null;
-  }
-
   StockAction = StockAction;
   SF = SF;
 
@@ -302,6 +294,7 @@ export class StockComponent implements OnInit, DoCheck {
                 if (this.stock) {
                   this.stock.stock.push({
                     productId: product.id,
+                    order: product.order,
                     category,
                     quantity: 0,
                   });
@@ -335,20 +328,25 @@ export class StockComponent implements OnInit, DoCheck {
         }
         this.products.forEach((product) => {
           if (!!product.id) {
-            const { id, name, price } = product;
+            const { id, name, price, order } = product;
             CATEGORIES_MATCHING[product.category].forEach((category) => {
               dataBeforeSort.push({
                 productId: id,
                 name,
                 price,
                 category,
+                order,
                 quantity: 0,
               });
             });
           }
         });
         this.sortedProducts = dataBeforeSort.sort((a, b) => {
-          return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
+          if (STOCK_ORDER[a.category] !== STOCK_ORDER[b.category]) {
+            return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
+          }
+
+          return a.order - b.order;
         });
         const stockPreparation = this.prepareStockQuantities(this.sortedProducts);
 
@@ -358,10 +356,7 @@ export class StockComponent implements OnInit, DoCheck {
             productId: new FormControl(data.productId),
             name: new FormControl(data.name),
             price: new FormControl(data.price),
-            quantity: new FormControl(
-              data.quantity,
-              Validators.compose([Validators.required, StockComponent.isPositiveError]),
-            ),
+            quantity: new FormControl(data.quantity, [Validators.required, Validators.min(0)]),
             maxQuantity: new FormControl(data.quantity),
             category: new FormControl(data.category),
           });
