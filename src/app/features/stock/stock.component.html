@@ -1,6 +1,6 @@
 <form [formGroup]="form" *ngIf="form">
   <ng-container formArrayName="stock">
-    <mat-grid-list [cols]="responsiveCols" (window:resize)="onResize($event)">
+    <mat-grid-list [cols]="responsiveCols" (window:resize)="onResize($event)" rowHeight="200px">
       <ng-container *ngFor="let stockItem of form.get('stock')?.controls; let i = index">
         <ng-container *ngIf="indexOfDividers.includes(i)">
           <mat-grid-tile
@@ -21,21 +21,28 @@
 
         <mat-grid-tile *ngIf="categories.includes(stockItem.value.category)">
           <mat-card [formGroupName]="i">
-            <mat-card-header *ngIf="sanitizedImages[stockItem.value.productId]">
+            <!-- <mat-card-header *ngIf="sanitizedImages[stockItem.value.productId]">
               <div class="image-preview" *ngIf="sanitizedImages[stockItem.value.productId]">
                 <img [src]="sanitizedImages[stockItem.value.productId]" />
               </div>
-            </mat-card-header>
+            </mat-card-header> -->
             <mat-card-content>
               <span>{{ stockItem.value.name }}</span>
-              <span>{{ stockItem.value.price }} €</span>
+              <span class="price">{{ stockItem.value.price }} €</span>
             </mat-card-content>
             <mat-card-actions>
               <div class="quantity-selector">
                 <button mat-icon-button (click)="decreaseQuantity(i)">
                   <mat-icon>remove</mat-icon>
                 </button>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" *ngIf="functionnality === SF.PRODUCE">
+                  <mat-label>Quantité</mat-label>
+                  <input matInput formControlName="quantity" type="number" required />
+                  <!-- <mat-error *ngIf="form.controls.name?.errors?.duplicated"
+                    >{{ 'features.products.form.errors.name_duplicated' | translate }}
+                  </mat-error> -->
+                </mat-form-field>
+                <mat-form-field appearance="outline" *ngIf="functionnality !== SF.PRODUCE">
                   <mat-label>Quantité</mat-label>
                   <mat-select formControlName="quantity" required>
                     <mat-option *ngFor="let quantity of quantities(i)" [value]="quantity">

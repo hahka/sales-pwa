@@ -9,9 +9,9 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+// import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { pairwise, startWith } from 'rxjs/operators';
@@ -21,7 +21,11 @@ import { Sale, SaleItem } from '../../shared/models/market-sales.model';
 import { SavedProduct } from '../../shared/models/product.model';
 import { StockItem } from '../../shared/models/stock-item.model';
 import { Stock } from '../../shared/models/stock.model';
-import { STOCK_CATEGORIES, STOCK_FUNCTIONALITIES } from '../../utils/enums';
+import {
+  STOCK_CATEGORIES,
+  STOCK_FUNCTIONALITIES,
+  STOCK_FUNCTIONALITIES as SF,
+} from '../../utils/enums';
 import { CATEGORIES_MATCHING, STOCK_ORDER } from '../../utils/stocks.util';
 import { ResetStockDialogComponent } from './reset-stock-dialog/reset-stock-dialog.component';
 
@@ -42,7 +46,16 @@ export class StockItemForForm extends StockItem {
   styleUrls: ['./stock.component.scss'],
 })
 export class StockComponent implements OnInit, DoCheck {
+  static isPositiveError(control: AbstractControl): { [key: string]: any } | null {
+    if (Number(control.value) < 0) {
+      return { isPositiveError: true };
+    }
+
+    return null;
+  }
+
   StockAction = StockAction;
+  SF = SF;
 
   @Input() categories: STOCK_CATEGORIES[] = [];
   @Input() functionnality: STOCK_FUNCTIONALITIES = STOCK_FUNCTIONALITIES.PRODUCE;
@@ -50,7 +63,7 @@ export class StockComponent implements OnInit, DoCheck {
   @Output() saleUpdate: EventEmitter<Sale> = new EventEmitter();
 
   products: SavedProduct[] | undefined;
-  sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
+  // sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
 
   /** The stock fetched from server. This is manually updated only when selling items */
   stock: Stock | undefined;
@@ -77,13 +90,13 @@ export class StockComponent implements OnInit, DoCheck {
 
   private categoriesDiff: IterableDiffer<STOCK_CATEGORIES>;
 
-  private readonly tileSize = 350;
+  private readonly tileSize = 250; // 350 seems OK with images
   private readonly maxQuantity = 100;
 
   constructor(
     private readonly productsService: ProductsService,
     private readonly stockService: StockService,
-    private readonly domSanitizer: DomSanitizer,
+    // private readonly domSanitizer: DomSanitizer,
     private readonly iterableDiffers: IterableDiffers,
     private readonly translateService: TranslateService,
     private readonly toasterService: ToastrService,
@@ -120,9 +133,9 @@ export class StockComponent implements OnInit, DoCheck {
       if (this.stockControl) {
         products.forEach((product) => {
           if (product.image && product.id) {
-            this.sanitizedImages[product.id] = this.domSanitizer.bypassSecurityTrustResourceUrl(
-              `data:image/png;base64, ${product.image}`,
-            );
+            // this.sanitizedImages[product.id] = this.domSanitizer.bypassSecurityTrustResourceUrl(
+            //   `data:image/png;base64, ${product.image}`,
+            // );
           }
         });
 
@@ -345,7 +358,10 @@ export class StockComponent implements OnInit, DoCheck {
             productId: new FormControl(data.productId),
             name: new FormControl(data.name),
             price: new FormControl(data.price),
-            quantity: new FormControl(data.quantity),
+            quantity: new FormControl(
+              data.quantity,
+              Validators.compose([Validators.required, StockComponent.isPositiveError]),
+            ),
             maxQuantity: new FormControl(data.quantity),
             category: new FormControl(data.category),
           });
