@@ -5,6 +5,7 @@ export class Stock {
     return items.map((stockItem) => {
       return new StockItem({
         category: stockItem.category,
+        order: stockItem.order,
         productId: stockItem.productId,
         quantity: stockItem.quantity,
       });

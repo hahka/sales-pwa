@@ -26,7 +26,7 @@ import {
   STOCK_FUNCTIONALITIES,
   STOCK_FUNCTIONALITIES as SF,
 } from '../../utils/enums';
-import { CATEGORIES_MATCHING, STOCK_ORDER } from '../../utils/stocks.util';
+import { CATEGORIES_MATCHING, linkedStockToUpdate, STOCK_ORDER } from '../../utils/stocks.util';
 import { ResetStockDialogComponent } from './reset-stock-dialog/reset-stock-dialog.component';
 
 export enum StockAction {
@@ -417,11 +417,11 @@ export class StockComponent implements OnInit, DoCheck {
           } else {
             // Market preparation. We can't put more products in SMALL_FREEZER than what is in LARGE_FREEZER
             const value = productControl.value;
-            if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
+            const stockToUpdate = linkedStockToUpdate(value.category);
+            if (stockToUpdate) {
               const referenceControl = (stockControl as FormArray).controls.find(
                 (fc) =>
-                  fc.value.productId === value.productId &&
-                  fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
+                  fc.value.productId === value.productId && fc.value.category === stockToUpdate,
               );
               if (referenceControl) {
                 const referenceValue = referenceControl.value.quantity;
@@ -553,7 +553,8 @@ export class StockComponent implements OnInit, DoCheck {
     if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
       if (this.isStockInitialized && this.stockControl) {
         const stockCategory = newControlValue.category;
-        if (stockCategory === STOCK_CATEGORIES.SMALL_FREEZER) {
+        const stockToUpdate = linkedStockToUpdate(stockCategory);
+        if (stockToUpdate) {
           const oldQuantity = oldControlValue.quantity;
           const newQuantity = newControlValue.quantity;
 
@@ -562,9 +563,7 @@ export class StockComponent implements OnInit, DoCheck {
           if (diff !== 0) {
             const productId = newControlValue.productId;
             const linkedControl = this.stockControl.controls.find(
-              (fc) =>
-                fc.value.productId === productId &&
-                fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
+              (fc) => fc.value.productId === productId && fc.value.category === stockToUpdate,
             );
             if (linkedControl) {
               linkedControl.patchValue({ quantity: linkedControl.value.quantity + diff });
