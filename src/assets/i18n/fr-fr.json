@@ -53,7 +53,8 @@
             "FRESH": "Frais",
             "SMALL_FREEZER": "Petit congélateur",
             "LARGE_FREEZER": "Gros congélateur",
-            "PASTEURIZED": "Pasteurisé"
+            "PASTEURIZED": "Pasteurisé",
+            "PASTEURIZED_FOR_MARKET": "Pasteurisé"
         }
     }
 }
