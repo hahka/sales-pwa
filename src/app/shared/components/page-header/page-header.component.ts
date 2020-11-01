@@ -56,6 +56,13 @@ export class PageHeaderComponent {
 
     return id && id.value;
   }
+
+  online: boolean;
+
+  constructor() {
+    this.online = navigator.onLine;
+  }
+
   /** Handles the buttons' click event */
   onClick(event: PageHeaderAction): void {
     if ((event === PageHeaderAction.BACK || event === PageHeaderAction.CANCEL) && !this.readonly) {

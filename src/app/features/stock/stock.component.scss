@@ -1,26 +1,26 @@
 mat-card {
-  min-width: 75%;
+  width: 80%; // 75 with images
 }
 
-mat-card-header {
-  width: 100%;
-  padding-top: 75%;
-  position: relative;
-  overflow: hidden;
-  .image-preview {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
+// mat-card-header {
+//   width: 100%;
+//   padding-top: 75%;
+//   position: relative;
+//   overflow: hidden;
+//   .image-preview {
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     display: flex;
+//     justify-content: center;
 
-    img {
-      object-fit: contain;
-    }
-  }
-}
+//     img {
+//       object-fit: contain;
+//     }
+//   }
+// }
 
 mat-card-content {
   display: flex;
@@ -29,6 +29,11 @@ mat-card-content {
 
   span {
     font-size: large;
+
+    &.price {
+      min-width: 50px;
+      text-align: end;
+    }
   }
 }
 

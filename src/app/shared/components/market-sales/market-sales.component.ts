@@ -23,7 +23,7 @@ export abstract class MarketSalesComponent {
           case PC.FROZEN:
             return SC.SMALL_FREEZER;
           case PC.PASTEURIZED:
-            return SC.PASTEURIZED;
+            return SC.PASTEURIZED_FOR_MARKET;
           case PC.FRESH:
           default:
             return SC.FRESH;

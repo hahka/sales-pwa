@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { from, Subscription } from 'rxjs';
+import { from, Observable, Subscription } from 'rxjs';
 import { pluck, take } from 'rxjs/operators';
-import { Product } from '../../../shared/models/product.model';
+import { Product, SavedProduct } from '../../../shared/models/product.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { ApiService } from '../api/api.service';
 
@@ -50,11 +50,11 @@ export class ProductsService extends ApiService<Product> {
     }
   }
 
-  public getFull() {
+  public getFull(): Observable<SavedProduct[]> {
     if (navigator.onLine) {
-      return this.httpClient.get<Product[]>(`${this.getFormattedUrl()}/full`);
+      return this.httpClient.get<SavedProduct[]>(`${this.getFormattedUrl()}/full`);
     }
 
-    return this.getAll();
+    return this.getAll() as Observable<SavedProduct[]>;
   }
 }

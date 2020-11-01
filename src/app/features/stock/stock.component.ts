@@ -9,20 +9,24 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+// import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { pairwise, startWith } from 'rxjs/operators';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
 import { Sale, SaleItem } from '../../shared/models/market-sales.model';
-import { Product } from '../../shared/models/product.model';
+import { SavedProduct } from '../../shared/models/product.model';
 import { StockItem } from '../../shared/models/stock-item.model';
 import { Stock } from '../../shared/models/stock.model';
-import { STOCK_CATEGORIES, STOCK_FUNCTIONALITIES } from '../../utils/enums';
-import { CATEGORIES_MATCHING, STOCK_ORDER } from '../../utils/stocks.util';
+import {
+  STOCK_CATEGORIES,
+  STOCK_FUNCTIONALITIES,
+  STOCK_FUNCTIONALITIES as SF,
+} from '../../utils/enums';
+import { CATEGORIES_MATCHING, linkedStockToUpdate, STOCK_ORDER } from '../../utils/stocks.util';
 import { ResetStockDialogComponent } from './reset-stock-dialog/reset-stock-dialog.component';
 
 export enum StockAction {
@@ -43,14 +47,15 @@ export class StockItemForForm extends StockItem {
 })
 export class StockComponent implements OnInit, DoCheck {
   StockAction = StockAction;
+  SF = SF;
 
   @Input() categories: STOCK_CATEGORIES[] = [];
   @Input() functionnality: STOCK_FUNCTIONALITIES = STOCK_FUNCTIONALITIES.PRODUCE;
 
   @Output() saleUpdate: EventEmitter<Sale> = new EventEmitter();
 
-  products: Product[];
-  sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
+  products: SavedProduct[] | undefined;
+  // sanitizedImages: { [productId: string]: SafeResourceUrl } = {};
 
   /** The stock fetched from server. This is manually updated only when selling items */
   stock: Stock | undefined;
@@ -77,13 +82,13 @@ export class StockComponent implements OnInit, DoCheck {
 
   private categoriesDiff: IterableDiffer<STOCK_CATEGORIES>;
 
-  private readonly tileSize = 350;
+  private readonly tileSize = 250; // 350 seems OK with images
   private readonly maxQuantity = 100;
 
   constructor(
     private readonly productsService: ProductsService,
     private readonly stockService: StockService,
-    private readonly domSanitizer: DomSanitizer,
+    // private readonly domSanitizer: DomSanitizer,
     private readonly iterableDiffers: IterableDiffers,
     private readonly translateService: TranslateService,
     private readonly toasterService: ToastrService,
@@ -120,15 +125,16 @@ export class StockComponent implements OnInit, DoCheck {
       if (this.stockControl) {
         products.forEach((product) => {
           if (product.image && product.id) {
-            this.sanitizedImages[product.id] = this.domSanitizer.bypassSecurityTrustResourceUrl(
-              `data:image/png;base64, ${product.image}`,
-            );
+            // this.sanitizedImages[product.id] = this.domSanitizer.bypassSecurityTrustResourceUrl(
+            //   `data:image/png;base64, ${product.image}`,
+            // );
           }
         });
 
         this.stockService.getStock().subscribe((stock) => {
           this.stock = stock ? new Stock(stock) : new Stock();
-          this.initializeStock();
+          this.addProductsToStock();
+          this.initializeStockControl();
         });
       } else {
         console.error('FormArray is missing');
@@ -138,7 +144,7 @@ export class StockComponent implements OnInit, DoCheck {
 
   ngDoCheck() {
     const changes = this.categoriesDiff.diff(this.categories);
-    this.initializeStock(!!changes || !this.isStockInitialized);
+    this.initializeStockControl(!!changes || !this.isStockInitialized);
   }
 
   onHttpError(_httpError: HttpErrorResponse): void {}
@@ -154,7 +160,7 @@ export class StockComponent implements OnInit, DoCheck {
       this.stock.stock = this.prepareStockAfterSale(stockControl.value);
       this.stock.cleanItems();
       this.stockService.put(this.stock).subscribe((_) => {
-        this.initializeStock(true);
+        this.initializeStockControl(true);
       });
     }
   }
@@ -263,7 +269,49 @@ export class StockComponent implements OnInit, DoCheck {
     console.error('new quantity is < 0');
   }
 
-  private initializeStock(force?: boolean) {
+  /**
+   * Adds products to stock if they are missing
+   */
+  private addProductsToStock() {
+    if (!this.products || !this.products.length) {
+      console.error('Products are missing');
+    } else {
+      // Looping through product to then add them to stock if they are missing
+      this.products.forEach((product) => {
+        if (this.stock && this.stock.stock) {
+          // Searching product in the stock
+          const found = this.stock.stock.find((stockItem) => {
+            return (
+              stockItem.productId === product.id &&
+              CATEGORIES_MATCHING[product.category].includes(stockItem.category) &&
+              this.categories.includes(stockItem.category)
+            );
+          });
+          if (!found) {
+            // Product is missing in stock
+            this.categories.forEach((category) => {
+              if (CATEGORIES_MATCHING[product.category].includes(category)) {
+                if (this.stock) {
+                  this.stock.stock.push({
+                    productId: product.id,
+                    order: product.order,
+                    category,
+                    quantity: 0,
+                  });
+                } else {
+                  console.error('Stock is missing');
+                }
+              }
+            });
+          }
+        } else {
+          console.error('Stock is missing');
+        }
+      });
+    }
+  }
+
+  private initializeStockControl(force?: boolean) {
     if (
       (!this.isStockInitialized || !!force) &&
       this.products &&
@@ -280,20 +328,25 @@ export class StockComponent implements OnInit, DoCheck {
         }
         this.products.forEach((product) => {
           if (!!product.id) {
-            const { id, name, price } = product;
+            const { id, name, price, order } = product;
             CATEGORIES_MATCHING[product.category].forEach((category) => {
               dataBeforeSort.push({
                 productId: id,
                 name,
                 price,
                 category,
+                order,
                 quantity: 0,
               });
             });
           }
         });
         this.sortedProducts = dataBeforeSort.sort((a, b) => {
-          return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
+          if (STOCK_ORDER[a.category] !== STOCK_ORDER[b.category]) {
+            return STOCK_ORDER[a.category] - STOCK_ORDER[b.category];
+          }
+
+          return a.order - b.order;
         });
         const stockPreparation = this.prepareStockQuantities(this.sortedProducts);
 
@@ -303,7 +356,7 @@ export class StockComponent implements OnInit, DoCheck {
             productId: new FormControl(data.productId),
             name: new FormControl(data.name),
             price: new FormControl(data.price),
-            quantity: new FormControl(data.quantity),
+            quantity: new FormControl(data.quantity, [Validators.required, Validators.min(0)]),
             maxQuantity: new FormControl(data.quantity),
             category: new FormControl(data.category),
           });
@@ -363,13 +416,12 @@ export class StockComponent implements OnInit, DoCheck {
             productControl.patchValue({ maxQuantity: this.maxQuantity });
           } else {
             // Market preparation. We can't put more products in SMALL_FREEZER than what is in LARGE_FREEZER
-
             const value = productControl.value;
-            if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
+            const stockToUpdate = linkedStockToUpdate(value.category);
+            if (stockToUpdate) {
               const referenceControl = (stockControl as FormArray).controls.find(
                 (fc) =>
-                  fc.value.productId === value.productId &&
-                  fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
+                  fc.value.productId === value.productId && fc.value.category === stockToUpdate,
               );
               if (referenceControl) {
                 const referenceValue = referenceControl.value.quantity;
@@ -453,13 +505,17 @@ export class StockComponent implements OnInit, DoCheck {
   private prepareStockItemsForSale(items: StockItem[]): SaleItem[] {
     return items
       .map((item) => {
-        const product = this.products.find((p) => p.id === item.productId);
-        if (product) {
-          return new SaleItem({
-            product: { id: item.productId, name: product.name },
-            quantity: item.quantity,
-            price: product.price * item.quantity,
-          });
+        if (this.products) {
+          const product = this.products.find((p) => p.id === item.productId);
+          if (product) {
+            return new SaleItem({
+              product: { id: item.productId, name: product.name },
+              quantity: item.quantity,
+              price: product.price * item.quantity,
+            });
+          }
+        } else {
+          console.error('Products are missing');
         }
 
         return undefined;
@@ -497,7 +553,8 @@ export class StockComponent implements OnInit, DoCheck {
     if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
       if (this.isStockInitialized && this.stockControl) {
         const stockCategory = newControlValue.category;
-        if (stockCategory === STOCK_CATEGORIES.SMALL_FREEZER) {
+        const stockToUpdate = linkedStockToUpdate(stockCategory);
+        if (stockToUpdate) {
           const oldQuantity = oldControlValue.quantity;
           const newQuantity = newControlValue.quantity;
 
@@ -506,9 +563,7 @@ export class StockComponent implements OnInit, DoCheck {
           if (diff !== 0) {
             const productId = newControlValue.productId;
             const linkedControl = this.stockControl.controls.find(
-              (fc) =>
-                fc.value.productId === productId &&
-                fc.value.category === STOCK_CATEGORIES.LARGE_FREEZER,
+              (fc) => fc.value.productId === productId && fc.value.category === stockToUpdate,
             );
             if (linkedControl) {
               linkedControl.patchValue({ quantity: linkedControl.value.quantity + diff });

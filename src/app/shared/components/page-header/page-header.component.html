@@ -18,17 +18,17 @@
   </div>
   <div class="buttons-wrapper buttons-wrapper--end" *ngIf="displayCrudBtn && !forList">
     <ng-content select="[buttons]"></ng-content>
-    <div *ngIf="readonly">
+    <div *ngIf="readonly && online">
       <button mat-stroked-button color="primary" (click)="onClick(PageHeaderAction.UPDATE)">
         {{ 'common.action.update' | translate }}
       </button>
     </div>
     <div *ngIf="!readonly" class="buttons-container">
-      <ng-container *ngIf="displayArchive">
+      <!-- <ng-container *ngIf="displayArchive">
         <button mat-stroked-button color="warn" (click)="onClick(PageHeaderAction.ARCHIVE)">
           {{ isArchived ? 'common.action.unarchive' : ('common.action.archive' | translate) }}
         </button>
-      </ng-container>
+      </ng-container> -->
 
       <button mat-stroked-button color="primary" (click)="onClick(PageHeaderAction.CANCEL)">
         {{ 'common.action.cancel' | translate }}
