@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
@@ -19,7 +12,6 @@ import { FullColumn } from './full-column.model';
   selector: 'app-datatable',
   templateUrl: './datatable.component.html',
   styleUrls: ['./datatable.component.scss'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class DatatableComponent<T extends BaseModel> implements OnDestroy {
   ColumnType = ColumnType;
