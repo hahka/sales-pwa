@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserModule } from '@angular/platform-browser';
@@ -14,6 +15,7 @@ import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { getFrenchPaginatorIntl } from './utils/paginator';
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,7 +33,7 @@ import { CoreModule } from './core/core.module';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ToastrModule.forRoot(),
   ],
-  providers: [],
+  providers: [{ provide: MatPaginatorIntl, useValue: getFrenchPaginatorIntl() }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

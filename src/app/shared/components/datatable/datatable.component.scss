@@ -1,9 +1,8 @@
 $margin: 24px;
-app-datatable {
+:host {
   display: flex;
   flex-direction: column;
-  margin: $margin;
-  height: calc(100% - #{$margin * 2});
+  height: 100%;
 
   button mat-icon[matPrefix] {
     margin-left: -5px;
@@ -41,6 +40,8 @@ app-datatable {
     flex: 1;
     overflow: auto;
     border-radius: 3px;
+    margin: $margin;
+    height: calc(100% - #{$margin * 2});
 
     app-searchbar {
       flex: 1;
