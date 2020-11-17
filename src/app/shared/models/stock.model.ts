@@ -14,6 +14,8 @@ export class Stock {
 
   id: string;
   stock: StockItem[] = [];
+
+  /** Timestamp of the last update, set by the server */
   lastUpdate: string;
 
   /** This property is only returned by the local IDB. If missing, data has been returned by the server. */
