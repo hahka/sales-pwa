@@ -11,8 +11,11 @@ export class SyncComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  synchronize() {
+  synchDown() {
     this.syncService.syncDown();
+  }
+
+  synchUp() {
     this.syncService.syncUp();
   }
 }

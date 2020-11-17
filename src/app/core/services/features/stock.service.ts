@@ -24,6 +24,11 @@ export class StockService extends ResourceUrlHelper {
     super(environmentService);
   }
 
+  /**
+   * Returns the stock:
+   * - from server if device is online AND stock is not found in local idb
+   * - from local idb otherwise
+   */
   public getStock(): Observable<Stock | null> {
     return from(
       (this.idbService.getById(this.resource, this.stockOnlyId) as Promise<Stock>).then(
@@ -31,11 +36,11 @@ export class StockService extends ResourceUrlHelper {
           /** Stock found in local IDB */
           localStock,
         ) => {
-          if (!navigator.onLine || !!localStock) {
-            return localStock;
+          if (navigator.onLine && !localStock) {
+            return this.httpClient.get<Stock>(`${this.getFormattedUrl()}`).toPromise();
           }
 
-          return this.httpClient.get<Stock>(`${this.getFormattedUrl()}`).toPromise();
+          return localStock;
         },
       ),
     );
@@ -65,10 +70,6 @@ export class StockService extends ResourceUrlHelper {
     return this.updateLocalStock(data);
   }
 
-  public getLocalStock() {
-    return from(this.idbService.getById(this.resource, this.stockOnlyId) as Promise<Stock>);
-  }
-
   /**
    * Updates local stock without modifying its values, e.g. after an online update, to keep idb up to date.
    */
@@ -86,7 +87,7 @@ export class StockService extends ResourceUrlHelper {
     ).pipe(take(1));
   }
 
-  async synchronize() {
+  async synchronizeDown() {
     if (navigator.onLine) {
       let stockSub: Subscription;
       stockSub = this.getStock().subscribe((stock) => {
@@ -97,6 +98,25 @@ export class StockService extends ResourceUrlHelper {
           /* If lastLocalUpdate is missing, it means that there's no stock in IDB
           and that the stock has been fetched from server, so we need to put it in IDB */
           this.updateLocalStock(new Stock(stock), true);
+        }
+      });
+    } else {
+      // TODO : error, offline
+    }
+  }
+
+  /**
+   * Synchronizes the stock (wether it's local or remote) to the server
+   */
+  async synchronizeUp() {
+    if (navigator.onLine) {
+      let stockSub: Subscription;
+      stockSub = this.getStock().subscribe((stock) => {
+        if (stockSub && !stockSub.closed) {
+          stockSub.unsubscribe();
+        }
+        if (stock) {
+          this.put(new Stock(stock));
         }
       });
     } else {

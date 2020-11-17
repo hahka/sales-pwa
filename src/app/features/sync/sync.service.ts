@@ -25,10 +25,11 @@ export class SyncService {
   syncDown() {
     this.marketsService.synchronizeDown();
     this.productsService.synchronizeDown();
-    this.stockService.synchronize();
+    this.stockService.synchronizeDown();
   }
 
   syncUp() {
+    this.stockService.synchronizeUp();
     this.marketSalesService.synchronizeUp();
   }
 
