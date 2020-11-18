@@ -17,6 +17,6 @@
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="cancel()">Annuler</button>
-  <button mat-button (click)="submit()" cdkFocusInitial [disabled]="disabled">Valider</button>
+  <button mat-button color="error" (click)="cancel()">Annuler</button>
+  <button mat-button color="primary" (click)="submit()" cdkFocusInitial [disabled]="disabled">Valider</button>
 </div>

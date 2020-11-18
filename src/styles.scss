@@ -4,6 +4,24 @@
 @import './fonts.scss';
 @import '~ngx-toastr/toastr.css';
 
+@import '~@angular/material/theming';
+@include mat-core();
+
+$app-primary: mat-palette($mat-teal);
+$app-accent: mat-palette($mat-teal);
+$app-warn: mat-palette($mat-red);
+
+$theme-dark: mat-dark-theme($app-primary, $app-accent, $app-warn);
+$theme-light: mat-light-theme($app-primary, $app-accent, $app-warn);
+
+.color-scheme-dark {
+  @include angular-material-theme($theme-dark);
+}
+
+.color-scheme-light {
+  @include angular-material-theme($theme-light);
+}
+
 html,
 body {
   height: 100%;
@@ -16,4 +34,8 @@ body {
 
 .mat-dialog-actions {
   justify-content: flex-end;
+}
+
+.color-scheme-dark .app__search__wrapper {
+  background: #212121;
 }

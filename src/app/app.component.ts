@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { fromEvent, Observable, Subscription } from 'rxjs';
+import { ColorSchemeService } from './core/services/color-scheme.service';
 import { ConnectionStatusService } from './core/services/connection-status.service';
 import { SyncService } from './features/sync/sync.service';
 
@@ -17,7 +18,10 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     public readonly connectionStatusService: ConnectionStatusService,
     public readonly syncService: SyncService,
-  ) {}
+    private readonly colorSchemeService: ColorSchemeService,
+  ) {
+    this.colorSchemeService.load();
+  }
 
   ngOnInit(): void {
     if (navigator.onLine) {
