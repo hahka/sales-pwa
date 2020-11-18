@@ -19,17 +19,8 @@ $margin: 24px;
     }
 
     mat-row {
-      border-width: 0;
-      &:nth-child(2n) {
-        background-color: #f7f7f7;
-      }
-
       td {
         border: none;
-      }
-
-      &.mat-row.--activated:nth-child(n) {
-        background-color: #e4edf4;
       }
     }
   }
@@ -41,6 +32,7 @@ $margin: 24px;
     overflow: auto;
     border-radius: 3px;
     margin: $margin;
+    margin-top: 0;
     height: calc(100% - #{$margin * 2});
 
     app-searchbar {
@@ -50,7 +42,6 @@ $margin: 24px;
     &__header {
       display: flex;
       align-items: center;
-      background-color: #fff;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
       mat-checkbox {
         font-size: 14px;
@@ -60,10 +51,6 @@ $margin: 24px;
         margin-right: 15px;
       }
     }
-  }
-
-  .mat-paginator {
-    background-color: #f5f7fa;
   }
 
   mat-header-cell {

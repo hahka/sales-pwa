@@ -1,12 +1,6 @@
 <div class="app__search__wrapper">
-  <div class="app__searchBar">
-    <i class="material-icons">search</i>
-    <input
-      #input
-      (keyup)="onKeyup(input.value)"
-      [value]="searchValue"
-      placeholder="{{ 'common.search' | translate }}"
-      id="datatable__input__search"
-    />
-  </div>
+  <mat-form-field>
+    <mat-label>{{ 'common.search' | translate }}</mat-label>
+    <input #input matInput (keyup)="onKeyup(input.value)"/>
+  </mat-form-field>
 </div>
