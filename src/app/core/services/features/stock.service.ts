@@ -28,15 +28,16 @@ export class StockService extends ResourceUrlHelper {
    * Returns the stock:
    * - from server if device is online AND stock is not found in local idb
    * - from local idb otherwise
+   * @param forceFromServer If true, data is fetched from server if device is online
    */
-  public getStock(): Observable<Stock | null> {
+  public getStock(forceFromServer = false): Observable<Stock | null> {
     return from(
       (this.idbService.getById(this.resource, this.stockOnlyId) as Promise<Stock>).then(
         (
           /** Stock found in local IDB */
           localStock,
         ) => {
-          if (navigator.onLine && !localStock) {
+          if (navigator.onLine && (forceFromServer || !localStock)) {
             return this.httpClient.get<Stock>(`${this.getFormattedUrl()}`).toPromise();
           }
 
@@ -90,7 +91,7 @@ export class StockService extends ResourceUrlHelper {
   async synchronizeDown() {
     if (navigator.onLine) {
       let stockSub: Subscription;
-      stockSub = this.getStock().subscribe((stock) => {
+      stockSub = this.getStock(true).subscribe((stock) => {
         if (stockSub && !stockSub.closed) {
           stockSub.unsubscribe();
         }
