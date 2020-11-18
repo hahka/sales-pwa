@@ -54,9 +54,6 @@ export class DatatableComponent<T extends BaseModel> implements OnDestroy {
   /** Title to display for the datatable */
   @Input() datatableTitle: string;
 
-  /** Activated object, to highlight row if datatable is still displayed */
-  @Input() activatedObject: T;
-
   /** Fired when a row has been clicked */
   @Output() rowClicked: EventEmitter<BaseModel> = new EventEmitter();
 

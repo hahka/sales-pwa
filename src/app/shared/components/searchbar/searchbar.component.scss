@@ -1,23 +1,7 @@
-.app {
-  &__search__wrapper {
-    background: white;
-    padding: 15px;
-  }
+.app__search__wrapper {
+  padding: 0 15px;
 
-  &__searchBar {
-    display: flex;
-    padding: 10px;
-    border-radius: 20px;
-    background-color: #f5f7fa;
-    color: #5a6872;
-    input {
-      font-size: 14px;
-      background-color: #f5f7fa;
-      border: none;
-      width: 100%;
-      &:focus {
-        outline: 0;
-      }
-    }
+  mat-form-field {
+    width: 100%;
   }
 }

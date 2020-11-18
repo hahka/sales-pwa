@@ -15,10 +15,11 @@ import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { ColorSchemeSettingComponent } from './shared/components/color-scheme-setting/color-scheme-setting.component';
 import { getFrenchPaginatorIntl } from './utils/paginator';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, ColorSchemeSettingComponent],
   imports: [
     AppRoutingModule,
     BrowserAnimationsModule,
