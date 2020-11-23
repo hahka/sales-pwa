@@ -45,10 +45,9 @@
           <span *ngSwitchCase="ColumnType.month_year" class="uppercase--first">
             {{ data | date: 'MMMM yyyy' }}</span
           >
-          <ng-container *ngSwitchCase="ColumnType.state">
-            <div class="colored-dot" [style.background-color]="data?.color"></div>
-            <span>{{ data?.name }}</span>
-          </ng-container>
+          <span *ngSwitchCase="ColumnType.day_month_year" class="uppercase--first">
+            {{ data | date: 'dd MMMM yyyy' }}</span
+          >
         </ng-template>
       </mat-cell>
     </ng-container>

@@ -15,6 +15,20 @@
       }}</mat-option>
     </mat-select>
   </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Date de début</mat-label>
+    <input matInput [matDatepicker]="marketStart" [formControl]="start" disabled>
+    <mat-datepicker-toggle matSuffix [for]="marketStart"></mat-datepicker-toggle>
+    <mat-datepicker #marketStart disabled="false"></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Date de fin</mat-label>
+    <input matInput [matDatepicker]="marketEnd" [formControl]="end" disabled>
+    <mat-datepicker-toggle matSuffix [for]="marketEnd"></mat-datepicker-toggle>
+    <mat-datepicker #marketEnd disabled="false"></mat-datepicker>
+  </mat-form-field>
 </div>
 <div mat-dialog-actions>
   <button mat-button color="error" (click)="cancel()">Annuler</button>

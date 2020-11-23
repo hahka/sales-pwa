@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -34,7 +35,10 @@ import { getFrenchPaginatorIntl } from './utils/paginator';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ToastrModule.forRoot(),
   ],
-  providers: [{ provide: MatPaginatorIntl, useValue: getFrenchPaginatorIntl() }],
+  providers: [
+    { provide: MatPaginatorIntl, useValue: getFrenchPaginatorIntl() },
+    { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

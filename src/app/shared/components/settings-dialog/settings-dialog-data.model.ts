@@ -4,4 +4,6 @@ export interface SettingsDialogData {
   marketId: string;
   marketName: string;
   categories: PRODUCT_CATEGORIES[];
+  startDate: string;
+  endDate?: string;
 }

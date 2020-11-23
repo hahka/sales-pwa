@@ -1,4 +1,5 @@
 import { Component, Inject } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { MarketsService } from '../../../core/services/features/markets.service';
@@ -15,6 +16,9 @@ export class SettingsDialogComponent {
   pCategories = [PC.FRESH, PC.FROZEN, PC.PASTEURIZED];
   markets: Market[];
 
+  start: FormControl;
+  end: FormControl;
+
   public get disabled() {
     return !this.data.marketId || !this.data.categories || !this.data.categories.length;
   }
@@ -28,6 +32,14 @@ export class SettingsDialogComponent {
     this.marketsService.getAll().subscribe((markets) => {
       this.markets = markets;
     });
+
+    this.start = new FormControl(new Date(data.startDate));
+
+    if (data.endDate) {
+      this.end = new FormControl(data.endDate);
+    } else {
+      this.end = new FormControl();
+    }
   }
 
   public cancel(): void {
@@ -38,6 +50,8 @@ export class SettingsDialogComponent {
     this.dialogRef.close({
       ...this.data,
       marketName: this.markets.find((market) => this.data.marketId === market.id)?.name,
+      startDate: this.start.value.toISOString(),
+      endDate: this.end.value ? this.end.value.toISOString() : null,
     });
   }
 

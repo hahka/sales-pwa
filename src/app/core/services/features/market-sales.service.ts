@@ -26,7 +26,7 @@ export class MarketSalesService extends ApiService<MarketSales> {
   public getCurrentMarketSales(): Observable<MarketSales | undefined> {
     return from(this.idbService.getAll(this.resource) as Promise<MarketSales[] | undefined>).pipe(
       map((results) => {
-        return results && results?.find((result) => !result.endDate);
+        return results && results?.find((result) => !result.isClosed);
       }),
     );
   }
@@ -42,7 +42,7 @@ export class MarketSalesService extends ApiService<MarketSales> {
   }
 
   public closeMarket(data: MarketSales) {
-    data.endDate = new Date().toISOString();
+    data.isClosed = true;
 
     return this.put(data);
   }
@@ -91,7 +91,7 @@ export class MarketSalesService extends ApiService<MarketSales> {
 
   private getClosedMarketSales(): Observable<MarketSales[] | undefined> {
     return from(this.idbService.getAll(this.resource) as Promise<MarketSales[] | undefined>).pipe(
-      map((results) => results && results.filter((r) => r.endDate)),
+      map((results) => results && results.filter((r) => r.isClosed)),
     );
   }
 }
