@@ -1,15 +1,15 @@
 <h1 mat-dialog-title>Paramétrage du marché</h1>
-<div class="settings-dialog__content" mat-dialog-content>
+<form [formGroup]="formGroup" class="settings-dialog__content" mat-dialog-content>
   <mat-form-field appearance="fill">
     <mat-label>Marché</mat-label>
-    <mat-select [(value)]="data.marketId">
+    <mat-select formControlName="marketId">
       <mat-option *ngFor="let market of markets" [value]="market.id">{{ market?.name }}</mat-option>
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="fill">
     <mat-label>Catégories</mat-label>
-    <mat-select [(value)]="data.categories" multiple>
+    <mat-select formControlName="categories" multiple>
       <mat-option *ngFor="let pCategory of pCategories" [value]="pCategory">{{
         translateCategoryName(pCategory)
       }}</mat-option>
@@ -18,19 +18,32 @@
 
   <mat-form-field appearance="fill">
     <mat-label>Date de début</mat-label>
-    <input matInput [matDatepicker]="marketStart" [formControl]="start" disabled>
+    <input matInput [matDatepicker]="marketStart" formControlName="startDate" />
     <mat-datepicker-toggle matSuffix [for]="marketStart"></mat-datepicker-toggle>
     <mat-datepicker #marketStart disabled="false"></mat-datepicker>
   </mat-form-field>
 
   <mat-form-field appearance="fill">
     <mat-label>Date de fin</mat-label>
-    <input matInput [matDatepicker]="marketEnd" [formControl]="end" disabled>
+    <input matInput [matDatepicker]="marketEnd" formControlName="endDate" />
     <mat-datepicker-toggle matSuffix [for]="marketEnd"></mat-datepicker-toggle>
     <mat-datepicker #marketEnd disabled="false"></mat-datepicker>
   </mat-form-field>
-</div>
+
+  <mat-form-field appearance="fill" *ngIf="data.forHistory">
+    <mat-label>Résultat des ventes</mat-label>
+    <input matInput formControlName="income" type="number" />
+  </mat-form-field>
+</form>
 <div mat-dialog-actions>
   <button mat-button color="error" (click)="cancel()">Annuler</button>
-  <button mat-button color="primary" (click)="submit()" cdkFocusInitial [disabled]="disabled">Valider</button>
+  <button
+    mat-button
+    color="primary"
+    (click)="submit()"
+    cdkFocusInitial
+    [disabled]="!formGroup.valid"
+  >
+    Valider
+  </button>
 </div>

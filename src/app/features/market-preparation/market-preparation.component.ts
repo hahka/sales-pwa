@@ -54,16 +54,12 @@ export class MarketPreparationComponent extends MarketSalesComponent {
         SettingsDialogComponent,
         {
           data: {
-            marketId: this.marketSales.marketId,
-            marketName: this.marketSales.marketName,
-            categories: this.marketSales.categories || [],
-            startDate: this.marketSales.startDate,
-            endDate: this.marketSales.endDate,
+            marketSales: this.marketSales,
           },
         },
       );
 
-      dialogRef.afterClosed().subscribe((result: SettingsDialogData) => {
+      dialogRef.afterClosed().subscribe((result: MarketSales) => {
         if (result) {
           this.marketSales.marketId = result.marketId;
           this.marketSales.categories = result.categories;

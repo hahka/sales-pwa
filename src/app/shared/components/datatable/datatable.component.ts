@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
@@ -53,6 +53,8 @@ export class DatatableComponent<T extends BaseModel> implements OnDestroy {
 
   /** Title to display for the datatable */
   @Input() datatableTitle: string;
+
+  @Input() topRightTemplate: TemplateRef<any>;
 
   /** Fired when a row has been clicked */
   @Output() rowClicked: EventEmitter<BaseModel> = new EventEmitter();

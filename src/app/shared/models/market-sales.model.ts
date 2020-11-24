@@ -10,6 +10,7 @@ export class MarketSales implements BaseModel {
   startDate: string;
   endDate?: string;
   isClosed: boolean;
+  income: number;
 
   constructor(obj?: MarketSales) {
     Object.assign(this, obj);
