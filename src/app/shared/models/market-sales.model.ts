@@ -7,7 +7,10 @@ export class MarketSales implements BaseModel {
   marketName: string;
   sales: Sale[];
   categories?: PRODUCT_CATEGORIES[];
-  endDate: string;
+  startDate: string;
+  endDate?: string;
+  isClosed: boolean;
+  income: number;
 
   constructor(obj?: MarketSales) {
     Object.assign(this, obj);

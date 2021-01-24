@@ -31,6 +31,11 @@ const routes: Routes = [
     loadChildren: () => import('./features/sale/sale.module').then((m) => m.SaleModule),
   },
   {
+    path: AppRoutes.SALES_HISTORY,
+    loadChildren: () =>
+      import('./features/sales-history/sales-history.module').then((m) => m.SalesHistoryModule),
+  },
+  {
     path: AppRoutes.SYNC,
     loadChildren: () => import('./features/sync/sync.module').then((m) => m.SyncModule),
   },

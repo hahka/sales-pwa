@@ -1,0 +1,13 @@
+<app-datatable
+  [dataSource]="dataSource"
+  datatableTitle="{{ 'features.markets.title' | translate }}"
+  [fullColumns]="fullColumns"
+  [showAddButton]="false"
+>
+  <div topRightTemplate *ngIf="isOnline">
+    <button mat-flat-button color="primary" (click)="addHistoryEntry()">
+      <mat-icon matPrefix>add</mat-icon>
+      {{ 'common.action.add' | translate }}
+    </button>
+  </div>
+</app-datatable>

@@ -50,18 +50,22 @@ export class MarketPreparationComponent extends MarketSalesComponent {
 
   openSettings() {
     if (this.marketSales) {
-      const dialogRef = this.matDialog.open(SettingsDialogComponent, {
-        data: {
-          marketId: this.marketSales.marketId,
-          categories: this.marketSales.categories,
+      const dialogRef = this.matDialog.open<SettingsDialogComponent, SettingsDialogData>(
+        SettingsDialogComponent,
+        {
+          data: {
+            marketSales: this.marketSales,
+          },
         },
-      });
+      );
 
-      dialogRef.afterClosed().subscribe((result: SettingsDialogData) => {
+      dialogRef.afterClosed().subscribe((result: MarketSales) => {
         if (result) {
           this.marketSales.marketId = result.marketId;
           this.marketSales.categories = result.categories;
           this.marketSales.marketName = result.marketName;
+          this.marketSales.startDate = result.startDate;
+          this.marketSales.endDate = result.endDate;
         }
         this.updateCategories();
       });
