@@ -41,7 +41,7 @@
         <mat-label>{{ 'common.product_category' | translate }}</mat-label>
         <mat-select formControlName="category" required>
           <mat-option *ngFor="let option of productCategories" [value]="option">
-            {{ option | translate }}
+            {{ translateCategoryName(option) }}
           </mat-option>
         </mat-select>
       </mat-form-field>

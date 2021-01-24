@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { ProductsService } from 'src/app/core/services/features/products.service';
 import { DetailComponent } from 'src/app/shared/components/detail/detail.component';
 import { Product } from 'src/app/shared/models/product.model';
@@ -32,6 +33,7 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
     protected readonly location: Location,
     protected readonly router: Router,
     private readonly domSanitizer: DomSanitizer,
+    private readonly translateService: TranslateService,
   ) {
     super(activatedRoute, productsService, location, router);
     this.form = this.formBuilder.group({
@@ -119,5 +121,9 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
         return;
       };
     }
+  }
+
+  translateCategoryName(category: PRODUCT_CATEGORIES) {
+    return this.translateService.instant(`categories.product.${category}`);
   }
 }
