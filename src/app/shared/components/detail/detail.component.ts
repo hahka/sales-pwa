@@ -6,13 +6,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api/api.service';
+import { MarketSales } from '../../models/market-sales.model';
 import { Market } from '../../models/market.model';
 import { Product } from '../../models/product.model';
 import { ApiObsHelperComponent } from '../api-obs-helper/api-obs-helper.component';
 import { PageHeaderAction } from '../page-header/page-header-action.enum';
 import { PageHeaderEvent } from '../page-header/page-header-event.interface';
 
-export abstract class DetailComponent<T extends Market | Product> implements AfterViewInit, OnInit {
+export abstract class DetailComponent<T extends Market | Product | MarketSales>
+  implements AfterViewInit, OnInit {
   /** ViewChild helping calling the api via observables without subscriptions */
   @ViewChild(ApiObsHelperComponent, { static: true }) apiObsHelper: ApiObsHelperComponent<T>;
 

@@ -71,7 +71,7 @@ export class SettingsDialogComponent {
   }
 
   public submit(): void {
-    const value: MarketSales = { ...this.formGroup.value };
+    const value: MarketSales = { ...this.formGroup.getRawValue() };
     this.dialogRef.close({
       ...this.data,
       ...value,

@@ -1,12 +1,12 @@
 :host, // For components without ViewEncapsulation.None
 .admin__detail // For components with ViewEncapsulation.None
 {
-  padding: 24px;
   display: flex;
   flex-direction: column;
   flex: 1;
 
   mat-card.mat-card {
+    margin: 0 24px 24px;
     display: flex;
     flex-direction: column;
     flex: 1;

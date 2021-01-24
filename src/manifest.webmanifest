@@ -1,6 +1,6 @@
 {
-  "name": "sales-pwa-app",
-  "short_name": "sales-pwa-app",
+  "name": "escargots-app",
+  "short_name": "escargots-app",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",

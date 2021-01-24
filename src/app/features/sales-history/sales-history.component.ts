@@ -1,7 +1,8 @@
+import { formatDate, registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { DatatableClickEvent } from 'src/app/shared/components/datatable/datatable-click-event.enum';
 import { SettingsDialogData } from 'src/app/shared/components/settings-dialog/settings-dialog-data.model';
 import { SettingsDialogComponent } from 'src/app/shared/components/settings-dialog/settings-dialog.component';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
@@ -11,21 +12,29 @@ import { FullColumn } from '../../shared/components/datatable/full-column.model'
 import { ApiDataSource } from '../../shared/models/api/api-datasource.model';
 import { MarketSales } from '../../shared/models/market-sales.model';
 
+registerLocaleData(localeFr);
+
 @Component({
   selector: 'app-sales-history',
   templateUrl: './sales-history.component.html',
   styleUrls: ['./sales-history.component.scss'],
 })
 export class SalesHistoryComponent extends AbstractListComponent<MarketSales> {
-  datatableClickEvent = DatatableClickEvent.OUTPUT;
-
   dataSource: ApiDataSource<MarketSales>;
   fullColumns: FullColumn<MarketSales>[] = [
     {
       field: 'start_date',
       label: 'Date',
-      type: ColumnType.day_month_year,
-      resolve: (marketSales: MarketSales) => marketSales.startDate,
+      type: ColumnType.string,
+      resolve: (marketSales: MarketSales) => {
+        if (!marketSales.endDate) {
+          return this.formatDate(marketSales.startDate);
+        }
+
+        return `${this.formatDate(marketSales.startDate)} au ${this.formatDate(
+          marketSales.endDate,
+        )}`;
+      },
     },
     {
       field: 'market_name',
@@ -81,5 +90,9 @@ export class SalesHistoryComponent extends AbstractListComponent<MarketSales> {
         });
       }
     });
+  }
+
+  private formatDate(date: string) {
+    return formatDate(new Date(date), 'dd MMM yyyy', 'fr');
   }
 }

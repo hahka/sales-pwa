@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { SettingsDialogModule } from 'src/app/shared/components/settings-dialog/settings-dialog.module';
@@ -16,8 +17,9 @@ import { SalesHistoryComponent } from './sales-history.component';
     CommonModule,
     DatatableModule,
     DetailModule,
-    MatIconModule,
     MatButtonModule,
+    MatDividerModule,
+    MatIconModule,
     SalesHistoryRoutingModule,
     SettingsDialogModule,
     TranslateModule,

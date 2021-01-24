@@ -3,7 +3,6 @@
   datatableTitle="{{ 'features.markets.title' | translate }}"
   [fullColumns]="fullColumns"
   [showAddButton]="false"
-  [clickEvent]="datatableClickEvent"
 >
   <div topRightTemplate *ngIf="isOnline">
     <button mat-flat-button color="primary" (click)="addHistoryEntry()">
