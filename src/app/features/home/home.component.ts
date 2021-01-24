@@ -13,7 +13,7 @@ export class HomeComponent implements OnInit {
   buttons = [
     { label: 'Gestion des Marchés', routerLink: AppRoutes.MARKETS_ADMIN },
     { label: 'Gestion des Produits', routerLink: AppRoutes.PRODUCTS_ADMIN },
-    { label: 'Fabrication de produits', routerLink: AppRoutes.PRODUCE },
+    { label: 'Stock', routerLink: AppRoutes.PRODUCE },
     { label: 'Préparation de marché', routerLink: AppRoutes.MARKET_PREPARATION },
     { label: 'Marché', routerLink: AppRoutes.SALE },
     { label: 'Synchronisation', routerLink: AppRoutes.SYNC },
