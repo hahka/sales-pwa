@@ -1,3 +1,5 @@
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
@@ -19,6 +21,7 @@ import { CoreModule } from './core/core.module';
 import { ColorSchemeSettingComponent } from './shared/components/color-scheme-setting/color-scheme-setting.component';
 import { getFrenchPaginatorIntl } from './utils/paginator';
 
+registerLocaleData(localeFr);
 @NgModule({
   declarations: [AppComponent, ColorSchemeSettingComponent],
   imports: [

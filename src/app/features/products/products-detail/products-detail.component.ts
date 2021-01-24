@@ -40,7 +40,7 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
       id: [''],
       name: ['', Validators.required],
       price: [null, [Validators.required, Validators.min(0)]],
-      order: [null, [Validators.required, Validators.min(0)]],
+      productOrder: [null, [Validators.required, Validators.min(0)]],
       category: ['', Validators.required],
       image: [null],
     });

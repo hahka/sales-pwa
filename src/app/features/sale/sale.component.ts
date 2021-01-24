@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { computeTva } from 'src/app/utils/utils';
+import { computeTva, formatMarketSalesDate } from 'src/app/utils/utils';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { MarketSalesComponent } from '../../shared/components/market-sales/market-sales.component';
 import { MarketSales, Sale } from '../../shared/models/market-sales.model';
@@ -47,6 +47,10 @@ export class SaleComponent extends MarketSalesComponent {
     dialogRef.afterClosed().subscribe((_) => {
       this.router.navigate(['..', AppRoutes.MARKET_PREPARATION]);
     });
+  }
+
+  marketSalesDate() {
+    return formatMarketSalesDate(this.marketSales);
   }
 
   onClick(action: StockAction) {

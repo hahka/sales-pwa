@@ -294,7 +294,7 @@ export class StockComponent implements OnInit, DoCheck {
                 if (this.stock) {
                   this.stock.stock.push({
                     productId: product.id,
-                    order: product.order,
+                    order: product.productOrder,
                     category,
                     quantity: 0,
                   });
@@ -328,7 +328,7 @@ export class StockComponent implements OnInit, DoCheck {
         }
         this.products.forEach((product) => {
           if (!!product.id) {
-            const { id, name, price, order } = product;
+            const { id, name, price, productOrder: order } = product;
             CATEGORIES_MATCHING[product.category].forEach((category) => {
               dataBeforeSort.push({
                 productId: id,

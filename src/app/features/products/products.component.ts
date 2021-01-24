@@ -31,6 +31,7 @@ export class ProductsComponent extends AbstractListComponent<Product> {
       },
       {
         initialQuery: { search: '' },
+        initialSort: { field: 'product_order' as 'productOrder', order: 1 },
       },
     );
   }

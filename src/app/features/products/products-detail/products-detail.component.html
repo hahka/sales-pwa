@@ -32,9 +32,9 @@
       </mat-form-field>
       <mat-form-field appearance="outline" floatLabel="always">
         <mat-label>Ordre</mat-label>
-        <input matInput formControlName="order" required type="number" />
+        <input matInput formControlName="productOrder" required type="number" />
         <mat-error *ngIf="form.controls.order?.errors?.negative"
-          >{{ 'features.products.form.errors.price_negative' | translate }}
+          >{{ 'common.form.errors.order_negative' | translate }}
         </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">

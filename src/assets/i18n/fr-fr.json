@@ -9,6 +9,9 @@
             "save": "Enregistrer",
             "sell": "Vendre"
         },
+        "form": {
+            "errors.order_negative": "L'ordre doit être positif"
+        },
         "information": "Informations",
         "name": "Nom",
         "price": "Prix",
