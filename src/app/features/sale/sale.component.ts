@@ -41,6 +41,30 @@ export class SaleComponent extends MarketSalesComponent {
     });
   }
 
+  getSalesIncome() {
+    if (!this.marketSales) {
+      return '';
+    }
+    if (!this.marketSales.sales) {
+      this.marketSales.sales = [];
+    }
+    const income = [new Sale(), ...this.marketSales.sales]
+      .map((sales) =>
+        [0, ...(sales && sales.items ? sales.items : []).map((item) => item.price)].reduce(
+          (acc, val) => {
+            return acc + val - sales.discount;
+          },
+        ),
+      )
+      .reduce((acc, val) => acc + val);
+
+    return income > 0 ? ` (Montant des ventes: ${income}€)` : '';
+  }
+
+  getTitle() {
+    return (this.marketSales && this.marketSales.marketName) || 'features.sale.title';
+  }
+
   marketNotReadyHandler(): void {
     const dialogRef = this.matDialog.open(NotReadyDialogComponent);
 
@@ -56,6 +80,9 @@ export class SaleComponent extends MarketSalesComponent {
   onClick(action: StockAction) {
     switch (action) {
       case StockAction.SAVE:
+        if (!this.marketSales) {
+          this.marketSales = new MarketSales();
+        }
         if (!this.marketSales.sales) {
           this.marketSales.sales = [];
         }
@@ -68,6 +95,12 @@ export class SaleComponent extends MarketSalesComponent {
 
             dialogRef.afterClosed().subscribe((response) => {
               if (!!response.confirm) {
+                if (!this.marketSales) {
+                  this.marketSales = new MarketSales();
+                }
+                if (!this.marketSales.sales) {
+                  this.marketSales.sales = [];
+                }
                 this.marketSales.sales.push({ ...sale, discount: response.discount });
                 this.marketSalesService
                   .put(this.marketSales)

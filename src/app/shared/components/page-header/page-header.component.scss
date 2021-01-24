@@ -25,6 +25,10 @@
     font-size: 24px;
     vertical-align: middle;
 
+    &__subtitle {
+      font-size: 18px;
+    }
+
     &--multi-lines {
       display: flex;
       flex-direction: column;

@@ -5,7 +5,7 @@ export class MarketSales implements BaseModel {
   id?: string;
   marketId: string;
   marketName: string;
-  sales: Sale[];
+  sales?: Sale[];
   categories?: PRODUCT_CATEGORIES[];
   startDate: string;
   endDate?: string;

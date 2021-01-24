@@ -1,9 +1,11 @@
 <div class="page-header">
   <!-- Left cell: back button and title -->
   <div class="page-header__content">
-    <span class="page-header__title">
-      {{ 'features.sale.title' | translate }}
-      <br />Date: {{ marketSalesDate() }}
+    <span class="page-header__title page-header__title--multi-lines">
+      <span>{{ getTitle() | translate }}</span>
+      <span class="page-header__title__subtitle"
+        >Date: {{ marketSalesDate() }}{{ getSalesIncome() }}</span
+      >
     </span>
 
     <div class="page-header__content__group">

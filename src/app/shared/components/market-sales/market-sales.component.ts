@@ -5,7 +5,7 @@ import { MarketSales } from '../../models/market-sales.model';
 
 export abstract class MarketSalesComponent {
   categories: SC[] = [];
-  marketSales: MarketSales;
+  marketSales: MarketSales | undefined;
 
   constructor(
     protected readonly matDialog: MatDialog,
@@ -17,7 +17,7 @@ export abstract class MarketSalesComponent {
   abstract marketNotReadyHandler(): void;
 
   updateCategories() {
-    if (this.marketSales.categories) {
+    if (this.marketSales && this.marketSales.categories) {
       this.categories = this.marketSales.categories.map((category) => {
         switch (category) {
           case PC.FROZEN:
