@@ -117,7 +117,12 @@ export class StockService extends ResourceUrlHelper {
           stockSub.unsubscribe();
         }
         if (stock) {
-          this.put(new Stock(stock));
+          let stockSubscription: Subscription;
+          stockSubscription = this.put(new Stock(stock)).subscribe((_) => {
+            if (stockSubscription && !!stockSubscription.closed) {
+              stockSubscription.unsubscribe();
+            }
+          });
         }
       });
     } else {
