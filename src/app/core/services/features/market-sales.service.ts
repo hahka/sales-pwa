@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from, Observable, Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { forkJoin, from, Observable, Subscription } from 'rxjs';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { MarketSales } from '../../../shared/models/market-sales.model';
 import { IdbStoresEnum } from '../../../utils/enums';
+import { TypeHelper } from '../../../utils/type-helper';
 import { ApiService } from '../api/api.service';
 import { EnvironmentService } from '../environment/environment.service';
 import { IdbService } from '../idb.service';
@@ -53,37 +54,27 @@ export class MarketSalesService extends ApiService<MarketSales> {
 
   async synchronizeUp() {
     if (navigator.onLine) {
-      let stockSub: Subscription;
-      stockSub = this.getClosedMarketSales().subscribe((marketSales) => {
-        if (marketSales && marketSales.length) {
-          let apiCall$: Observable<MarketSales[]>;
-          apiCall$ = this.httpClient.post<MarketSales[]>(
-            this.getFormattedUrl(),
-            marketSales.map((m) => {
-              return { ...m, sales: m.sales || [] };
-            }),
-          );
-          if (stockSub && !stockSub.closed) {
-            stockSub.unsubscribe();
-          }
-
-          return apiCall$.pipe(take(1)).subscribe(() => {
-            marketSales.forEach((marketSalesToDelete) => {
-              if (marketSalesToDelete.id) {
-                this.idbService.deleteByID(this.resource, marketSalesToDelete.id);
-              }
-            });
-
-            return marketSales;
-          });
-        }
-
-        if (stockSub && !stockSub.closed) {
-          stockSub.unsubscribe();
-        }
-
-        return marketSales;
-      });
+      this.getClosedMarketSales()
+        .pipe(
+          filter(TypeHelper.isNotNullOrUndefined),
+          filter((marketSales) => !!marketSales && marketSales.length > 0),
+          switchMap((marketSales) =>
+            forkJoin(
+              marketSales.map((marketSale) => {
+                return this.httpClient
+                  .post<MarketSales>(this.getFormattedUrl(), MarketSales.toValidDto(marketSale))
+                  .pipe(
+                    tap((results) => console.log(results)),
+                    filter((result) => !!result.id),
+                    switchMap(() =>
+                      this.idbService.deleteByID(this.resource, marketSale.id as string),
+                    ),
+                  );
+              }),
+            ),
+          ),
+        )
+        .subscribe();
     } else {
       // TODO : error, offline
     }

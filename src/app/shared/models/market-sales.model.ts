@@ -2,6 +2,18 @@ import { PRODUCT_CATEGORIES } from '../../utils/enums';
 import { BaseModel } from './api/base.model';
 
 export class MarketSales implements BaseModel {
+  static toValidDto(marketSales: MarketSales) {
+    return {
+      marketId: marketSales.marketId,
+      marketName: marketSales.marketName,
+      sales: marketSales.sales || [],
+      categories: marketSales.categories,
+      startDate: marketSales.startDate,
+      income: marketSales.income,
+      endDate: marketSales.endDate,
+    };
+  }
+
   id?: string;
   marketId: string;
   marketName: string;

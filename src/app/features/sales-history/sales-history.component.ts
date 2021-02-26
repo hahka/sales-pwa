@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
+import { filter, switchMap } from 'rxjs/operators';
 import { SettingsDialogData } from 'src/app/shared/components/settings-dialog/settings-dialog-data.model';
 import { SettingsDialogComponent } from 'src/app/shared/components/settings-dialog/settings-dialog.component';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
@@ -9,6 +9,7 @@ import { ColumnType } from '../../shared/components/datatable/column-type.enum';
 import { FullColumn } from '../../shared/components/datatable/full-column.model';
 import { ApiDataSource } from '../../shared/models/api/api-datasource.model';
 import { MarketSales } from '../../shared/models/market-sales.model';
+import { TypeHelper } from '../../utils/type-helper';
 import { formatMarketSalesDate } from '../../utils/utils';
 
 @Component({
@@ -57,27 +58,23 @@ export class SalesHistoryComponent extends AbstractListComponent<MarketSales> {
   }
 
   addHistoryEntry() {
-    const dialogRef = this.matDialog.open<SettingsDialogComponent, SettingsDialogData>(
-      SettingsDialogComponent,
-      {
+    this.matDialog
+      .open<SettingsDialogComponent, SettingsDialogData, MarketSales>(SettingsDialogComponent, {
         data: {
           marketSales: new MarketSales(),
           forHistory: true,
         },
-      },
-    );
+      })
+      .afterClosed()
+      .pipe(
+        filter(TypeHelper.isNotNullOrUndefined),
+        switchMap((marketSales) => {
+          marketSales.isClosed = true;
 
-    dialogRef.afterClosed().subscribe((dialogResponse: MarketSales) => {
-      if (dialogResponse) {
-        dialogResponse.isClosed = true;
-        let subscription: Subscription;
-        subscription = this.marketSalesService.put(dialogResponse).subscribe((_) => {
-          if (subscription && !subscription.closed) {
-            subscription.unsubscribe();
-          }
-          this.marketSalesService.synchronizeUp();
-        });
-      }
-    });
+          return this.marketSalesService.put(marketSales);
+        }),
+        switchMap(() => this.marketSalesService.synchronizeUp()),
+      )
+      .subscribe();
   }
 }

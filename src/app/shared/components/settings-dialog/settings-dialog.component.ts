@@ -37,7 +37,7 @@ export class SettingsDialogComponent {
   }
 
   constructor(
-    public dialogRef: MatDialogRef<SettingsDialogComponent>,
+    public dialogRef: MatDialogRef<SettingsDialogComponent, MarketSales>,
     @Inject(MAT_DIALOG_DATA) public data: SettingsDialogData,
     private readonly marketsService: MarketsService,
     private readonly translateService: TranslateService,
@@ -72,13 +72,14 @@ export class SettingsDialogComponent {
 
   public submit(): void {
     const value: MarketSales = { ...this.formGroup.getRawValue() };
-    this.dialogRef.close({
-      ...this.data,
-      ...value,
-      marketName: this.markets.find((market) => value.marketId === market.id)?.name,
-    });
+    Object.assign(this.data.marketSales, value);
+    this.data.marketSales.marketName =
+      this.markets.find((market) => value.marketId === market.id)?.name || '';
+
+    this.dialogRef.close(this.data.marketSales);
   }
 
+  // TODO: généraliser?
   public translateCategoryName(category: PC) {
     return this.translateService.instant(`categories.product.${category}`);
   }

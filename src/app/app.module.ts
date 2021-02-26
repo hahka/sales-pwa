@@ -1,6 +1,6 @@
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
@@ -18,6 +18,7 @@ import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { ErrorInterceptorHandler } from './core/services/error-interceptor.handler';
 import { ColorSchemeSettingComponent } from './shared/components/color-scheme-setting/color-scheme-setting.component';
 import { getFrenchPaginatorIntl } from './utils/paginator';
 
@@ -41,6 +42,10 @@ registerLocaleData(localeFr);
   providers: [
     { provide: MatPaginatorIntl, useValue: getFrenchPaginatorIntl() },
     { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
+    {
+      provide: ErrorHandler,
+      useClass: ErrorInterceptorHandler,
+    },
   ],
   bootstrap: [AppComponent],
 })
