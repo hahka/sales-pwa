@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { MarketSales } from '../../../shared/models/market-sales.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { TypeHelper } from '../../../utils/type-helper';
