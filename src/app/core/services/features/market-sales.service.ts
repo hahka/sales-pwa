@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, from, Observable, Subscription } from 'rxjs';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+import { forkJoin, from, Observable, of, throwError } from 'rxjs';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { MarketSales } from '../../../shared/models/market-sales.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { TypeHelper } from '../../../utils/type-helper';
@@ -20,6 +21,7 @@ export class MarketSalesService extends ApiService<MarketSales> {
     protected readonly environmentService: EnvironmentService,
     protected readonly httpClient: HttpClient,
     protected readonly idbService: IdbService<MarketSales>,
+    private readonly toastrService: ToastrService,
   ) {
     super(environmentService, httpClient, idbService);
   }
@@ -52,32 +54,36 @@ export class MarketSalesService extends ApiService<MarketSales> {
     return data.marketName.toLowerCase().indexOf(keyword) !== -1;
   }
 
-  async synchronizeUp() {
+  synchronizeUp() {
     if (navigator.onLine) {
-      this.getClosedMarketSales()
-        .pipe(
-          filter(TypeHelper.isNotNullOrUndefined),
-          filter((marketSales) => !!marketSales && marketSales.length > 0),
-          switchMap((marketSales) =>
-            forkJoin(
-              marketSales.map((marketSale) => {
-                return this.httpClient
-                  .post<MarketSales>(this.getFormattedUrl(), MarketSales.toValidDto(marketSale))
-                  .pipe(
-                    tap((results) => console.log(results)),
-                    filter((result) => !!result.id),
-                    switchMap(() =>
-                      this.idbService.deleteByID(this.resource, marketSale.id as string),
-                    ),
-                  );
-              }),
-            ),
-          ),
-        )
-        .subscribe();
-    } else {
-      // TODO : error, offline
+      return this.getClosedMarketSales().pipe(
+        filter(TypeHelper.isNotNullOrUndefined),
+        switchMap((marketSales) => {
+          return marketSales.length > 0
+            ? forkJoin(
+                marketSales.map((marketSale) => {
+                  return this.httpClient
+                    .post<MarketSales>(this.getFormattedUrl(), MarketSales.toValidDto(marketSale))
+                    .pipe(
+                      catchError((error) => {
+                        this.toastrService.error(`Erreur lors de l'enovi des ventes au serveur`);
+
+                        return throwError(error);
+                      }),
+                      filter((result) => !!result.id),
+                      switchMap(() =>
+                        this.idbService.deleteByID(this.resource, marketSale.id as string),
+                      ),
+                    );
+                }),
+              )
+            : of(undefined);
+        }),
+      );
     }
+
+    // TODO : error, offline
+    return of(undefined);
   }
 
   private getClosedMarketSales(): Observable<MarketSales[] | undefined> {

@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { BehaviorSubject, Observable, Subscription, throwError } from 'rxjs';
+import { catchError, filter, switchMap, tap } from 'rxjs/operators';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { MarketsService } from '../../core/services/features/markets.service';
 import { ProductsService } from '../../core/services/features/products.service';
 import { StockService } from '../../core/services/features/stock.service';
+import { TypeHelper } from '../../utils/type-helper';
 
 @Injectable({
   providedIn: 'root',
@@ -13,11 +16,14 @@ export class SyncService {
 
   private readonly isSynchronizationNeeded = new BehaviorSubject(false);
 
+  private syncUpSub: Subscription;
+
   constructor(
     private readonly marketsService: MarketsService,
     private readonly productsService: ProductsService,
     private readonly stockService: StockService,
     private readonly marketSalesService: MarketSalesService,
+    private readonly toastrService: ToastrService,
   ) {
     this.isSynchronizationNeeded$ = this.isSynchronizationNeeded.asObservable();
   }
@@ -29,8 +35,21 @@ export class SyncService {
   }
 
   syncUp() {
-    this.stockService.synchronizeUp();
-    this.marketSalesService.synchronizeUp();
+    if (!this.syncUpSub || this.syncUpSub.closed) {
+      this.syncUpSub = this.stockService
+        .synchronizeUp()
+        .pipe(
+          filter(TypeHelper.isNotNullOrUndefined),
+          switchMap(() => this.marketSalesService.synchronizeUp()),
+          catchError((error) => {
+            this.toastrService.error(`Erreur lors de l'envoi des données au serveur.`);
+
+            return throwError(error);
+          }),
+          tap(() => this.toastrService.success(`Données envoyées au serveur avec succès`)),
+        )
+        .subscribe();
+    }
   }
 
   checkIfSynchronizationIsNeeded() {

@@ -37,7 +37,10 @@ registerLocaleData(localeFr);
     MatSidenavModule,
     MatToolbarModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({
+      disableTimeOut: true,
+      tapToDismiss: true,
+    }),
   ],
   providers: [
     { provide: MatPaginatorIntl, useValue: getFrenchPaginatorIntl() },

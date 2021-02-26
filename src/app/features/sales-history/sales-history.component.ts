@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { filter, switchMap } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+import { filter, switchMap, tap } from 'rxjs/operators';
 import { SettingsDialogData } from 'src/app/shared/components/settings-dialog/settings-dialog-data.model';
 import { SettingsDialogComponent } from 'src/app/shared/components/settings-dialog/settings-dialog.component';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
@@ -45,6 +46,7 @@ export class SalesHistoryComponent extends AbstractListComponent<MarketSales> {
   constructor(
     private readonly marketSalesService: MarketSalesService,
     private readonly matDialog: MatDialog,
+    private readonly toastrService: ToastrService,
   ) {
     super(marketSalesService);
     this.dataSource = new ApiDataSource<MarketSales>(
@@ -74,6 +76,7 @@ export class SalesHistoryComponent extends AbstractListComponent<MarketSales> {
           return this.marketSalesService.put(marketSales);
         }),
         switchMap(() => this.marketSalesService.synchronizeUp()),
+        tap(() => this.toastrService.success(`Données envoyées au serveur avec succès`)),
       )
       .subscribe();
   }
