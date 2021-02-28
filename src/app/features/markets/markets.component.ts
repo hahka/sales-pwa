@@ -31,7 +31,6 @@ export class MarketsComponent extends AbstractListComponent<Market> {
       },
       {
         initialQuery: { search: '' },
-        initialSort: { field: 'market_order' as 'marketOrder', order: 1 },
       },
     );
   }

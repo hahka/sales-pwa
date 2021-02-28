@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { BehaviorSubject, Observable, Subscription, throwError } from 'rxjs';
-import { catchError, filter, switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { filter, switchMap, tap } from 'rxjs/operators';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { MarketsService } from '../../core/services/features/markets.service';
 import { ProductsService } from '../../core/services/features/products.service';
@@ -17,6 +17,7 @@ export class SyncService {
   private readonly isSynchronizationNeeded = new BehaviorSubject(false);
 
   private syncUpSub: Subscription;
+  private clearObjectStoreSub: Subscription;
 
   constructor(
     private readonly marketsService: MarketsService,
@@ -41,14 +42,15 @@ export class SyncService {
         .pipe(
           filter(TypeHelper.isNotNullOrUndefined),
           switchMap(() => this.marketSalesService.synchronizeUp()),
-          catchError((error) => {
-            this.toastrService.error(`Erreur lors de l'envoi des données au serveur.`);
-
-            return throwError(error);
-          }),
           tap(() => this.toastrService.success(`Données envoyées au serveur avec succès`)),
         )
         .subscribe();
+    }
+  }
+
+  clearObjectStores() {
+    if (!this.clearObjectStoreSub || this.clearObjectStoreSub.closed) {
+      this.clearObjectStoreSub = this.marketSalesService.clearObjectStore().subscribe();
     }
   }
 

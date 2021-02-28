@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
-import { catchError, filter, map, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { MarketSales } from '../../../shared/models/market-sales.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { TypeHelper } from '../../../utils/type-helper';
@@ -44,17 +44,25 @@ export class MarketSalesService extends ApiService<MarketSales> {
     return from(this.idbService.putCommon(this.resource, new MarketSales(data), data.id));
   }
 
+  public clearObjectStore() {
+    return of(this.idbService.clearObjectStore(this.resource)).pipe(
+      tap(() => {
+        this.toastrService.success('Ventes enregistrées supprimées avec succès.');
+      }),
+    );
+  }
+
   public closeMarket(data: MarketSales) {
     data.isClosed = true;
 
     return this.put(data);
   }
 
-  idbSearch(data: MarketSales, keyword: string): boolean {
+  public idbSearch(data: MarketSales, keyword: string): boolean {
     return data.marketName.toLowerCase().indexOf(keyword) !== -1;
   }
 
-  synchronizeUp() {
+  public synchronizeUp() {
     if (navigator.onLine) {
       return this.getClosedMarketSales().pipe(
         filter(TypeHelper.isNotNullOrUndefined),
@@ -66,7 +74,7 @@ export class MarketSalesService extends ApiService<MarketSales> {
                     .post<MarketSales>(this.getFormattedUrl(), MarketSales.toValidDto(marketSale))
                     .pipe(
                       catchError((error) => {
-                        this.toastrService.error(`Erreur lors de l'enovi des ventes au serveur`);
+                        this.toastrService.error(`Erreur lors de l'envoi des ventes au serveur`);
 
                         return throwError(error);
                       }),
