@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { filter, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
+import { ConfirmationDialogService } from '../../../shared/components/confirmation-dialog/confirmation-dialog.service';
 import { SyncService } from '../sync.service';
-import { ClearObjectStoresWarningDialogComponent } from './clear-object-stores-warning-dialog/clear-object-stores-warning-dialog.component';
 
 @Component({
   selector: 'app-sync',
@@ -10,7 +9,10 @@ import { ClearObjectStoresWarningDialogComponent } from './clear-object-stores-w
   styleUrls: ['./sync.component.scss'],
 })
 export class SyncComponent implements OnInit {
-  constructor(private readonly syncService: SyncService, private readonly matDialog: MatDialog) {}
+  constructor(
+    private readonly syncService: SyncService,
+    private readonly confirmationDialogService: ConfirmationDialogService,
+  ) {}
 
   ngOnInit(): void {}
 
@@ -23,15 +25,12 @@ export class SyncComponent implements OnInit {
   }
 
   clearObjectStores() {
-    this.matDialog
-      .open<ClearObjectStoresWarningDialogComponent, boolean>(
-        ClearObjectStoresWarningDialogComponent,
+    this.confirmationDialogService
+      .openConfirmationDialog(
+        'Suppression des données locales',
+        "Attention, les ventes enregistrées sur l'appareil et qui n'ont pas été envoyées au serveur seront définitivement perdues.",
       )
-      .afterClosed()
-      .pipe(
-        filter((response) => !!response),
-        tap(() => this.syncService.clearObjectStores()),
-      )
+      .pipe(tap(() => this.syncService.clearObjectStores()))
       .subscribe();
   }
 }

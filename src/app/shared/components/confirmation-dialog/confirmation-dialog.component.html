@@ -1,9 +1,8 @@
-<h1 mat-dialog-title>Cloturer le marché actuel</h1>
+<h1 mat-dialog-title>{{ data.title }}</h1>
 <div mat-dialog-content>
-  <p>Voulez-vous vraiment cloturer le marché actuel?</p>
+  <p>{{ data.line1 }}</p>
   <p>
-    Attention, vous ne pourrez plus effectuer de ventes pour ce marché et devrez préparer un nouveau
-    marché.
+    {{ data.line2 }}
   </p>
 </div>
 <div mat-dialog-actions>

@@ -1,4 +1,3 @@
-import { MatDialog } from '@angular/material/dialog';
 import { MarketSalesService } from '../../../core/services/features/market-sales.service';
 import { PRODUCT_CATEGORIES as PC, STOCK_CATEGORIES as SC } from '../../../utils/enums';
 import { MarketSales } from '../../models/market-sales.model';
@@ -7,10 +6,7 @@ export abstract class MarketSalesComponent {
   categories: SC[] = [];
   marketSales: MarketSales | undefined;
 
-  constructor(
-    protected readonly matDialog: MatDialog,
-    protected readonly marketSalesService: MarketSalesService,
-  ) {
+  constructor(protected readonly marketSalesService: MarketSalesService) {
     this.loadMarketSales();
   }
 

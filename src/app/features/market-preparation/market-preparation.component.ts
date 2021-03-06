@@ -1,14 +1,15 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { switchMap, tap } from 'rxjs/operators';
 import { SettingsDialogData } from 'src/app/shared/components/settings-dialog/settings-dialog-data.model';
 import { SettingsDialogComponent } from 'src/app/shared/components/settings-dialog/settings-dialog.component';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
+import { ConfirmationDialogService } from '../../shared/components/confirmation-dialog/confirmation-dialog.service';
 import { MarketSalesComponent } from '../../shared/components/market-sales/market-sales.component';
 import { MarketSales } from '../../shared/models/market-sales.model';
 import { STOCK_CATEGORIES as SC, STOCK_FUNCTIONALITIES } from '../../utils/enums';
 import { StockAction, StockComponent } from '../stock/stock.component';
-import { CloseMarketDialogComponent } from './close-market-dialog/close-market-dialog.component';
 
 @Component({
   selector: 'app-market-preparation',
@@ -28,10 +29,11 @@ export class MarketPreparationComponent extends MarketSalesComponent {
   marketSales: MarketSales;
 
   constructor(
-    protected readonly matDialog: MatDialog,
     protected readonly marketSalesService: MarketSalesService,
+    private readonly matDialog: MatDialog,
+    private readonly confirmationDialogService: ConfirmationDialogService,
   ) {
-    super(matDialog, marketSalesService);
+    super(marketSalesService);
   }
 
   marketNotReadyHandler(): void {
@@ -80,15 +82,17 @@ export class MarketPreparationComponent extends MarketSalesComponent {
 
   closeMarket() {
     if (this.marketSales) {
-      const dialogRef = this.matDialog.open(CloseMarketDialogComponent);
-
-      dialogRef.afterClosed().subscribe((result: { confirm: boolean }) => {
-        if (result && result.confirm) {
-          this.marketSalesService.closeMarket(this.marketSales).subscribe((_) => {
-            this.loadMarketSales();
-          });
-        }
-      });
+      this.confirmationDialogService
+        .openConfirmationDialog(
+          'Cloturer le marché actuel',
+          'Voulez-vous vraiment cloturer le marché actuel?',
+          'Attention, vous ne pourrez plus effectuer de ventes pour ce marché et devrez préparer un nouveau marché.',
+        )
+        .pipe(
+          switchMap(() => this.marketSalesService.closeMarket(this.marketSales)),
+          tap(() => this.loadMarketSales()),
+        )
+        .subscribe();
     }
   }
 }

@@ -53,7 +53,6 @@ export abstract class ApiService<
   /**
    * Deletes a resouce corresponding to the given id
    * @param id Id of the wanted resource
-   * @deprecated use archiveResourceById(id) instead
    */
   deleteById(id: string): Observable<any> {
     // TODO: type

@@ -2,7 +2,13 @@
   <app-page-header
     title="Ventes du {{ form.controls?.startDate?.value | date: 'dd MMMM yyyy' }}"
     (pageHeaderEvent)="onPageHeaderEvent($event)"
-  ></app-page-header>
+  >
+    <ng-container buttons>
+      <button mat-stroked-button color="warn" (click)="delete()">
+        {{ 'common.action.delete' | translate }}
+      </button>
+    </ng-container>
+  </app-page-header>
   <mat-card>
     <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="detail$ | async as detail">
       <h2>Résultat des ventes: {{ form.controls?.income?.value }} €</h2>

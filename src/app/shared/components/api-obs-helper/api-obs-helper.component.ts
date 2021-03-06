@@ -70,6 +70,31 @@ export class ApiObsHelperComponent<T extends Product | Market | MarketSales> {
   }
 
   /**
+   * Called when we want to delete the resource
+   * @param id Id of the resource to delete
+   */
+  delete(id: string): void {
+    this.posting$ = this.apiService
+      .deleteById(id)
+      .pipe(
+        map((apiResponse) => {
+          this.posting = false;
+          this.postedOrPatched.emit(apiResponse);
+
+          return apiResponse;
+        }),
+      )
+      .pipe(
+        catchError((err) => {
+          this.httpError.emit(err);
+
+          return throwError(err);
+        }),
+      );
+    this.posting = true;
+  }
+
+  /**
    * Called on form submit, used to post/patch defect category
    * @param value The new value of the resource
    */

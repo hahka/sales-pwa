@@ -31,11 +31,11 @@ export class SaleComponent extends MarketSalesComponent {
   }
 
   constructor(
-    protected readonly matDialog: MatDialog,
     protected readonly marketSalesService: MarketSalesService,
+    private readonly matDialog: MatDialog,
     private readonly router: Router,
   ) {
-    super(matDialog, marketSalesService);
+    super(marketSalesService);
     this.marketSalesService.getCurrentMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
     });

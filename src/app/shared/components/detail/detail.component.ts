@@ -1,9 +1,9 @@
 import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api/api.service';
 import { MarketSales } from '../../models/market-sales.model';
@@ -14,7 +14,7 @@ import { PageHeaderAction } from '../page-header/page-header-action.enum';
 import { PageHeaderEvent } from '../page-header/page-header-event.interface';
 
 export abstract class DetailComponent<T extends Market | Product | MarketSales>
-  implements AfterViewInit, OnInit {
+  implements AfterViewInit, OnInit, OnDestroy {
   /** ViewChild helping calling the api via observables without subscriptions */
   @ViewChild(ApiObsHelperComponent, { static: true }) apiObsHelper: ApiObsHelperComponent<T>;
 
@@ -44,6 +44,8 @@ export abstract class DetailComponent<T extends Market | Product | MarketSales>
 
   /** Track all disabled field */
   disabledControls: string[] = [];
+
+  subscriptions: Subscription;
 
   constructor(
     protected readonly activatedRoute: ActivatedRoute,
@@ -82,6 +84,12 @@ export abstract class DetailComponent<T extends Market | Product | MarketSales>
     );
   }
 
+  ngOnDestroy() {
+    if (this.subscriptions) {
+      this.subscriptions.unsubscribe();
+    }
+  }
+
   /** Needs to return a new object when form is in creation mode */
   abstract newData(): T;
 
@@ -91,11 +99,26 @@ export abstract class DetailComponent<T extends Market | Product | MarketSales>
   /** Needs to update this.isArchived and to patch the form and differents FormControls/FormGroups */
   abstract patchForm(data: T): void;
 
+  addSubscription(sub: Subscription) {
+    if (!this.subscriptions) {
+      this.subscriptions = sub;
+    } else {
+      this.subscriptions.add(sub);
+    }
+  }
+
   /**
    * Called when the user click on archive via PageHeaderComponent
    */
   archive(): void {
     this.apiObsHelper.archive(this.detailId, this.isArchived);
+  }
+
+  /**
+   * Called when the user click on archive via PageHeaderComponent
+   */
+  delete(): void {
+    this.apiObsHelper.delete(this.detailId);
   }
 
   /** Disables the FormGroup. Can be overridden if FormGroup needs specific processing to be disabled */
