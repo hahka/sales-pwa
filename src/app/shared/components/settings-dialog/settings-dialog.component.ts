@@ -43,7 +43,9 @@ export class SettingsDialogComponent {
     private readonly translateService: TranslateService,
   ) {
     this.marketsService.getAll().subscribe((markets) => {
-      this.markets = markets;
+      this.markets = (markets || []).sort((a, b) => {
+        return a.marketOrder - b.marketOrder;
+      });
     });
 
     const marketSales = data.marketSales;

@@ -13,6 +13,7 @@ export class Market implements BaseModel {
     return {
       ...this,
       nameSortable: this.name.toUpperCase(),
+      marketOrderSortable: this.marketOrder,
     };
   }
 }

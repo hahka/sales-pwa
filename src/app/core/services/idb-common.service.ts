@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DBSchema, IDBPDatabase, openDB } from 'idb';
+import { DBSchema, IDBPDatabase, IDBPTransaction, openDB } from 'idb';
 import { MarketSales } from '../../shared/models/market-sales.model';
 import { Market } from '../../shared/models/market.model';
 import { Product } from '../../shared/models/product.model';
@@ -45,10 +45,17 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
     db.createObjectStore(IdbStoresEnum.MARKET_SALES);
   }
 
+  static upgradeToV3(transaction: IDBPTransaction<MyDB>) {
+    const marketsStore = transaction.objectStore(IdbStoresEnum.MARKETS);
+    marketsStore.createIndex('marketOrderSortable', 'marketOrderSortable');
+    const productsStore = transaction.objectStore(IdbStoresEnum.PRODUCTS);
+    productsStore.createIndex('productOrderSortable', 'productOrderSortable');
+  }
+
   onlineIdb: IDBPDatabase<MyDB>;
 
   databaseName = 'OnlineIdb';
-  databaseVersion = 2;
+  databaseVersion = 3;
 
   constructor() {
     this.connectToIDB();
@@ -57,7 +64,7 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
   public async connectToIDB() {
     if (!this.onlineIdb) {
       this.onlineIdb = await openDB<MyDB>(this.databaseName, this.databaseVersion, {
-        upgrade(db, oldVersion, newVersion) {
+        upgrade(db, oldVersion, newVersion, transaction) {
           if (newVersion) {
             let currentVersion = oldVersion;
 
@@ -68,6 +75,9 @@ export class IdbCommonService<T extends Market | MarketSales | Stock | Product> 
                   break;
                 case 1:
                   IdbCommonService.upgradeToV2(db);
+                  break;
+                case 2:
+                  IdbCommonService.upgradeToV3(transaction);
                   break;
                 default:
                   break;
