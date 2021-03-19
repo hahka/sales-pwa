@@ -159,7 +159,7 @@ export class StockComponent implements OnInit, DoCheck {
 
       this.stock.stock = this.prepareStockAfterSale(stockControl.value);
       this.stock.cleanItems();
-      this.stockService.put(this.stock).subscribe((_) => {
+      this.stockService.post(this.stock).subscribe((_) => {
         this.initializeStockControl(true);
       });
     }
