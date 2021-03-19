@@ -16,10 +16,18 @@ $theme-light: mat-light-theme($app-primary, $app-accent, $app-warn);
 
 .color-scheme-dark {
   @include angular-material-theme($theme-dark);
+  .fix-overlap {
+    background-color: #303030;
+    border-bottom: solid 1px #424242;
+  }
 }
 
 .color-scheme-light {
   @include angular-material-theme($theme-light);
+  .fix-overlap {
+    background-color: #fafafa;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.12);
+  }
 }
 
 html,
