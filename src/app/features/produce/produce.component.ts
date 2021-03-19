@@ -12,7 +12,7 @@ export class ProduceComponent {
 
   StockAction = StockAction;
 
-  categories: SC[] = [SC.FRESH, SC.LARGE_FREEZER, SC.PASTEURIZED];
+  categories: SC[] = [SC.FRESH, SC.LARGE_FREEZER, SC.SMALL_FREEZER, SC.PASTEURIZED];
 
   onClick(producingAction: StockAction) {
     if (producingAction === StockAction.SAVE) {
