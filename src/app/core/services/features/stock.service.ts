@@ -50,13 +50,13 @@ export class StockService extends ResourceUrlHelper {
   }
 
   /**
-   * Posts or patches a resource via API
+   * Creates a new entry in the stock db table
    * @param data The data to patch
    */
-  public put(data: Stock): Observable<Stock> {
+  public post(data: Stock): Observable<Stock> {
     if (navigator.onLine) {
       return this.httpClient
-        .put<Stock>(this.getFormattedUrl(), {
+        .post<Stock>(this.getFormattedUrl(), {
           stock: data.stock,
         })
         .pipe(
@@ -117,7 +117,7 @@ export class StockService extends ResourceUrlHelper {
     if (navigator.onLine) {
       return this.getStock().pipe(
         switchMap((stock) => {
-          return !!stock ? this.put(new Stock(stock)) : of(undefined);
+          return !!stock ? this.post(new Stock(stock)) : of(undefined);
         }),
       );
     }
