@@ -77,7 +77,7 @@ async function addLabel(name, alwaysPassCI) {
     core.info(`Adding label (${name}) - ` + addLabelResponse.status);
     if (!alwaysPassCI) core.setFailed('Failing CI test');
   } catch (error) {
-    core.info('All OK');
+    core.info('All is OK');
   }
 }
 
@@ -91,7 +91,7 @@ async function removeLabel(name) {
     });
     core.info('No mismatches found. Deleting label - ' + removeLabelResponse.status);
   } catch (error) {
-    core.info('All OK');
+    core.info('All is OK');
   }
 }
 
