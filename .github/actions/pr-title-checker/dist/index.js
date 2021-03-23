@@ -778,7 +778,7 @@ async function run() {
     }
 
     try {
-      let createResponse = await octokit.issues.createLabel({
+      let createResponse = await octokit.issues.addLabel({
         owner,
         repo,
         name: LABEL.name,
