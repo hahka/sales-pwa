@@ -33,4 +33,4 @@ jobs:
         with:
           GITHUB_TOKEN: 75fd809b3d18f6b87ebe082da508d6105d416028
           # config file path
-          configuration-path: .github/pr-title-checker-config.json
+          configuration-path: ./.github/pr-title-checker-config.json
