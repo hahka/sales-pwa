@@ -41,6 +41,7 @@ async function run() {
       });
       core.info(`Creating label (${LABEL.name}) - ` + createResponse.status);
     } catch (error) {
+      core.info(error);
       core.info(`Label (${LABEL.name}) exists.`);
     }
     if (CHECKS.prefixes && CHECKS.prefixes.length) {

@@ -786,6 +786,7 @@ async function run() {
       });
       _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Creating label (${LABEL.name}) - ` + createResponse.status);
     } catch (error) {
+      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(error);
       _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Label (${LABEL.name}) exists.`);
     }
     if (CHECKS.prefixes && CHECKS.prefixes.length) {
