@@ -4,8 +4,7 @@
       "color": "EEEEEE"
     },
     "CHECKS": {
-      "prefixes": ["fix: ", "feat: ", "build:", "chore:", "ci:", "docs:", "style:", "refactor:", "perf:", "test:"],
-      "regexp": "docs\\(v[0-9]\\): ",
-      "ignoreLabels" : ["dont-check-PRs-with-this-label", "meta"]
+      "regexp": "^(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?<scope>\\(\\w+\\)?((?=:\\s)|(?=!:\\s)))?(?<breaking>!)?(?<subject>:\\s.*)?|^(?<merge>Merge \\w+)",
+      "ignoreLabels" : ["dont-check-PRs-with-this-label"]
     }
 }
