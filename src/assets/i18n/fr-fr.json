@@ -31,6 +31,18 @@
                 }
             },
             "title": "Produits"
+        },
+        "produce": {
+            "title": "Fabrication",
+            "reset_fresh": { "button": "Stock de frais", "question": "Remettre à zéro le stock de frais?" }
+        }
+    },
+    "categories": {
+        "stock": {
+            "FRESH": "Frais",
+            "SMALL_FREEZER": "Petit congélateur",
+            "LARGE_FREEZER": "Gros congélateur",
+            "PASTEURIZED": "Pasteurisé"
         }
     }
 }

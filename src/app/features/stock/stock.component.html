@@ -1,0 +1,56 @@
+<form [formGroup]="form" *ngIf="form">
+  <ng-container formArrayName="stock">
+    <mat-grid-list [cols]="responsiveCols" (window:resize)="onResize($event)">
+      <ng-container *ngFor="let stockItem of form.get('stock')?.controls; let i = index">
+        <ng-container *ngIf="indexOfDividers.includes(i)">
+          <mat-grid-tile
+            [colspan]="processMissingDividers(i)"
+            class="grid-list__divider"
+          ></mat-grid-tile
+          ><mat-grid-tile class="grid-list__divider">
+            {{ translateCategoryName(stockItem.value.category) }}
+            <button
+              mat-icon-button
+              color="error"
+              class="btn--size-l"
+              (click)="onClick(StockAction.RESET, stockItem.value.category)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-grid-tile>
+        </ng-container>
+
+        <mat-grid-tile *ngIf="categories.includes(stockItem.value.category)">
+          <mat-card [formGroupName]="i">
+            <!-- <mat-card-header>{{ stockItem.value.name }}</mat-card-header> -->
+            <div>{{ stockItem.value.name }}</div>
+            <mat-card-content *ngIf="sanitizedImages[stockItem.value.productId]">
+              <div class="image-preview" *ngIf="sanitizedImages[stockItem.value.productId]">
+                <img [src]="sanitizedImages[stockItem.value.productId]" />
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <div class="quantity-selector">
+                <button mat-icon-button (click)="decreaseQuantity(i)">
+                  <mat-icon>remove</mat-icon>
+                </button>
+                <mat-form-field appearance="outline">
+                  <mat-label>Quantité</mat-label>
+                  <mat-select formControlName="quantity" required>
+                    <mat-option *ngFor="let quantity of quantities" [value]="quantity">
+                      {{ quantity }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <button mat-icon-button (click)="increaseQuantity(i)">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+            </mat-card-actions>
+          </mat-card>
+        </mat-grid-tile>
+      </ng-container>
+    </mat-grid-list>
+  </ng-container>
+</form>
+<app-api-obs-helper (httpError)="onHttpError($event)"></app-api-obs-helper>

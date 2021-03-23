@@ -30,9 +30,6 @@ export abstract class DetailComponent<T extends BaseModel> implements AfterViewI
   /** FormGroup patched by observables, used to display object information */
   form: FormGroup;
 
-  /** Wether the object is instanciated and needs some processing (dialog when trying to archive, prevent some properties updates...) */
-  isInstantiated: boolean;
-
   /** Wether the object is archived or not. Needs to be updated at GET/PATCH */
   isArchived = false;
 

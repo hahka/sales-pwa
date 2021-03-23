@@ -1,0 +1,33 @@
+mat-card-content {
+  width: 100%;
+  padding-top: 75%;
+  position: relative;
+  overflow: hidden;
+  .image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+
+    img {
+      object-fit: contain;
+    }
+  }
+}
+
+.quantity-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  mat-form-field {
+    width: 120px;
+  }
+
+  button {
+    margin-bottom: 18px;
+  }
+}
