@@ -1,9 +1,9 @@
-import * as core from '@actions/core';
-import * as github from '@actions/github';
-const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
-const issue_number = process.env.GITHUB_REF.split('/')[2];
-const configPath = core.getInput('configuration-path');
-const { Octokit } = require('@octokit/action');
+import * as core from "@actions/core";
+import * as github from "@actions/github";
+const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+const issue_number = process.env.GITHUB_REF.split("/")[2];
+const configPath = core.getInput("configuration-path");
+const { Octokit } = require("@octokit/action");
 
 const octokit = new Octokit();
 
@@ -13,32 +13,32 @@ async function run() {
     const title = github.context.payload.pull_request.title;
     const labels = github.context.payload.pull_request.labels;
 
-    core.info('GO');
-    core.info(title);
-    core.info(labels);
+    
 
     let a = await getJSON(configPath);
     let { CHECKS, LABEL } = JSON.parse(a);
-    LABEL.name = LABEL.name || 'title needs formatting';
-    LABEL.color = LABEL.color || 'eee';
-    CHECKS.ignoreLabels = CHECKS.ignoreLabels || [];
+    LABEL.name = LABEL.name || "title needs formatting";
+    LABEL.color = LABEL.color || "eee";
+    CHECKS.ignoreLabels = CHECKS.ignoreLabels || []
 
     for (let i = 0; i < labels.length; i++) {
       for (let j = 0; j < CHECKS.ignoreLabels.length; j++) {
-        if (labels[i].name == CHECKS.ignoreLabels[j]) {
-          core.info('Ignoring Title Check for label - ' + labels[i].name);
-          return;
+        if (labels[i].name == CHECKS.ignoreLabels[j]){
+          core.info("Ignoring Title Check for label - " + labels[i].name);
+          return
         }
       }
     }
 
     try {
-      let createResponse = await octokit.issues.addLabels({
-        labels: [LABEL.name],
+      let createResponse = await octokit.issues.createLabel({
+        owner,
+        repo,
+        name: LABEL.name,
+        color: LABEL.color,
       });
       core.info(`Creating label (${LABEL.name}) - ` + createResponse.status);
     } catch (error) {
-      core.info(error);
       core.info(`Label (${LABEL.name}) exists.`);
     }
     if (CHECKS.prefixes && CHECKS.prefixes.length) {
@@ -73,9 +73,9 @@ async function addLabel(name, alwaysPassCI) {
       labels: [name],
     });
     core.info(`Adding label (${name}) - ` + addLabelResponse.status);
-    if (!alwaysPassCI) core.setFailed('Failing CI test');
+    if (!alwaysPassCI) core.setFailed("Failing CI test");
   } catch (error) {
-    core.info('All OK');
+    core.info("All OK");
   }
 }
 
@@ -87,9 +87,11 @@ async function removeLabel(name) {
       issue_number,
       name: name,
     });
-    core.info('No mismatches found. Deleting label - ' + removeLabelResponse.status);
+    core.info(
+      "No mismatches found. Deleting label - " + removeLabelResponse.status
+    );
   } catch (error) {
-    core.info('All OK');
+    core.info("All OK");
   }
 }
 
