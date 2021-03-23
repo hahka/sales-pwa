@@ -778,11 +778,8 @@ async function run() {
     }
 
     try {
-      let createResponse = await octokit.issues.addLabel({
-        owner,
-        repo,
-        name: LABEL.name,
-        color: LABEL.color,
+      let createResponse = await octokit.issues.addLabels({
+        labels: [LABEL.name],
       });
       _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Creating label (${LABEL.name}) - ` + createResponse.status);
     } catch (error) {
