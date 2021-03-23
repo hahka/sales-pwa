@@ -4,7 +4,7 @@
       "color": "EEEEEE"
     },
     "CHECKS": {
-      "regexp": "^(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?<scope>\\(\\w+\\)?((?=:\\s)|(?=!:\\s)))?(?<breaking>!)?(?<subject>:\\s.*)?|^(?<merge>Merge \\w+)",
+      "regexp": "(<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?<scope>\\(\\w+\\)?((?=:\\s)|(?=!:\\s)))?(?<breaking>!)?(?<subject>:\\s.*)",
       "ignoreLabels" : ["dont-check-PRs-with-this-label"]
     }
 }
