@@ -4,6 +4,7 @@
       <mat-icon matPrefix>add</mat-icon>
       {{ 'common.action.add' | translate }}
     </button>
+    <ng-content select="[topRightTemplate]"></ng-content>
   </div>
 </app-page-header>
 <div class="app-datatable mat-elevation-z2">
@@ -45,10 +46,9 @@
           <span *ngSwitchCase="ColumnType.month_year" class="uppercase--first">
             {{ data | date: 'MMMM yyyy' }}</span
           >
-          <ng-container *ngSwitchCase="ColumnType.state">
-            <div class="colored-dot" [style.background-color]="data?.color"></div>
-            <span>{{ data?.name }}</span>
-          </ng-container>
+          <span *ngSwitchCase="ColumnType.day_month_year" class="uppercase--first">
+            {{ data | date: 'dd MMMM yyyy' }}</span
+          >
         </ng-template>
       </mat-cell>
     </ng-container>
@@ -56,10 +56,7 @@
     <ng-container *ngIf="headerRowOptions?.isDisplayed">
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     </ng-container>
-    <mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      (click)="onRowClick(row)"
-    ></mat-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClick(row)"></mat-row>
   </mat-table>
 
   <mat-paginator

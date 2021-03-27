@@ -1,5 +1,8 @@
-Envoyer le stock et les ventes sur le serveur: 
-<button mat-button (click)="syncUp()">Envoyer</button>
-<br><br>
-Récupérer les produits, marchés et le stock depuis le serveur: 
-<button mat-button (click)="syncDown()">Récupérer</button>
+Envoyer le stock et les ventes sur le serveur
+<button mat-stroked-button (click)="syncUp()">Envoyer</button>
+Récupérer les produits, marchés et le stock depuis le serveur
+<button mat-stroked-button (click)="syncDown()">Récupérer</button>
+Supprimer les ventes enregistrées
+<button mat-stroked-button color="warn" (click)="clearObjectStores()">
+  Suppression
+</button>

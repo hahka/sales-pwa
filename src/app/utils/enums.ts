@@ -40,5 +40,6 @@ export enum AppRoutes {
   SALE = 'sale',
   SYNC = 'sync',
   PRODUCE = 'produce',
-  MARKET_PREPARATION = 'market_preparation',
+  MARKET_PREPARATION = 'market-preparation',
+  SALES_HISTORY = 'sales-history',
 }

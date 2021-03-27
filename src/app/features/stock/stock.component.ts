@@ -159,7 +159,7 @@ export class StockComponent implements OnInit, DoCheck {
 
       this.stock.stock = this.prepareStockAfterSale(stockControl.value);
       this.stock.cleanItems();
-      this.stockService.put(this.stock).subscribe((_) => {
+      this.stockService.post(this.stock).subscribe((_) => {
         this.initializeStockControl(true);
       });
     }
@@ -294,7 +294,7 @@ export class StockComponent implements OnInit, DoCheck {
                 if (this.stock) {
                   this.stock.stock.push({
                     productId: product.id,
-                    order: product.order,
+                    order: product.productOrder,
                     category,
                     quantity: 0,
                   });
@@ -328,7 +328,7 @@ export class StockComponent implements OnInit, DoCheck {
         }
         this.products.forEach((product) => {
           if (!!product.id) {
-            const { id, name, price, order } = product;
+            const { id, name, price, productOrder: order } = product;
             CATEGORIES_MATCHING[product.category].forEach((category) => {
               dataBeforeSort.push({
                 productId: id,
@@ -350,7 +350,6 @@ export class StockComponent implements OnInit, DoCheck {
         });
         const stockPreparation = this.prepareStockQuantities(this.sortedProducts);
 
-        this.processCorrections();
         stockPreparation.forEach((data) => {
           const productFormGroup = new FormGroup({
             productId: new FormControl(data.productId),
@@ -369,6 +368,7 @@ export class StockComponent implements OnInit, DoCheck {
         });
 
         this.patchStockMaxQuantities(stockControl);
+        this.processCorrections();
 
         this.isStockInitialized = true;
       }
@@ -415,7 +415,7 @@ export class StockComponent implements OnInit, DoCheck {
           } else if (this.functionnality === STOCK_FUNCTIONALITIES.PRODUCE) {
             productControl.patchValue({ maxQuantity: this.maxQuantity });
           } else {
-            // Market preparation. We can't put more products in SMALL_FREEZER than what is in LARGE_FREEZER
+            // Market preparation.
             const value = productControl.value;
             const stockToUpdate = linkedStockToUpdate(value.category);
             if (stockToUpdate) {

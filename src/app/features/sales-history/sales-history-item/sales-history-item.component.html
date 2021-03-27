@@ -1,0 +1,39 @@
+<ng-container *ngIf="detailId$ | async as detailId">
+  <app-page-header
+    title="Ventes du {{ form.controls?.startDate?.value | date: 'dd MMMM yyyy' }}"
+    (pageHeaderEvent)="onPageHeaderEvent($event)"
+  >
+    <ng-container buttons>
+      <button mat-stroked-button color="warn" (click)="delete()">
+        {{ 'common.action.delete' | translate }}
+      </button>
+    </ng-container>
+  </app-page-header>
+  <mat-card>
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="detail$ | async as detail">
+      <h2>Résultat des ventes: {{ form.controls?.income?.value }} €</h2>
+      <div class="sales-container" *ngIf="!!detail.sales && !!detail.sales.length">
+        <h2>Ventes</h2>
+        <ng-container *ngFor="let sale of form.controls?.sales?.value; let i = index">
+          <mat-divider *ngIf="i > 0"></mat-divider>
+          <div class="sale">
+            <b>{{ sale.date | date: 'dd MMMM yyyy - HH:mm' }}</b>
+            <span *ngIf="!!sale.discount"> (réduction de {{ sale.discount }} €)</span>
+            <div class="sale-item">
+              <span>Produit</span>
+              <span>Quantité</span>
+            </div>
+            <div class="sale-item" *ngFor="let item of sale.items">
+              <span>{{ item?.product?.name }}</span>
+              <span>{{ item?.quantity }}</span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </form>
+  </mat-card>
+</ng-container>
+<app-api-obs-helper
+  (postedOrPatched)="onPostedOrPatched($event)"
+  (httpError)="onHttpError($event)"
+></app-api-obs-helper>

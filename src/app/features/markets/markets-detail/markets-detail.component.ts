@@ -25,6 +25,7 @@ export class MarketsDetailComponent extends DetailComponent<Market> {
     this.form = this.formBuilder.group({
       id: [''],
       name: ['', Validators.required],
+      marketOrder: [null, [Validators.required, Validators.min(0)]],
     });
   }
   newData(): Market {

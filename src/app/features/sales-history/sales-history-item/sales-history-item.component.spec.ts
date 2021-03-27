@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CloseMarketDialogComponent } from './close-market-dialog.component';
+import { SalesHistoryItemComponent } from './sales-history-item.component';
 
-describe('CloseMarketDialogComponent', () => {
-  let component: CloseMarketDialogComponent;
-  let fixture: ComponentFixture<CloseMarketDialogComponent>;
+describe('SalesHistoryItemComponent', () => {
+  let component: SalesHistoryItemComponent;
+  let fixture: ComponentFixture<SalesHistoryItemComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CloseMarketDialogComponent ]
+      declarations: [ SalesHistoryItemComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CloseMarketDialogComponent);
+    fixture = TestBed.createComponent(SalesHistoryItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -15,6 +15,13 @@
           >{{ 'features.markets.form.errors.name_duplicated' | translate }}
         </mat-error>
       </mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Ordre</mat-label>
+        <input matInput formControlName="marketOrder" required type="number" />
+        <mat-error *ngIf="form.controls.order?.errors?.negative"
+          >{{ 'common.form.errors.order_negative' | translate }}
+        </mat-error>
+      </mat-form-field>
     </form>
   </mat-card>
 </ng-container>

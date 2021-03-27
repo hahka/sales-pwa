@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { computeTva } from 'src/app/utils/utils';
+import { computeTva, formatMarketSalesDate } from 'src/app/utils/utils';
 import { MarketSalesService } from '../../core/services/features/market-sales.service';
 import { MarketSalesComponent } from '../../shared/components/market-sales/market-sales.component';
 import { MarketSales, Sale } from '../../shared/models/market-sales.model';
@@ -31,14 +31,36 @@ export class SaleComponent extends MarketSalesComponent {
   }
 
   constructor(
-    protected readonly matDialog: MatDialog,
     protected readonly marketSalesService: MarketSalesService,
+    private readonly matDialog: MatDialog,
     private readonly router: Router,
   ) {
-    super(matDialog, marketSalesService);
+    super(marketSalesService);
     this.marketSalesService.getCurrentMarketSales().subscribe((marketSales) => {
       this.marketSales = new MarketSales(marketSales);
     });
+  }
+
+  getSalesIncome() {
+    if (!this.marketSales) {
+      return '';
+    }
+    if (!this.marketSales.sales) {
+      this.marketSales.sales = [];
+    }
+    const income = [new Sale(), ...this.marketSales.sales]
+      .map(
+        (sales) =>
+          [0, ...(sales?.items || []).map((item) => item.price)].reduce((acc, val) => acc + val) -
+            sales.discount || 0,
+      )
+      .reduce((acc, val) => acc + val);
+
+    return income > 0 ? ` (Montant des ventes: ${income}€)` : '';
+  }
+
+  getTitle() {
+    return (this.marketSales && this.marketSales.marketName) || 'features.sale.title';
   }
 
   marketNotReadyHandler(): void {
@@ -49,9 +71,16 @@ export class SaleComponent extends MarketSalesComponent {
     });
   }
 
+  marketSalesDate() {
+    return formatMarketSalesDate(this.marketSales);
+  }
+
   onClick(action: StockAction) {
     switch (action) {
       case StockAction.SAVE:
+        if (!this.marketSales) {
+          this.marketSales = new MarketSales();
+        }
         if (!this.marketSales.sales) {
           this.marketSales.sales = [];
         }
@@ -64,6 +93,12 @@ export class SaleComponent extends MarketSalesComponent {
 
             dialogRef.afterClosed().subscribe((response) => {
               if (!!response.confirm) {
+                if (!this.marketSales) {
+                  this.marketSales = new MarketSales();
+                }
+                if (!this.marketSales.sales) {
+                  this.marketSales.sales = [];
+                }
                 this.marketSales.sales.push({ ...sale, discount: response.discount });
                 this.marketSalesService
                   .put(this.marketSales)

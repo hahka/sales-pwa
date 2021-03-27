@@ -3,6 +3,7 @@ import { BaseModel } from './api/base.model';
 export class Market implements BaseModel {
   id?: string;
   name: string;
+  marketOrder: number;
 
   constructor(obj?: Market) {
     Object.assign(this, obj);
@@ -12,6 +13,7 @@ export class Market implements BaseModel {
     return {
       ...this,
       nameSortable: this.name.toUpperCase(),
+      marketOrderSortable: this.marketOrder,
     };
   }
 }

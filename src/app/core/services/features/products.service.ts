@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { from, Observable, Subscription } from 'rxjs';
-import { pluck, take } from 'rxjs/operators';
+import { map, pluck, take } from 'rxjs/operators';
 import { Product, SavedProduct } from '../../../shared/models/product.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { ApiService } from '../api/api.service';
@@ -55,6 +55,12 @@ export class ProductsService extends ApiService<Product> {
       return this.httpClient.get<SavedProduct[]>(`${this.getFormattedUrl()}/full`);
     }
 
-    return this.getAll() as Observable<SavedProduct[]>;
+    return this.getAll().pipe(
+      map((values) =>
+        (values || []).sort((a, b) => {
+          return a.productOrder - b.productOrder;
+        }),
+      ),
+    ) as Observable<SavedProduct[]>;
   }
 }

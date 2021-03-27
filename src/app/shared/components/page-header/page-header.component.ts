@@ -37,11 +37,7 @@ export class PageHeaderComponent {
 
   /** Wether buttons on the upper right corner should be displayed, mainly if in edit mode */
   get displayCrudBtn(): boolean {
-    if (!this.control) {
-      return false;
-    }
-
-    return true;
+    return !!this.control;
   }
 
   get displayArchive(): boolean {
@@ -66,7 +62,7 @@ export class PageHeaderComponent {
   /** Handles the buttons' click event */
   onClick(event: PageHeaderAction): void {
     if ((event === PageHeaderAction.BACK || event === PageHeaderAction.CANCEL) && !this.readonly) {
-      // TODO: prevent user via popup
+      // TODO: prevent user via popup? (via onDeactivate vs !this.readonly?)
       this.pageHeaderEvent.emit({ action: event });
     } else {
       this.pageHeaderEvent.emit({ action: event });

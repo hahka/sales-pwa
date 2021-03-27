@@ -1,7 +1,6 @@
-import { PRODUCT_CATEGORIES } from '../../../utils/enums';
+import { MarketSales } from '../../models/market-sales.model';
 
 export interface SettingsDialogData {
-  marketId: string;
-  marketName: string;
-  categories: PRODUCT_CATEGORIES[];
+  marketSales: MarketSales;
+  forHistory?: boolean;
 }

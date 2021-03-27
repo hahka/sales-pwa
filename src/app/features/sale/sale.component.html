@@ -1,7 +1,12 @@
-<div class="page-header">
+<div class="page-header fix-overlap">
   <!-- Left cell: back button and title -->
   <div class="page-header__content">
-    <span class="page-header__title">{{ 'features.sale.title' | translate }}</span>
+    <span class="page-header__title page-header__title--multi-lines">
+      <span>{{ getTitle() | translate }}</span>
+      <span class="page-header__title__subtitle"
+        >Date: {{ marketSalesDate() }}{{ getSalesIncome() }}</span
+      >
+    </span>
 
     <div class="page-header__content__group">
       <button mat-icon-button color="error" (click)="onClick(StockAction.RESET_ALL)">

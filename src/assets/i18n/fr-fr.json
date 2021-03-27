@@ -4,10 +4,14 @@
             "add": "Ajouter",
             "archive": "Archiver",
             "cancel": "Annuler",
+            "delete": "Supprimer",
             "unarchive": "Restaurer",
             "update": "Mettre à jour",
             "save": "Enregistrer",
             "sell": "Vendre"
+        },
+        "form": {
+            "errors.order_negative": "L'ordre doit être positif"
         },
         "information": "Informations",
         "name": "Nom",
@@ -34,7 +38,7 @@
             "title": "Produits"
         },
         "produce": {
-            "title": "Fabrication"
+            "title": "Stock"
         },
         "market_preparation": {
             "title": "Préparation de marché"

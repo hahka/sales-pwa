@@ -1,0 +1,14 @@
+@import '../../../shared/components/detail/detail.component.scss';
+
+.sale-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sale {
+  padding: 10px 0;
+}
+
+.mat-card .mat-divider-horizontal {
+  position: relative;
+}

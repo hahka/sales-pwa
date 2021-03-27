@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from, Observable, Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+import { from, Observable, of, Subscription, throwError } from 'rxjs';
+import { catchError, switchMap, take } from 'rxjs/operators';
 import { Stock } from '../../../shared/models/stock.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { ResourceUrlHelper } from '../api/resource-url-helper';
@@ -20,6 +21,7 @@ export class StockService extends ResourceUrlHelper {
     protected readonly environmentService: EnvironmentService,
     protected readonly httpClient: HttpClient,
     protected readonly idbService: IdbCommonService<Stock>,
+    private readonly toastrService: ToastrService,
   ) {
     super(environmentService);
   }
@@ -48,24 +50,26 @@ export class StockService extends ResourceUrlHelper {
   }
 
   /**
-   * Posts or patches a resource via API
+   * Creates a new entry in the stock db table
    * @param data The data to patch
    */
-  public put(data: Stock): Observable<Stock> {
+  public post(data: Stock): Observable<Stock> {
     if (navigator.onLine) {
-      let apiCall$: Observable<Stock>;
-      apiCall$ = this.httpClient.put<Stock>(`${this.getFormattedUrl()}`, {
-        stock: data.stock,
-      });
+      return this.httpClient
+        .post<Stock>(this.getFormattedUrl(), {
+          stock: data.stock,
+        })
+        .pipe(
+          catchError((error) => {
+            this.toastrService.error(`Erreur lors de l'envoi du stock au serveur`);
 
-      return apiCall$.pipe(
-        map((stock) => {
-          this.updateLocalStock(stock, true);
-
-          return stock;
-        }),
-        take(1),
-      );
+            return throwError(error);
+          }),
+          switchMap((stock) => {
+            return this.updateLocalStock(stock, true);
+          }),
+          take(1),
+        );
     }
 
     return this.updateLocalStock(data);
@@ -109,19 +113,16 @@ export class StockService extends ResourceUrlHelper {
   /**
    * Synchronizes the stock (wether it's local or remote) to the server
    */
-  async synchronizeUp() {
+  synchronizeUp() {
     if (navigator.onLine) {
-      let stockSub: Subscription;
-      stockSub = this.getStock().subscribe((stock) => {
-        if (stockSub && !stockSub.closed) {
-          stockSub.unsubscribe();
-        }
-        if (stock) {
-          this.put(new Stock(stock));
-        }
-      });
-    } else {
-      // TODO : error, offline
+      return this.getStock().pipe(
+        switchMap((stock) => {
+          return !!stock ? this.post(new Stock(stock)) : of(undefined);
+        }),
+      );
     }
+
+    // TODO : error, offline
+    return of(undefined);
   }
 }

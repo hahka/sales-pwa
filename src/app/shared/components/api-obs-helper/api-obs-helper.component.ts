@@ -4,6 +4,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api/api.service';
+import { MarketSales } from '../../models/market-sales.model';
 import { Market } from '../../models/market.model';
 import { Product } from '../../models/product.model';
 
@@ -12,7 +13,7 @@ import { Product } from '../../models/product.model';
   templateUrl: './api-obs-helper.component.html',
   styleUrls: ['./api-obs-helper.component.scss'],
 })
-export class ApiObsHelperComponent<T extends Product | Market> {
+export class ApiObsHelperComponent<T extends Product | Market | MarketSales> {
   /** The apiService corresponding to the current resource */
   _apiService: ApiService<T>;
 
@@ -50,6 +51,31 @@ export class ApiObsHelperComponent<T extends Product | Market> {
   archive(id: string, unarchive?: boolean): void {
     this.posting$ = this.apiService
       .archiveById(id, unarchive)
+      .pipe(
+        map((apiResponse) => {
+          this.posting = false;
+          this.postedOrPatched.emit(apiResponse);
+
+          return apiResponse;
+        }),
+      )
+      .pipe(
+        catchError((err) => {
+          this.httpError.emit(err);
+
+          return throwError(err);
+        }),
+      );
+    this.posting = true;
+  }
+
+  /**
+   * Called when we want to delete the resource
+   * @param id Id of the resource to delete
+   */
+  delete(id: string): void {
+    this.posting$ = this.apiService
+      .deleteById(id)
       .pipe(
         map((apiResponse) => {
           this.posting = false;
