@@ -49,12 +49,10 @@ export class SaleComponent extends MarketSalesComponent {
       this.marketSales.sales = [];
     }
     const income = [new Sale(), ...this.marketSales.sales]
-      .map((sales) =>
-        [0, ...(sales && sales.items ? sales.items : []).map((item) => item.price)].reduce(
-          (acc, val) => {
-            return acc + val - sales.discount;
-          },
-        ),
+      .map(
+        (sales) =>
+          [0, ...(sales?.items || []).map((item) => item.price)].reduce((acc, val) => acc + val) -
+            sales.discount || 0,
       )
       .reduce((acc, val) => acc + val);
 
