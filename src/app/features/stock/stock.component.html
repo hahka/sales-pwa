@@ -20,7 +20,7 @@
         </ng-container>
 
         <mat-grid-tile *ngIf="categories.includes(stockItem.value.category)">
-          <mat-card [formGroupName]="i">
+          <mat-card [formGroupName]="i" [class.disabled]="stockItem.disabled">
             <!-- <mat-card-header *ngIf="sanitizedImages[stockItem.value.productId]">
               <div class="image-preview" *ngIf="sanitizedImages[stockItem.value.productId]">
                 <img [src]="sanitizedImages[stockItem.value.productId]" />
@@ -32,7 +32,11 @@
             </mat-card-content>
             <mat-card-actions>
               <div class="quantity-selector">
-                <button mat-icon-button (click)="decreaseQuantity(i)">
+                <button
+                  mat-icon-button
+                  [disabled]="stockItem.disabled"
+                  (click)="decreaseQuantity(i)"
+                >
                   <mat-icon>remove</mat-icon>
                 </button>
                 <mat-form-field appearance="outline" *ngIf="functionnality === SF.PRODUCE">
@@ -50,7 +54,11 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-                <button mat-icon-button (click)="increaseQuantity(i)">
+                <button
+                  mat-icon-button
+                  [disabled]="stockItem.disabled"
+                  (click)="increaseQuantity(i)"
+                >
                   <mat-icon>add</mat-icon>
                 </button>
               </div>
