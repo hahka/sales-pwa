@@ -57,8 +57,8 @@
             "FRESH": "Frais",
             "SMALL_FREEZER": "Petit congélateur",
             "LARGE_FREEZER": "Gros congélateur",
-            "PASTEURIZED": "Pasteurisé",
-            "PASTEURIZED_FOR_MARKET": "Pasteurisé"
+            "PASTEURIZED": "Stock d'Escargotines",
+            "PASTEURIZED_FOR_MARKET": "Escargotines"
         }
     }
 }

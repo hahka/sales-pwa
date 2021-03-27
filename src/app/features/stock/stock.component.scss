@@ -37,6 +37,10 @@ mat-card-content {
   }
 }
 
+.disabled {
+  opacity: 0.3;
+}
+
 .quantity-selector {
   display: flex;
   justify-content: center;

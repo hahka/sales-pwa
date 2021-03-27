@@ -411,7 +411,11 @@ export class StockComponent implements OnInit, DoCheck {
         );
         if (productControl) {
           if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET) {
-            productControl.patchValue({ maxQuantity: stockItem.quantity });
+            const maxQuantity = stockItem.quantity;
+            productControl.patchValue({ maxQuantity });
+            if (maxQuantity <= 0) {
+              productControl.disable();
+            }
           } else if (this.functionnality === STOCK_FUNCTIONALITIES.PRODUCE) {
             productControl.patchValue({ maxQuantity: this.maxQuantity });
           } else {
