@@ -247,7 +247,10 @@ export class StockComponent implements OnInit, DoCheck {
       const newValueForThisStock = value.quantity + quantity;
       if (newValueForThisStock > value.maxQuantity) {
         if (this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION) {
-          if (value.category === STOCK_CATEGORIES.SMALL_FREEZER) {
+          if (
+            value.category === STOCK_CATEGORIES.SMALL_FREEZER ||
+            value.category === STOCK_CATEGORIES.PASTEURIZED_FOR_MARKET
+          ) {
             this.toasterService.error(`Stock d'origin insuffisant`);
           }
         }
