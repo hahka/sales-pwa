@@ -5,12 +5,12 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { SettingsDialogModule } from '../../shared/components/settings-dialog/settings-dialog.module';
 import { StockModule } from '../stock/stock.module';
-import { NotReadyDialogComponent } from './not-ready-dialog/not-ready-dialog.component';
+import { NotReadyDialogModule } from './not-ready-dialog/not-ready-dialog.module';
 import { SaleConfirmationDialogModule } from './sale-confirmation-dialog/sale-confirmation-dialog.module';
 import { SaleComponent } from './sale.component';
 
 @NgModule({
-  declarations: [SaleComponent, NotReadyDialogComponent],
+  declarations: [SaleComponent],
   imports: [
     MatIconModule,
     MatButtonModule,
@@ -24,6 +24,7 @@ import { SaleComponent } from './sale.component';
     StockModule,
     TranslateModule,
     SaleConfirmationDialogModule,
+    NotReadyDialogModule,
   ],
 })
 export class SaleModule {}

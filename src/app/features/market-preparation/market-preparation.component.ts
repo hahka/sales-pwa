@@ -61,16 +61,22 @@ export class MarketPreparationComponent extends MarketSalesComponent {
         },
       );
 
-      dialogRef.afterClosed().subscribe((result: MarketSales) => {
-        if (result) {
-          this.marketSales.marketId = result.marketId;
-          this.marketSales.categories = result.categories;
-          this.marketSales.marketName = result.marketName;
-          this.marketSales.startDate = result.startDate;
-          this.marketSales.endDate = result.endDate;
-        }
-        this.updateCategories();
-      });
+      dialogRef
+        .afterClosed()
+        .pipe(
+          tap((result: MarketSales) => {
+            if (result) {
+              this.marketSales.marketId = result.marketId;
+              this.marketSales.categories = result.categories;
+              this.marketSales.marketName = result.marketName;
+              this.marketSales.startDate = result.startDate;
+              this.marketSales.endDate = result.endDate;
+            }
+            this.updateCategories();
+          }),
+          switchMap(() => this.marketSalesService.put(this.marketSales)),
+        )
+        .subscribe();
     }
   }
 
