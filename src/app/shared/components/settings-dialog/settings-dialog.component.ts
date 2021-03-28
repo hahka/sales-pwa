@@ -9,7 +9,6 @@ import { Market } from '../../models/market.model';
 import { SettingsDialogData } from './settings-dialog-data.model';
 
 @Component({
-  selector: 'app-settings-dialog',
   templateUrl: './settings-dialog.component.html',
   styleUrls: ['./settings-dialog.component.scss'],
 })
