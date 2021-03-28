@@ -8,8 +8,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { ProductsService } from 'src/app/core/services/features/products.service';
 import { DetailComponent } from 'src/app/shared/components/detail/detail.component';
 import { Product } from 'src/app/shared/models/product.model';
-import { PRODUCT_CATEGORIES } from 'src/app/utils/enums';
+import { IdbStoresEnum, PRODUCT_CATEGORIES } from 'src/app/utils/enums';
 import { POSTGRESQL_DUPLICATION_CODE } from 'src/app/utils/error_codes.util';
+import { IdbService } from '../../../core/services/idb.service';
 
 @Component({
   selector: 'app-products-detail',
@@ -34,6 +35,7 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
     protected readonly router: Router,
     private readonly domSanitizer: DomSanitizer,
     private readonly translateService: TranslateService,
+    private readonly idbService: IdbService<Product>,
   ) {
     super(activatedRoute, productsService, location, router);
     this.form = this.formBuilder.group({
@@ -57,6 +59,12 @@ export class ProductsDetailComponent extends DetailComponent<Product> {
     }
 
     return new Product(formValue);
+  }
+
+  onPostedOrPatched(product: Product) {
+    const productForIdb = new Product(product);
+    this.idbService.put(IdbStoresEnum.PRODUCTS, productForIdb, product.id);
+    super.onPostedOrPatched(product);
   }
 
   patchForm(product: Product): void {
