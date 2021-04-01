@@ -29,8 +29,8 @@ jobs:
         # You may pin to the exact commit or the version.
         # uses: thehanimo/pr-title-checker@37e645b56d8a4840df904a265966ce523de26d3c
         # uses: thehanimo/pr-title-checker@v1.2
-        uses: ./.github/actions/pr-title-checker
+        uses: .github/actions/pr-title-checker
         with:
           GITHUB_TOKEN: ${{ secrets.PR_TITLE_CHECKER }}
           # config file path
-          configuration-path: ./.github/pr-title-checker-config.json
+          configuration-path: .github/pr-title-checker-config.json
