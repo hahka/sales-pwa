@@ -33,4 +33,4 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.PR_TITLE_CHECKER }}
           # config file path
-          configuration-path: .github/pr-title-checker-config.json
+          configuration-path: ./.github/pr-title-checker-config.json
