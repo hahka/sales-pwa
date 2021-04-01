@@ -95,6 +95,9 @@ async function removeLabel(name) {
 }
 
 async function getJSON(repoPath) {
+  core.info(octokit.repos.configPath);
+  core.info(octokit.repos.path);
+  core.info(octokit.repos.repoPath);
   const response = await octokit.repos.getContent({
     owner,
     repo,

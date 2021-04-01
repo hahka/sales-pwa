@@ -108,6 +108,9 @@ async function removeLabel(name) {
 }
 
 async function getJSON(repoPath) {
+  _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(octokit.repos.configPath);
+  _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(octokit.repos.path);
+  _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(octokit.repos.repoPath);
   const response = await octokit.repos.getContent({
     owner,
     repo,
