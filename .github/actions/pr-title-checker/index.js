@@ -13,18 +13,18 @@ async function run() {
     const title = github.context.payload.pull_request.title;
     const labels = github.context.payload.pull_request.labels;
 
-    // let { CHECKS, LABEL } = JSON.parse(await getJSON(configPath));
-    let { CHECKS, LABEL } = {
-      LABEL: {
-        name: 'title needs formatting',
-        color: 'EEEEEE',
-      },
-      CHECKS: {
-        regexp:
-          '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\((\\w|\\-)+\\))?((?=:\\s)|(?=!:\\s))?(!)?(:\\s.*)',
-        ignoreLabels: ['dont-check-PRs-with-this-label'],
-      },
-    };
+    let { CHECKS, LABEL } = JSON.parse(await getJSON(configPath));
+    // let { CHECKS, LABEL } = {
+    //   LABEL: {
+    //     name: 'title needs formatting',
+    //     color: 'EEEEEE',
+    //   },
+    //   CHECKS: {
+    //     regexp:
+    //       '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\((\\w|\\-)+\\))?((?=:\\s)|(?=!:\\s))?(!)?(:\\s.*)',
+    //     ignoreLabels: ['dont-check-PRs-with-this-label'],
+    //   },
+    // };
     LABEL.name = LABEL.name || 'title needs formatting';
     LABEL.color = LABEL.color || 'eee';
     CHECKS.ignoreLabels = CHECKS.ignoreLabels || [];
