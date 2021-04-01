@@ -1,0 +1,10 @@
+{
+    "LABEL": {
+      "name": "title needs formatting",
+      "color": "EEEEEE"
+    },
+    "CHECKS": {
+      "regexp": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\((\\w|\\-)+\\))?((?=:\\s)|(?=!:\\s))?(!)?(:\\s.*)",
+      "ignoreLabels" : ["dont-check-PRs-with-this-label"]
+    }
+}
