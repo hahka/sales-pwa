@@ -28,9 +28,18 @@ async function run() {
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`test: ${configPath}`);
 
-    let a = await getJSON(configPath);
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info('test 2');
-    let { CHECKS, LABEL } = JSON.parse(a);
+    // let { CHECKS, LABEL } = JSON.parse(await getJSON(configPath));
+    let { CHECKS, LABEL } = {
+      LABEL: {
+        name: 'title needs formatting',
+        color: 'EEEEEE',
+      },
+      CHECKS: {
+        regexp:
+          '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\((\\w|\\-)+\\))?((?=:\\s)|(?=!:\\s))?(!)?(:\\s.*)',
+        ignoreLabels: ['dont-check-PRs-with-this-label'],
+      },
+    };
     LABEL.name = LABEL.name || 'title needs formatting';
     LABEL.color = LABEL.color || 'eee';
     CHECKS.ignoreLabels = CHECKS.ignoreLabels || [];
@@ -108,14 +117,14 @@ async function removeLabel(name) {
 }
 
 async function getJSON(repoPath) {
-  _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(octokit.repos.configPath);
-  _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(octokit.repos.path);
-  _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(octokit.repos.repoPath);
+  core.info(octokit.repos.configPath);
+  core.info(octokit.repos.path);
+  core.info(octokit.repos.repoPath);
   const response = await octokit.repos.getContent({
     owner,
     repo,
     path: repoPath,
-    ref: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
+    ref: github.context.sha,
   });
 
   return Buffer.from(response.data.content, response.data.encoding).toString();
