@@ -42,19 +42,7 @@ export class SaleComponent extends MarketSalesComponent {
   }
 
   getSalesIncome() {
-    if (!this.marketSales) {
-      return '';
-    }
-    if (!this.marketSales.sales) {
-      this.marketSales.sales = [];
-    }
-    const income = [new Sale(), ...this.marketSales.sales]
-      .map(
-        (sales) =>
-          [0, ...(sales?.items || []).map((item) => item.price)].reduce((acc, val) => acc + val) -
-            sales.discount || 0,
-      )
-      .reduce((acc, val) => acc + val);
+    const income = MarketSales.getSalesIncome(this.marketSales);
 
     return income > 0 ? ` (Montant des ventes: ${income}€)` : '';
   }

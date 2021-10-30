@@ -205,15 +205,13 @@ export class StockComponent implements OnInit, DoCheck {
   }
 
   onClick(action: StockAction, stockCategory: STOCK_CATEGORIES) {
-    switch (action) {
-      case StockAction.RESET:
-        if (
-          this.functionnality === STOCK_FUNCTIONALITIES.PRODUCE ||
-          this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION
-        ) {
-          this.resetStock(stockCategory);
-        }
-        break;
+    if (action === StockAction.RESET) {
+      if (
+        this.functionnality === STOCK_FUNCTIONALITIES.PRODUCE ||
+        this.functionnality === STOCK_FUNCTIONALITIES.MARKET_PREPARATION
+      ) {
+        this.resetStock(stockCategory);
+      }
     }
   }
 
@@ -426,7 +424,7 @@ export class StockComponent implements OnInit, DoCheck {
             const value = productControl.value;
             const stockToUpdate = linkedStockToUpdate(value.category);
             if (stockToUpdate) {
-              const referenceControl = (stockControl as FormArray).controls.find(
+              const referenceControl = stockControl.controls.find(
                 (fc) =>
                   fc.value.productId === value.productId && fc.value.category === stockToUpdate,
               );

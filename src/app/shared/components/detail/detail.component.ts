@@ -55,33 +55,35 @@ export abstract class DetailComponent<T extends Market | Product | MarketSales>
   ) {}
 
   ngOnInit(): void {
-    this.detail$ = this.refresh.asObservable().pipe(
-      switchMap((refreshedId) => {
-        this.detailId = refreshedId || '';
-        if (this.detailId === 'new') {
-          // Creation mode, returning a "fake" observable returning an empty data
-          return of(this.newData());
-        }
-        this.form.disable();
+    if (!this.detail$) {
+      this.detail$ = this.refresh.asObservable().pipe(
+        switchMap((refreshedId) => {
+          this.detailId = refreshedId || '';
+          if (this.detailId === 'new') {
+            // Creation mode, returning a "fake" observable returning an empty data
+            return of(this.newData());
+          }
+          this.form.disable();
 
-        // Edition mode, returning an api call
-        return this.apiService.getById(this.detailId).pipe(
-          tap((data) => {
-            this.patchForm(data);
-            this.disable();
-          }),
-        );
-      }),
-    );
+          // Edition mode, returning an api call
+          return this.apiService.getById(this.detailId).pipe(
+            tap((data) => {
+              this.patchForm(data);
+              this.disable();
+            }),
+          );
+        }),
+      );
 
-    this.detailId$ = this.activatedRoute.paramMap.pipe(
-      map((paramMap) => {
-        const detailId = paramMap.get('id') || '';
-        this.refresh.next(detailId);
+      this.detailId$ = this.activatedRoute.paramMap.pipe(
+        map((paramMap) => {
+          const detailId = paramMap.get('id') || '';
+          this.refresh.next(detailId);
 
-        return detailId;
-      }),
-    );
+          return detailId;
+        }),
+      );
+    }
   }
 
   ngOnDestroy() {

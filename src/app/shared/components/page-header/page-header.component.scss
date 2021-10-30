@@ -17,14 +17,30 @@
 
     &__group {
       display: flex;
-      margin-right: 10px;
+      flex: 1;
       align-items: center;
+      &:not(:last-of-type) {
+        margin-right: 10px;
+      }
+
+      &.left {
+        justify-content: left;
+      }
+      &.center {
+        justify-content: center;
+      }
+      &.right {
+        justify-content: right;
+      }
     }
   }
 
   &__title {
     font-size: 24px;
     vertical-align: middle;
+    justify-content: left;
+    margin-right: 10px;
+    flex: 1;
 
     &__subtitle {
       font-size: 18px;

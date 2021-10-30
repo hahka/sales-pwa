@@ -13,10 +13,10 @@ export enum STOCK_CATEGORIES {
 }
 
 export enum STOCK_FUNCTIONALITIES {
-  /** In this case we just add products to the existing stock */
+  /** In this products may go from one stock to another (e.g. SMALL_FREEZER => LARGE_FREEZER) */
   PRODUCE = 'PRODUCE',
 
-  /** This is the only case when product may go from one stock to another (e.g. SMALL_FREEZER => LARGE_FREEZER) */
+  /** In this products may go from one stock to another (e.g. SMALL_FREEZER => LARGE_FREEZER) */
   MARKET_PREPARATION = 'MARKET_PREPARATION',
 
   /** In this case the stock should be keep as a reference and a new Form should be use for a sale */

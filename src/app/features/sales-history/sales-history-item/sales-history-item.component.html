@@ -1,10 +1,10 @@
-<ng-container *ngIf="detailId$ | async as detailId">
+<ng-container *ngIf="!!displayCurrentSales || (detailId$ | async)">
   <app-page-header
     title="Ventes du {{ form.controls?.startDate?.value | date: 'dd MMMM yyyy' }}"
     (pageHeaderEvent)="onPageHeaderEvent($event)"
   >
     <ng-container buttons>
-      <button mat-stroked-button color="warn" (click)="delete()">
+      <button *ngIf="!displayCurrentSales" mat-stroked-button color="warn" (click)="delete()">
         {{ 'common.action.delete' | translate }}
       </button>
     </ng-container>
