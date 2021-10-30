@@ -2,8 +2,8 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { MarketSalesService } from 'src/app/core/services/features/market-sales.service';
 import { DetailComponent } from 'src/app/shared/components/detail/detail.component';
 import { MarketSales } from 'src/app/shared/models/market-sales.model';
@@ -15,6 +15,8 @@ import { ConfirmationDialogService } from '../../../shared/components/confirmati
   styleUrls: ['./sales-history-item.component.scss'],
 })
 export class SalesHistoryItemComponent extends DetailComponent<MarketSales> implements OnDestroy {
+  displayCurrentSales = false;
+
   private confirmationSub: Subscription;
 
   constructor(
@@ -34,6 +36,26 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
       income: [''],
       sales: [''],
     });
+
+    this.displayCurrentSales = this.activatedRoute.snapshot?.data?.displayCurrentSales;
+    if (this.displayCurrentSales) {
+      this.detail$ = this.refresh.asObservable().pipe(
+        switchMap(() => {
+          this.form.disable();
+
+          // Consulting current sales =>
+          return (this.marketSalesService.getCurrentMarketSales() as Observable<MarketSales>).pipe(
+            tap((data) => {
+              if (data) {
+                data.income = MarketSales.getSalesIncome(data);
+                this.patchForm(data);
+                this.disable();
+              }
+            }),
+          );
+        }),
+      );
+    }
   }
 
   ngOnDestroy() {

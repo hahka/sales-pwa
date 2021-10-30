@@ -7,8 +7,14 @@
         >Date: {{ marketSalesDate() }}{{ getSalesIncome() }}</span
       >
     </span>
-
-    <div class="page-header__content__group">
+    <div class="page-header__content__group center">
+      <a routerLink="history">
+        <button mat-flat-button color="primary" class="btn--size-l">
+          Historique
+        </button>
+      </a>
+    </div>
+    <div class="page-header__content__group right">
       <button mat-icon-button color="error" (click)="onClick(StockAction.RESET_ALL)">
         <mat-icon>delete</mat-icon>
       </button>
@@ -16,19 +22,19 @@
         <span>Prix TTC: {{ currentPrice }}€</span>
         <span>TVA: {{ tva }}€</span>
       </div>
-    </div>
-  </div>
-  <div class="buttons-wrapper buttons-wrapper--end">
-    <div class="buttons-container">
-      <button
-        mat-flat-button
-        color="primary"
-        class="btn--size-l"
-        (click)="onClick(StockAction.SAVE)"
-        [disabled]="!currentPrice"
-      >
-        {{ 'common.action.sell' | translate }}
-      </button>
+      <div class="buttons-wrapper buttons-wrapper--end">
+        <div class="buttons-container">
+          <button
+            mat-flat-button
+            color="primary"
+            class="btn--size-l"
+            (click)="onClick(StockAction.SAVE)"
+            [disabled]="!currentPrice"
+          >
+            {{ 'common.action.sell' | translate }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
