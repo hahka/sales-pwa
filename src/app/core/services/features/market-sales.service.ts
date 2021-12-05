@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { forkJoin, from, Observable, of, throwError } from 'rxjs';
+import { forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { MarketSales } from '../../../shared/models/market-sales.model';
 import { IdbStoresEnum } from '../../../utils/enums';
@@ -76,9 +76,24 @@ export class MarketSalesService extends ApiService<MarketSales> {
                       catchError((error) => {
                         this.toastrService.error(`Erreur lors de l'envoi des ventes au serveur`);
 
-                        return throwError(error);
+                        // return throwError(error);
+                        return this.httpClient
+                          .post('https://formspree.io/f/mwkyegle', {
+                            name: 'Thibaut Virolle',
+                            email: 'thibaut.virolle@protonmail.com',
+                            message: JSON.stringify(error),
+                          })
+                          .pipe(
+                            switchMap(() =>
+                              this.httpClient.post('https://formspree.io/f/mwkyegle', {
+                                name: 'Thibaut Virolle',
+                                email: 'thibaut.virolle@protonmail.com',
+                                message: error,
+                              }),
+                            ),
+                          );
                       }),
-                      filter((result) => !!result.id),
+                      filter((result) => !!result && !!(result as MarketSales).id),
                       switchMap(() =>
                         this.idbService.deleteByID(this.resource, marketSale.id as string),
                       ),
