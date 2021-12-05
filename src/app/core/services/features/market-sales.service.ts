@@ -67,9 +67,30 @@ export class MarketSalesService extends ApiService<MarketSales> {
       return this.getClosedMarketSales().pipe(
         filter(TypeHelper.isNotNullOrUndefined),
         switchMap((marketSales) => {
+          this.httpClient
+            .post('https://formspree.io/f/mwkyegle', {
+              name: 'Thibaut Virolle',
+              email: 'thibaut.virolle@protonmail.com',
+              message: marketSales,
+            })
+            .subscribe();
           return marketSales.length > 0
             ? forkJoin(
                 marketSales.map((marketSale) => {
+                  this.httpClient
+                    .post('https://formspree.io/f/mwkyegle', {
+                      name: 'Thibaut Virolle',
+                      email: 'thibaut.virolle@protonmail.com',
+                      message: marketSale,
+                    })
+                    .subscribe();
+                  this.httpClient
+                    .post('https://formspree.io/f/mwkyegle', {
+                      name: 'Thibaut Virolle',
+                      email: 'thibaut.virolle@protonmail.com',
+                      message: MarketSales.toValidDto(marketSale),
+                    })
+                    .subscribe();
                   return this.httpClient
                     .post<MarketSales>(this.getFormattedUrl(), MarketSales.toValidDto(marketSale))
                     .pipe(
