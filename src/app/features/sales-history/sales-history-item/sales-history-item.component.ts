@@ -6,7 +6,7 @@ import { Observable, Subscription } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 import { MarketSalesService } from 'src/app/core/services/features/market-sales.service';
 import { DetailComponent } from 'src/app/shared/components/detail/detail.component';
-import { MarketSales } from 'src/app/shared/models/market-sales.model';
+import { MarketSales, Sale } from 'src/app/shared/models/market-sales.model';
 import { ConfirmationDialogService } from '../../../shared/components/confirmation-dialog/confirmation-dialog.service';
 
 @Component({
@@ -38,6 +38,7 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
     });
 
     this.displayCurrentSales = this.activatedRoute.snapshot?.data?.displayCurrentSales;
+    console.log(this.displayCurrentSales);
     if (this.displayCurrentSales) {
       this.detail$ = this.refresh.asObservable().pipe(
         switchMap(() => {
@@ -46,6 +47,9 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
           // Consulting current sales =>
           return (this.marketSalesService.getCurrentMarketSales() as Observable<MarketSales>).pipe(
             tap((data) => {
+              console.log(data);
+
+              // const income = MarketSales.getSalesIncome(this.marketSales);
               if (data) {
                 data.income = MarketSales.getSalesIncome(data);
                 this.patchForm(data);
@@ -71,6 +75,13 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
 
   getFormattedData(): MarketSales {
     return new MarketSales(this.form.value);
+  }
+
+  getSaleIncome(sale: Sale) {
+    return (
+      (sale?.items || []).map((item) => item.price).reduce((acc, val) => acc + val) -
+      (sale.discount || 0)
+    );
   }
 
   patchForm(marketSales: MarketSales): void {

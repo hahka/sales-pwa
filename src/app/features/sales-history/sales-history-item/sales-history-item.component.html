@@ -18,11 +18,8 @@
           <mat-divider *ngIf="i > 0"></mat-divider>
           <div class="sale">
             <b>{{ sale.date | date: 'dd MMMM yyyy - HH:mm' }}</b>
+            <b *ngIf="!!getSaleIncome(sale)"> - {{ getSaleIncome(sale) }}€</b>
             <span *ngIf="!!sale.discount"> (réduction de {{ sale.discount }} €)</span>
-            <div class="sale-item">
-              <span>Produit</span>
-              <span>Quantité</span>
-            </div>
             <div class="sale-item" *ngFor="let item of sale.items">
               <span>{{ item?.product?.name }}</span>
               <span>{{ item?.quantity }}</span>
