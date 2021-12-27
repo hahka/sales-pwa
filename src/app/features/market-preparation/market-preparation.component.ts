@@ -52,16 +52,12 @@ export class MarketPreparationComponent extends MarketSalesComponent {
 
   openSettings() {
     if (this.marketSales) {
-      const dialogRef = this.matDialog.open<SettingsDialogComponent, SettingsDialogData>(
-        SettingsDialogComponent,
-        {
+      this.matDialog
+        .open<SettingsDialogComponent, SettingsDialogData>(SettingsDialogComponent, {
           data: {
             marketSales: this.marketSales,
           },
-        },
-      );
-
-      dialogRef
+        })
         .afterClosed()
         .pipe(
           tap((result: MarketSales) => {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { tap } from 'rxjs/operators';
 import { ConfirmationDialogService } from '../../../shared/components/confirmation-dialog/confirmation-dialog.service';
 import { SyncService } from '../sync.service';
@@ -8,13 +8,11 @@ import { SyncService } from '../sync.service';
   templateUrl: './sync.component.html',
   styleUrls: ['./sync.component.scss'],
 })
-export class SyncComponent implements OnInit {
+export class SyncComponent {
   constructor(
     private readonly syncService: SyncService,
     private readonly confirmationDialogService: ConfirmationDialogService,
   ) {}
-
-  ngOnInit(): void {}
 
   syncDown() {
     this.syncService.syncDown();

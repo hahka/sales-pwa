@@ -99,9 +99,37 @@ export class MarketSalesService extends ApiService<MarketSales> {
     return of(undefined);
   }
 
-  private getClosedMarketSales(): Observable<MarketSales[] | undefined> {
+  private getClosedMarketSales(): Observable<MarketSales[]> {
     return from(this.idbService.getAll(this.resource) as Promise<MarketSales[] | undefined>).pipe(
-      map((results) => results && results.filter((r) => r.isClosed)),
+      filter(TypeHelper.isNotNullOrUndefined),
+      map((results) => results && results.filter((r) => r.isClosed && r.id)),
+      switchMap((marketSales) => {
+        return marketSales.length > 0
+          ? forkJoin(
+              marketSales.map((marketSale) => {
+                if (this.isClosedMarketSalesValid(marketSale)) {
+                  return of(marketSale);
+                }
+
+                return from(
+                  this.idbService.deleteByID(this.resource, marketSale.id as string), // marketSale comes from idb, so it has a string id
+                ).pipe(switchMap(() => of(null)));
+              }),
+            )
+          : of(undefined);
+      }),
+      filter(TypeHelper.isNotNullOrUndefined),
+      map((marketSales) => marketSales.filter(TypeHelper.isNotNullOrUndefined)),
+    );
+  }
+
+  private isClosedMarketSalesValid(marketSale: MarketSales): boolean {
+    return (
+      !!marketSale.isClosed &&
+      !!marketSale.marketId &&
+      !!marketSale.marketName &&
+      !!marketSale.startDate &&
+      !!marketSale.categories?.length
     );
   }
 }
