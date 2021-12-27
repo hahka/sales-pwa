@@ -67,30 +67,9 @@ export class MarketSalesService extends ApiService<MarketSales> {
       return this.getClosedMarketSales().pipe(
         filter(TypeHelper.isNotNullOrUndefined),
         switchMap((marketSales) => {
-          this.httpClient
-            .post('https://formspree.io/f/mwkyegle', {
-              name: 'Thibaut Virolle',
-              email: 'thibaut.virolle@protonmail.com',
-              message: marketSales,
-            })
-            .subscribe();
           return marketSales.length > 0
             ? forkJoin(
                 marketSales.map((marketSale) => {
-                  this.httpClient
-                    .post('https://formspree.io/f/mwkyegle', {
-                      name: 'Thibaut Virolle',
-                      email: 'thibaut.virolle@protonmail.com',
-                      message: marketSale,
-                    })
-                    .subscribe();
-                  this.httpClient
-                    .post('https://formspree.io/f/mwkyegle', {
-                      name: 'Thibaut Virolle',
-                      email: 'thibaut.virolle@protonmail.com',
-                      message: MarketSales.toValidDto(marketSale),
-                    })
-                    .subscribe();
                   return this.httpClient
                     .post<MarketSales>(this.getFormattedUrl(), MarketSales.toValidDto(marketSale))
                     .pipe(
@@ -98,21 +77,11 @@ export class MarketSalesService extends ApiService<MarketSales> {
                         this.toastrService.error(`Erreur lors de l'envoi des ventes au serveur`);
 
                         // return throwError(error);
-                        return this.httpClient
-                          .post('https://formspree.io/f/mwkyegle', {
-                            name: 'Thibaut Virolle',
-                            email: 'thibaut.virolle@protonmail.com',
-                            message: JSON.stringify(error),
-                          })
-                          .pipe(
-                            switchMap(() =>
-                              this.httpClient.post('https://formspree.io/f/mwkyegle', {
-                                name: 'Thibaut Virolle',
-                                email: 'thibaut.virolle@protonmail.com',
-                                message: error,
-                              }),
-                            ),
-                          );
+                        return this.httpClient.post('https://formspree.io/f/mwkyegle', {
+                          name: 'Thibaut Virolle',
+                          email: 'thibaut.virolle@protonmail.com',
+                          message: { error, data: marketSale },
+                        });
                       }),
                       filter((result) => !!result && !!(result as MarketSales).id),
                       switchMap(() =>
