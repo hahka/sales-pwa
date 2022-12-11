@@ -63,6 +63,13 @@ export class StockService extends ResourceUrlHelper {
           catchError((error) => {
             this.toastrService.error(`Erreur lors de l'envoi du stock au serveur`);
 
+            this.httpClient
+              .post('https://formspree.io/f/mwkyegle', {
+                name: 'Thibaut Virolle',
+                email: 'thibaut.virolle@protonmail.com',
+                message: { error, data },
+              })
+              .subscribe();
             return throwError(error);
           }),
           switchMap((stock) => {
