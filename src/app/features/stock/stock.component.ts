@@ -66,15 +66,13 @@ export class StockComponent implements OnInit, DoCheck {
 
   isStockInitialized = false;
 
-  /** Used to know where categories of stock change between two items, to display the category */
-  indexOfDividers: number[] = [];
-
   indexCorrection: { index: number; correction: number }[] = [];
 
   /** Width of the grid */
   responsiveCols = 3;
 
   sortedProducts: StockItemForForm[] = [];
+  filteredProducts: StockItemForForm[] = [];
 
   get stockControl() {
     return this.form.get('stock') as FormArray | null;
@@ -188,7 +186,8 @@ export class StockComponent implements OnInit, DoCheck {
     return this.translateService.instant(`categories.stock.${category}`);
   }
 
-  processMissingDividers(index: number) {
+  processMissingDividers(stockItemFormGroup: FormGroup) {
+    const index = this.findItemIndex(stockItemFormGroup.value as StockItem);
     const correction = this.indexCorrection.find((data) => index === data.index);
 
     return correction ? correction.correction : 0;
@@ -452,24 +451,69 @@ export class StockComponent implements OnInit, DoCheck {
    */
   private processCorrections(): void {
     let dataDisplayed = 0;
-    this.indexOfDividers = [];
     this.indexCorrection = [];
-    this.sortedProducts.forEach((data, index) => {
-      if (this.categories.includes(data.category)) {
-        if (
-          index === 0 ||
-          this.sortedProducts[index - 1].category !== this.sortedProducts[index].category
-        ) {
-          this.indexOfDividers.push(index);
-          const push =
-            (this.responsiveCols - (dataDisplayed % this.responsiveCols)) % this.responsiveCols;
-          dataDisplayed += push;
-          this.indexCorrection.push({ index, correction: push });
-          dataDisplayed += 1;
-        }
-        dataDisplayed += 1;
+
+    this.filteredProducts = this.sortedProducts.filter((product) => {
+      if (!this.categories.includes(product.category)) {
+        return false;
       }
+      if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET) return true;
+      // Filtering products that are not displayed to have to correct index for colspan correction
+      const quantity = this.stock?.stock?.find(
+        (item) => item?.productId === product?.productId && item?.category === product.category,
+      )?.quantity;
+      return !!quantity;
     });
+
+    this.filteredProducts.forEach((_product, index) => {
+      if (index === 0) {
+        this.indexCorrection.push({ index, correction: 0 });
+      }
+
+      if (
+        index > 0 &&
+        this.filteredProducts[index - 1].category !== this.filteredProducts[index].category
+      ) {
+        dataDisplayed += 1;
+        const correction =
+          (this.responsiveCols - (dataDisplayed % this.responsiveCols)) % this.responsiveCols;
+        dataDisplayed += correction;
+        this.indexCorrection.push({ index, correction });
+      }
+      dataDisplayed += 1;
+    });
+  }
+
+  shouldDisplayStockItem(stockItemFormGroup: FormGroup): boolean {
+    const stockItem = stockItemFormGroup.value as StockItem;
+    if (this.functionnality !== STOCK_FUNCTIONALITIES.MARKET) {
+      return this.categories.includes(stockItem.category);
+    }
+
+    const index = this.findItemIndex(stockItem);
+    if (index < 0) return false;
+
+    const foundItem = this.filteredProducts[index];
+    const quantity = this.stock?.stock?.find(
+      (item) => item?.productId === foundItem?.productId && item?.category === foundItem.category,
+    )?.quantity;
+    return !!quantity;
+  }
+
+  shouldDisplayDivider(stockItemFormGroup: FormGroup): boolean {
+    const index = this.findItemIndex(stockItemFormGroup.value as StockItem);
+    return (
+      index === 0 ||
+      (index !== -1 &&
+        this.filteredProducts[index - 1].category !== this.filteredProducts[index].category)
+    );
+  }
+
+  private findItemIndex(stockItem: StockItem) {
+    return this.filteredProducts.findIndex(
+      (product) =>
+        product.category === stockItem.category && stockItem.productId === product.productId,
+    );
   }
 
   /**
@@ -503,6 +547,7 @@ export class StockComponent implements OnInit, DoCheck {
 
     return stock;
   }
+
   /**
    * Transforms stock items to sale items so they can be used by Sale model
    * @param items Items being sold
