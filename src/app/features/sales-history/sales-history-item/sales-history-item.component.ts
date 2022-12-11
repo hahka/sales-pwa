@@ -1,4 +1,4 @@
-import { Location } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { switchMap, tap } from 'rxjs/operators';
 import { MarketSalesService } from 'src/app/core/services/features/market-sales.service';
 import { DetailComponent } from 'src/app/shared/components/detail/detail.component';
 import { MarketSales, Sale } from 'src/app/shared/models/market-sales.model';
+import { StockService } from '../../../core/services/features/stock.service';
 import { ConfirmationDialogService } from '../../../shared/components/confirmation-dialog/confirmation-dialog.service';
 
 @Component({
@@ -17,6 +18,8 @@ import { ConfirmationDialogService } from '../../../shared/components/confirmati
 export class SalesHistoryItemComponent extends DetailComponent<MarketSales> implements OnDestroy {
   displayCurrentSales = false;
 
+  marketSales: MarketSales;
+
   private confirmationSub: Subscription;
 
   constructor(
@@ -26,6 +29,7 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
     protected readonly router: Router,
     private readonly confirmationDialogService: ConfirmationDialogService,
     private readonly formBuilder: FormBuilder,
+    private readonly stockService: StockService,
   ) {
     super(activatedRoute, marketSalesService, location, router);
     this.form = this.formBuilder.group({
@@ -37,8 +41,7 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
       sales: [''],
     });
 
-    this.displayCurrentSales = this.activatedRoute.snapshot?.data?.displayCurrentSales;
-    console.log(this.displayCurrentSales);
+    this.displayCurrentSales = !!this.activatedRoute.snapshot?.data?.displayCurrentSales;
     if (this.displayCurrentSales) {
       this.detail$ = this.refresh.asObservable().pipe(
         switchMap(() => {
@@ -48,9 +51,9 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
           return (this.marketSalesService.getCurrentMarketSales() as Observable<MarketSales>).pipe(
             tap((data) => {
               console.log(data);
-
               // const income = MarketSales.getSalesIncome(this.marketSales);
               if (data) {
+                this.marketSales = data;
                 data.income = MarketSales.getSalesIncome(data);
                 this.patchForm(data);
                 this.disable();
@@ -86,6 +89,36 @@ export class SalesHistoryItemComponent extends DetailComponent<MarketSales> impl
 
   patchForm(marketSales: MarketSales): void {
     this.form.patchValue(marketSales);
+  }
+
+  cancelSale(sale: Sale) {
+    if (!this.displayCurrentSales) {
+      return;
+    }
+    if (this.confirmationSub) {
+      this.confirmationSub.unsubscribe();
+    }
+    this.confirmationSub = this.confirmationDialogService
+      .openConfirmationDialog(
+        'Annuler une vente',
+        'Voulez-vous vraiment annuler cette vente ' +
+          (this.getSaleIncome(sale) ? `de ${this.getSaleIncome(sale)}€ ` : '') +
+          `faite à ${new DatePipe('fr-FR').transform(sale.date, 'HH:mm')}`,
+      )
+      .pipe(
+        switchMap(() => {
+          this.stockService.cancelSale(sale).subscribe();
+          const marketSales = this.marketSales;
+          marketSales.sales = marketSales.sales?.filter(
+            (marketSale) => marketSale.date !== sale.date,
+          );
+          marketSales.income = MarketSales.getSalesIncome(marketSales);
+
+          return this.marketSalesService.put(marketSales);
+        }),
+        tap(() => this.refresh.next(this.detailId)),
+      )
+      .subscribe();
   }
 
   delete() {

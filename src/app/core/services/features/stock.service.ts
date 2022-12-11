@@ -3,8 +3,9 @@ import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { from, Observable, of, Subscription, throwError } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
+import { Sale } from '../../../shared/models/market-sales.model';
 import { Stock } from '../../../shared/models/stock.model';
-import { IdbStoresEnum } from '../../../utils/enums';
+import { IdbStoresEnum, STOCK_CATEGORIES } from '../../../utils/enums';
 import { ResourceUrlHelper } from '../api/resource-url-helper';
 import { EnvironmentService } from '../environment/environment.service';
 import { IdbCommonService } from '../idb-common.service';
@@ -97,6 +98,29 @@ export class StockService extends ResourceUrlHelper {
         Stock
       >,
     ).pipe(take(1));
+  }
+
+  public cancelSale(sale: Sale): Observable<Stock> {
+    return this.getStock().pipe(
+      switchMap((stock: Stock) => {
+        const newStock = new Stock();
+        newStock.id = stock?.id;
+        newStock.lastLocalUpdate = stock.lastLocalUpdate;
+        newStock.lastUpdate = stock.lastUpdate;
+        newStock.stock = stock?.stock.map((stockProduct) => {
+          if (stockProduct.category === STOCK_CATEGORIES.LARGE_FREEZER) {
+            return stockProduct;
+          }
+          const saleItem = sale.items.find((item) => {
+            return item.product.id === stockProduct.productId;
+          });
+          stockProduct.quantity += saleItem?.quantity || 0;
+          return stockProduct;
+        });
+
+        return this.post(newStock);
+      }),
+    );
   }
 
   async synchronizeDown() {
