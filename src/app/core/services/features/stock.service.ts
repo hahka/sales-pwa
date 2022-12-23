@@ -8,6 +8,7 @@ import { Stock } from '../../../shared/models/stock.model';
 import { IdbStoresEnum, STOCK_CATEGORIES } from '../../../utils/enums';
 import { ResourceUrlHelper } from '../api/resource-url-helper';
 import { EnvironmentService } from '../environment/environment.service';
+import { FormspreeService } from '../formspree.service';
 import { IdbCommonService } from '../idb-common.service';
 
 @Injectable({
@@ -23,6 +24,7 @@ export class StockService extends ResourceUrlHelper {
     protected readonly httpClient: HttpClient,
     protected readonly idbService: IdbCommonService<Stock>,
     private readonly toastrService: ToastrService,
+    private readonly formspreeService: FormspreeService,
   ) {
     super(environmentService);
   }
@@ -63,14 +65,8 @@ export class StockService extends ResourceUrlHelper {
         .pipe(
           catchError((error) => {
             this.toastrService.error(`Erreur lors de l'envoi du stock au serveur`);
+            this.formspreeService.log(error, data).subscribe();
 
-            this.httpClient
-              .post('https://formspree.io/f/mwkyegle', {
-                name: 'Thibaut Virolle',
-                email: 'thibaut.virolle@protonmail.com',
-                message: { error, data },
-              })
-              .subscribe();
             return throwError(error);
           }),
           switchMap((stock) => {

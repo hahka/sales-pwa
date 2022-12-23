@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { forkJoin, from, Observable, of } from 'rxjs';
+import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { MarketSales } from '../../../shared/models/market-sales.model';
 import { IdbStoresEnum } from '../../../utils/enums';
 import { TypeHelper } from '../../../utils/type-helper';
 import { ApiService } from '../api/api.service';
 import { EnvironmentService } from '../environment/environment.service';
+import { FormspreeService } from '../formspree.service';
 import { IdbService } from '../idb.service';
 
 @Injectable({
@@ -22,6 +23,7 @@ export class MarketSalesService extends ApiService<MarketSales> {
     protected readonly httpClient: HttpClient,
     protected readonly idbService: IdbService<MarketSales>,
     private readonly toastrService: ToastrService,
+    private readonly formspreeService: FormspreeService,
   ) {
     super(environmentService, httpClient, idbService);
   }
@@ -75,13 +77,9 @@ export class MarketSalesService extends ApiService<MarketSales> {
                     .pipe(
                       catchError((error) => {
                         this.toastrService.error(`Erreur lors de l'envoi des ventes au serveur`);
+                        this.formspreeService.log(error, marketSale).subscribe();
 
-                        // return throwError(error);
-                        return this.httpClient.post('https://formspree.io/f/mwkyegle', {
-                          name: 'Thibaut Virolle',
-                          email: 'thibaut.virolle@protonmail.com',
-                          message: { error, data: marketSale },
-                        });
+                        return throwError(error);
                       }),
                       filter((result) => !!result && !!(result as MarketSales).id),
                       switchMap(() =>
